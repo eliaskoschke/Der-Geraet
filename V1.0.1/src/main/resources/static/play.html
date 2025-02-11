@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Der Gerät</title>
+    <link rel="stylesheet" href="css/play.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <button onclick="leave()" class="main-button btn-leave">Verlassen</button>
+    <div class="container">
+        <div class="container-btn" id="btns-sitzplaetze">
+            <button id="1" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(0deg) translate(160px) rotate(0deg);"><b>Platz</b>1</button>
+            <button id="2" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(30deg) translate(160px) rotate(-30deg);"><b>Platz</b>2</button>
+            <button id="3" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(60deg) translate(160px) rotate(-60deg);"><b>Platz</b>3</button>
+            <button id="4" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(90deg) translate(160px) rotate(-90deg);"><b>Platz</b>4</button>
+            <button id="5" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(120deg) translate(160px) rotate(-120deg);"><b>Platz</b>5</button>
+            <button id="6" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(150deg) translate(160px) rotate(-150deg);"><b>Platz</b>6</button>
+            <button id="7" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(180deg) translate(160px) rotate(-180deg);"><b>Platz</b>7</button>
+            <button id="8" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(210deg) translate(160px) rotate(-210deg);"><b>Platz</b>8</button>
+            <button id="9" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(240deg) translate(160px) rotate(-240deg);"><b>Platz</b>9</button>
+            <button id="10" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(270deg) translate(160px) rotate(-270deg);"><b>Platz</b>10</button>
+            <button id="11" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(300deg) translate(160px) rotate(-300deg);"><b>Platz</b>11</button>
+            <button id="12" onclick="sendMessage(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(330deg) translate(160px) rotate(-330deg);"><b>Platz</b>12</button>
+        </div>
+        <div class="start hidden" id="start">
+            <h1>Warte bis Host das <br> Spiel Startet <br> <span id="dots">...</span></h1>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
