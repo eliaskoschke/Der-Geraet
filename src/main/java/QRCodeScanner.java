@@ -1,8 +1,8 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sarxos.webcam.Webcam;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -21,9 +21,6 @@ public class QRCodeScanner {
 
 
 
-
-
-
 // Öffne die Standard-Webcam
         Webcam webcam = Webcam.getDefault();
         if (webcam == null) {
@@ -35,13 +32,14 @@ public class QRCodeScanner {
 
         // Erfasse ein Bild von der Webcam
         BufferedImage bufferedImage = webcam.getImage();
-
+        ObjectMapper mapper = new ObjectMapper();
         if (bufferedImage != null) {
             try {
                 // Dekodiere den QR-Code
                 String decodedText = decodeQRCode(bufferedImage);
                 if (decodedText != null) {
                     System.out.println("Decoded text: " + decodedText);
+                    Karte karte = mapper.readValue(decodedText, Karte.class);
                     storeInDatabase(decodedText, "DeinZugewiesenerWert", "Dein Typ", "Dein Name");
                 } else {
                     System.out.println("QR-Code nicht gefunden");
