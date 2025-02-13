@@ -14,8 +14,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         if (passwordLine && wait) {
             passwordLine.classList.add('hidden');
             wait.classList.remove('hidden');
-        } else {
-            console.error("Elemente 'passwordLine' oder 'start' nicht gefunden");
         }
         let password = '';
         inputs.forEach(input => {

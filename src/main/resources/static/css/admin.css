@@ -7,6 +7,12 @@
     margin-top: -60px;
 }
 
+.passwort-inputs {
+    display: flex;
+    gap: 5px;
+}
+
+
 .psw-in {
     height: 60px;
     width: 40px;
