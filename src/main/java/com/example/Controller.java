@@ -12,6 +12,10 @@ public class Controller {
     ArrayList<String> playersAtTable = new ArrayList<>();
     private ObjectMapper mapper = new ObjectMapper();
     private String getMessage ="";
+    private boolean gameHasStarted = false;
+    boolean gameReset = false;
+    int playerAtReset =0;
+    int playerGotReseted = 0;
     public Controller() {
     }
 
@@ -57,10 +61,26 @@ public class Controller {
 
     @GetMapping("/user/hasGameStarted")
     public ResponseMessage hasGameSatrted() throws JsonProcessingException {
-        System.out.println("Get request bekommen");
-        System.out.println(playersAtTable);
-        return new ResponseMessage(mapper.writeValueAsString(playersAtTable));
+        if(gameHasStarted){
+            return new ResponseMessage("true");
+        }
+        return new ResponseMessage(mapper.writeValueAsString("false"));
     }
+
+    @GetMapping("/user/hasGameReseted")
+    public ResponseMessage hasGameReseted() throws JsonProcessingException {
+        if(gameReset){
+            playerGotReseted += 1;
+            if(playerGotReseted >= playerAtReset){
+                playerAtReset =0;
+                playerGotReseted = 0;
+                gameReset = false;
+            }
+            return new ResponseMessage("true");
+        }
+        return new ResponseMessage(mapper.writeValueAsString("false"));
+    }
+
 
     @PostMapping("/admin/sendPassword")
     public ResponseMessage sendPassword(@RequestBody Message postPassword) {
@@ -68,6 +88,21 @@ public class Controller {
             return new ResponseMessage("true");
         }
         return new ResponseMessage("false");
+    }
+
+
+    @PostMapping("/admin/startGame")
+    public ResponseMessage startGame(@RequestBody Message postPassword) {
+        gameHasStarted = true;
+        return new ResponseMessage("true");
+    }
+
+    @PostMapping("/admin/sendReset")
+    public ResponseMessage sendReset(@RequestBody Message postPassword) {
+        gameReset = true;
+        playerAtReset = playersAtTable.size();
+        playersAtTable = new ArrayList<>();
+        return new ResponseMessage("true");
     }
 
     public static class Message {
