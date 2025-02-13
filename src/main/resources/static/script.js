@@ -9,7 +9,6 @@ function sitzplatzClicked(index) {
     ingame = true;
     var start = document.getElementById('start');
     start.classList.remove('hidden');
-    // Einbindung dass Spieler / Sitzplatz (user) nun belegt ist.
 }
 
 function leave() {
@@ -59,7 +58,9 @@ window.onload = function() {
 };
 
 function inGame() {
-    //test ob game gestartet, wenn ja user weiterleitung auf error.html mit parameter gameAlreadyStarted
+    if (gameAlreadyStarted) {
+        window.location.href = 'error.html?error=gameAlreadyStarted';
+    }
 
     var gameStarted = false;
     while(!gameStarted) {
