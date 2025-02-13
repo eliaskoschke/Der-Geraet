@@ -55,7 +55,7 @@ public class Controller {
         return new ResponseMessage(mapper.writeValueAsString(playersAtTable));
     }
 
-    @GetMapping("/user/onload")
+    @GetMapping("/user/hasGameStarted")
     public ResponseMessage hasGameSatrted() throws JsonProcessingException {
         System.out.println("Get request bekommen");
         System.out.println(playersAtTable);
