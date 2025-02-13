@@ -14,10 +14,32 @@ function sitzplatzClicked(index) {
 
 function leave() {
     console.log(user + " left the game.");
+    window.location.href = 'index.html';
+    fetch('/api/playerLeftTheTable', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: user })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Netzwerkantwort war nicht ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.message) {
+
+                    } else {
+                        alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
+                    }
+                })
+                .catch(
+                //error => console.error('Fehler:', error)
+                );
     user = null;
     ingame = false;
-    window.location.href = 'index.html';
-    // Einbindung dass Spieler / Sitzplatz (user) frei ist.
 }
 
 function isUserLoggedIn() {
@@ -60,7 +82,7 @@ function sendMessage(id) {
             } else {
                 console.warn(`Button mit ID ${id} nicht gefunden.`);
             }
-            fetch('/api/message', {
+            fetch('/api/playerJoinedTheTable', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -85,13 +107,12 @@ function sendMessage(id) {
             );
         }
 
-        function fetchRandomNumber() {
-            fetch('/api/onload', {
-                method: 'POST',
+        function loadTables() {
+            fetch('/api/onload?message=hallo', {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ message: "hallo" })
+                }
             })
             .then(response => {
                 if (!response.ok) {
@@ -106,9 +127,7 @@ function sendMessage(id) {
                     console.error('Keine Nachricht in der Antwort gefunden.');
                 }
             })
-            .catch(
-            //error => console.error('Fehler:', error)
-            );
+            .catch(error => console.error('Fehler:', error));
         }
 
          function handleServerResponse(message) {
@@ -125,4 +144,4 @@ function sendMessage(id) {
                     });
         }
 
-        window.onload = fetchRandomNumber; // Zuweisung der Funktion, nicht der Aufruf
+        window.onload = loadTables; // Zuweisung der Funktion, nicht der Aufruf

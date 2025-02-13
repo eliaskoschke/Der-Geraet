@@ -1,5 +1,6 @@
 package com.example;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,21 +17,29 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class Controller {
+    ArrayList<String> playersAtTable = new ArrayList<>();
     private ObjectMapper mapper = new ObjectMapper();
     private String getMessage ="";
     public Controller() {
     }
 
-    @PostMapping("/message")
-    public ResponseMessage receiveMessage(@RequestBody Message message) {
+    @PostMapping("/playerJoinedTheTable")
+    public ResponseMessage playerJoinedTheTable(@RequestBody Message message) {
         System.out.println("Nachricht erhalten: " + message.getMessage());
-        try{
-            //writer.println("load new Player: "+message.getMessage());
+        if(!playersAtTable.contains(message.getMessage())){
+            playersAtTable.add(message.getMessage());
+            System.out.println("Es sollte in der Liste sein "+ playersAtTable);
         }
-        catch (Exception e){
-            System.out.println(e);
+        return null;
+    }
+
+    @PostMapping("/playerLeftTheTable")
+    public ResponseMessage playerLeftTheTable(@RequestBody Message message) {
+        System.out.println("Nachricht erhalten: " + message.getMessage());
+        if(playersAtTable.contains(message.getMessage())){
+            playersAtTable.remove(message.getMessage());
+            System.out.println("Es sollte aus der Liste sein "+ playersAtTable);
         }
-        System.out.println("Es hätte ausgegeben erden müssen");
         return null;
     }
 
@@ -46,14 +55,11 @@ public class Controller {
         return "Post bekommen";
     }
 
-    @PostMapping("/onload")
-    public ResponseMessage receiveMessageSitzplatz(@RequestBody Message id) throws IOException {
-        System.out.println("Nachricht erhalten: " + id.getMessage());
-        //writer.println("test");
-        System.out.println("Es wurd geschickt");
-        ArrayList response = (ArrayList) List.of("");
-        System.out.println(response);
-        return new ResponseMessage(mapper.writeValueAsString(response));
+    @GetMapping("/onload")
+    public ResponseMessage receiveMessageSitzplatz() throws JsonProcessingException {
+        System.out.println("Get request bekommen");
+        System.out.println(playersAtTable);
+        return new ResponseMessage(mapper.writeValueAsString(playersAtTable));
     }
 
     public static class Message {
