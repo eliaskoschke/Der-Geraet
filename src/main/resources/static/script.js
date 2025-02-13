@@ -64,8 +64,28 @@ function inGame() {
 
     var gameStarted = false;
     while(!gameStarted) {
-        //test ob host spiel gestartet hat
-        setTimeout(100);
+        fetch('/api/hasGameStarted', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Netzwerkantwort war nicht ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.message) {
+                            handleServerResponse(data.message);
+                        } else {
+                            console.error('Keine Nachricht in der Antwort gefunden.');
+                        }
+                    })
+                    .catch(error => console.error('Fehler:', error));
+
+        setTimeout(1000);
     }
 
     //
