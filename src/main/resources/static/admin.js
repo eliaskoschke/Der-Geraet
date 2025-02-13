@@ -78,16 +78,14 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 
     function wrongPassword() {
-        //Aufrufen wenn Passwort Falsch
-        console.log('falscher penis');
+        window.location.href = 'error.html?error=wrongPassword';
     }
 
     function rightPassword() {
-        console.log('penis');
         var dots = document.getElementById('start');
         var adminPanel = document.getElementById('adminPanel');
         dots.classList.add('hidden');
-
+        adminPanel.classList.remove('hidden')
     }
 
     window.onload = function() {

@@ -7,6 +7,9 @@ window.onload = function() {
         case 'gameAlreadyStarted': 
             h1.textContent = "Error: Das Spiel wurde bereits gestartet.";
             break;
+        case 'wrongPassword':
+            h1.textContent = "Falsches Passwort!";
+            break;
     }
 }
 
