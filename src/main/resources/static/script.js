@@ -15,7 +15,7 @@ function sitzplatzClicked(index) {
 function leave() {
     console.log(user + " left the game.");
     window.location.href = 'index.html';
-    fetch('/api/playerLeftTheTable', {
+    fetch('/api/user/playerLeftTheTable', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -82,7 +82,7 @@ function sendMessage(id) {
             } else {
                 console.warn(`Button mit ID ${id} nicht gefunden.`);
             }
-            fetch('/api/playerJoinedTheTable', {
+            fetch('/api/user/playerJoinedTheTable', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -108,7 +108,7 @@ function sendMessage(id) {
         }
 
         function loadTables() {
-            fetch('/api/onload?message=hallo', {
+            fetch('/api/onload', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

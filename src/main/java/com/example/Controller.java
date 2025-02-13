@@ -23,7 +23,7 @@ public class Controller {
     public Controller() {
     }
 
-    @PostMapping("/playerJoinedTheTable")
+    @PostMapping("/user/playerJoinedTheTable")
     public ResponseMessage playerJoinedTheTable(@RequestBody Message message) {
         System.out.println("Nachricht erhalten: " + message.getMessage());
         if(!playersAtTable.contains(message.getMessage())){
@@ -33,7 +33,7 @@ public class Controller {
         return null;
     }
 
-    @PostMapping("/playerLeftTheTable")
+    @PostMapping("/user/playerLeftTheTable")
     public ResponseMessage playerLeftTheTable(@RequestBody Message message) {
         System.out.println("Nachricht erhalten: " + message.getMessage());
         if(playersAtTable.contains(message.getMessage())){
@@ -48,7 +48,7 @@ public class Controller {
         return getMessage;
     }
 
-    @PostMapping("/test")
+    @PostMapping("/user/test")
     public String helloPost(@RequestBody Message postMessage) {
         getMessage = postMessage.getMessage();
         System.out.println("message bekommen" + postMessage.getMessage());
@@ -57,6 +57,13 @@ public class Controller {
 
     @GetMapping("/onload")
     public ResponseMessage receiveMessageSitzplatz() throws JsonProcessingException {
+        System.out.println("Get request bekommen");
+        System.out.println(playersAtTable);
+        return new ResponseMessage(mapper.writeValueAsString(playersAtTable));
+    }
+
+    @GetMapping("/user/onload")
+    public ResponseMessage hasGameSatrted() throws JsonProcessingException {
         System.out.println("Get request bekommen");
         System.out.println(playersAtTable);
         return new ResponseMessage(mapper.writeValueAsString(playersAtTable));
