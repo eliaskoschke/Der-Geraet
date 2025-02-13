@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             password += input.value;
         });
         console.log("Password entered:", password);
-        fetch('/api/user/playerLeftTheTable', {
+        fetch('/api/admin/sendPassword', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -35,10 +35,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
                         })
                         .then(data => {
                             if (data && data.message) {
-                                if(data.message == "true"){
-                                rightPassword();
+                                if(data.message === "true"){
+                                    rightPassword();
                                 } else{
-                                wrongPassword();
+                                    wrongPassword();
                                 }
                             } else {
                                 alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
@@ -79,19 +79,23 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     function wrongPassword() {
         //Aufrufen wenn Passwort Falsch
+        console.log('falscher penis');
     }
 
     function rightPassword() {
-        //Aufrufen wenn Passwort richtig
+        console.log('penis');
+        var dots = document.getElementById('start');
+        var adminPanel = document.getElementById('adminPanel');
+        dots.classList.add('hidden');
+
     }
 
     window.onload = function() {
-        isUserLoggedIn();
     
         var dots = document.getElementById('dots');
         if (!dots) {
             console.error("Element 'dots' nicht gefunden");
-            return; // Beende die Funktion, wenn das Element nicht gefunden wird
+            return;
         }
         var dotCount = 0;
     

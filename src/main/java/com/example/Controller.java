@@ -4,15 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -71,11 +63,11 @@ public class Controller {
     }
 
     @PostMapping("/admin/sendPassword")
-    public String sendPassword(@RequestBody Message postPassword) {
-        if(postPassword.equals("1111")){
-            return "true";
+    public ResponseMessage sendPassword(@RequestBody Message postPassword) {
+        if(postPassword.getMessage().equals("1111")){
+            return new ResponseMessage("true");
         }
-        return "false";
+        return new ResponseMessage("false");
     }
 
     public static class Message {
