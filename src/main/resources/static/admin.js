@@ -20,6 +20,33 @@ document.addEventListener('DOMContentLoaded', (event) => {
             password += input.value;
         });
         console.log("Password entered:", password);
+        fetch('/api/user/playerLeftTheTable', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ message: password })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Netzwerkantwort war nicht ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data && data.message) {
+                                if(data.message == "true"){
+                                rightPassword();
+                                } else{
+                                wrongPassword();
+                                }
+                            } else {
+                                alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
+                            }
+                        })
+                        .catch(
+                        //error => console.error('Fehler:', error)
+                        );
     }
 
     inputs.forEach((input, index) => {

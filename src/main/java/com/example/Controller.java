@@ -70,6 +70,14 @@ public class Controller {
         return new ResponseMessage(mapper.writeValueAsString(playersAtTable));
     }
 
+    @PostMapping("/admin/sendPassword")
+    public String sendPassword(@RequestBody Message postPassword) {
+        if(postPassword.equals("1111")){
+            return "true";
+        }
+        return "false";
+    }
+
     public static class Message {
         private String message;
 
