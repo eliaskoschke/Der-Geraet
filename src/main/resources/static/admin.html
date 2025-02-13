@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Der Gerät</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <button onclick="leave()" class="main-button btn-leave">Verlassen</button>
+    <div class="container">
+        <div class="passwort-inputs" id="passwordLine">
+            <input class="psw-in" type="text" id="1" maxlength="1">
+            <input class="psw-in" type="text" id="2" maxlength="1">
+            <input class="psw-in" type="text" id="3" maxlength="1">
+            <input class="psw-in" type="text" id="4" maxlength="1">
+        </div>
+       
+        <div class="start hidden" id="start">
+            <h1><span id="dots">...</span></h1>
+        </div>
+
+        <div class="panel hidden" id="adminPanel">
+            <button onclick="" class="main-button">Spiel Starten</button>
+        </div>
+
+    </div>
+    <script src="root.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
