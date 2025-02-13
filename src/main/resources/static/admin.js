@@ -102,3 +102,77 @@ document.addEventListener('DOMContentLoaded', (event) => {
             dots.textContent = '.'.repeat(dotCount);
         }, 500);
     };
+
+
+function startGameForAll() {
+    var adminPanel = document.getElementById('adminPanel')
+    adminPanel.classList.add('hidden')
+
+    fetch('/api/admin/startGame', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: "start the game" })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+            if(data.message === "true"){
+                
+            } else {
+
+            }
+        } else {
+            alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
+        }
+    })
+    .catch(
+    //error => console.error('Fehler:', error)
+    );
+}
+
+function sendReset() {
+    fetch('/api/admin/sendReset', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: "reset" })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+            var message = document.getElementById('');
+                
+            if (data.message === "true"){
+                message.textContent('Alle Spieler wurden erfolgreich entfernt.');
+                message.classList.remove('hidden');
+                message.style.add('color: green !important;')
+                setTimeout(2300);
+                message.classList.add('hidden');
+            } else {
+                message.textContent('Fehler beim entfernen der Spieler.');
+                message.classList.remove('hidden');
+                message.style.add('color: red !important;')
+                setTimeout(2300);
+                message.classList.add('hidden');
+            }
+        } else {
+            alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
+        }
+    })
+    .catch(
+    //error => console.error('Fehler:', error)
+    );
+}
