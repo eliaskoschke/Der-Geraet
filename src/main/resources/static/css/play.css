@@ -1,0 +1,57 @@
+/*.container-btn {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 0 10px 0 10px;
+} */
+
+.container-btn {
+    position: relative;
+    width: 400px; 
+    height: 400px; 
+    margin: auto;
+    border-radius: 50%;
+    
+}
+
+
+
+.platz-button {
+    position: absolute; 
+    padding: 0;
+    width: 60px;
+    height: 60px;
+} 
+
+.container-btn b {
+    font-size: 0.8rem !important;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin-top: -60px;
+}
+
+.btn-leave {
+    padding: 12px 24px !important;
+    font-size: 0.9rem !important;
+    margin: 10px;
+}
+
+.start {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* dot animation */
+#dots {
+    position: fixed;
+    display: block;
+    white-space: pre;
+    margin: 0 145px;
+}
