@@ -29,8 +29,9 @@ public class Controller {
         if(!playersAtTable.contains(message.getMessage())){
             playersAtTable.add(message.getMessage());
             System.out.println("Es sollte in der Liste sein "+ playersAtTable);
+            return new ResponseMessage("acknowledged");
         }
-        return null;
+        return new ResponseMessage("not acknowledged");
     }
 
     @PostMapping("/user/playerLeftTheTable")

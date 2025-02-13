@@ -74,7 +74,7 @@ function startGame() {
     inGame.gameStarted = true;
 }
 
-function sendMessage(id) {
+function joinTable(id) {
             sitzplatzClicked(id)
             const button = document.getElementById(id);
             if (button) {
@@ -97,7 +97,9 @@ function sendMessage(id) {
             })
             .then(data => {
                 if (data && data.message) {
-
+                    if(data.message == "not acknowledged"){
+                        window.location.reload();
+                    }
                 } else {
                     alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
                 }
