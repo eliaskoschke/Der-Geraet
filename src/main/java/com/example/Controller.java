@@ -11,20 +11,20 @@ import java.util.ArrayList;
 public class Controller {
     ArrayList<String> playersAtTable = new ArrayList<>();
     private ObjectMapper mapper = new ObjectMapper();
-    private String getMessage ="";
+    private String getMessage = "";
     private boolean gameHasStarted = false;
     boolean gameReset = false;
-    int playerAtReset =0;
+    int playerAtReset = 0;
     int playerGotReseted = 0;
+
     public Controller() {
     }
 
     @PostMapping("/user/playerJoinedTheTable")
     public ResponseMessage playerJoinedTheTable(@RequestBody Message message) {
         System.out.println("Nachricht erhalten: " + message.getMessage());
-        if(!playersAtTable.contains(message.getMessage())){
+        if (!playersAtTable.contains(message.getMessage())) {
             playersAtTable.add(message.getMessage());
-            System.out.println("Es sollte in der Liste sein "+ playersAtTable);
             return new ResponseMessage("acknowledged");
         }
         return new ResponseMessage("not acknowledged");
@@ -33,23 +33,22 @@ public class Controller {
     @PostMapping("/user/playerLeftTheTable")
     public ResponseMessage playerLeftTheTable(@RequestBody Message message) {
         System.out.println("Nachricht erhalten: " + message.getMessage());
-        if(playersAtTable.contains(message.getMessage())){
+        if (playersAtTable.contains(message.getMessage())) {
             playersAtTable.remove(message.getMessage());
-            System.out.println("Es sollte aus der Liste sein "+ playersAtTable);
+            System.out.println("Es sollte aus der Liste sein " + playersAtTable);
         }
         return null;
     }
 
     @GetMapping("/onload")
     public ResponseMessage receiveMessageSitzplatz() throws JsonProcessingException {
-        System.out.println("Get request bekommen");
         System.out.println(playersAtTable);
         return new ResponseMessage(mapper.writeValueAsString(playersAtTable));
     }
 
     @GetMapping("/user/hasGameStarted")
     public ResponseMessage hasGameSatrted() throws JsonProcessingException {
-        if(gameHasStarted){
+        if (gameHasStarted) {
             return new ResponseMessage("true");
         }
         return new ResponseMessage(mapper.writeValueAsString("false"));
@@ -57,10 +56,10 @@ public class Controller {
 
     @GetMapping("/user/hasGameReseted")
     public ResponseMessage hasGameReseted() throws JsonProcessingException {
-        if(gameReset){
+        if (gameReset) {
             playerGotReseted += 1;
-            if(playerGotReseted >= playerAtReset){
-                playerAtReset =0;
+            if (playerGotReseted >= playerAtReset) {
+                playerAtReset = 0;
                 playerGotReseted = 0;
                 gameReset = false;
             }
@@ -71,29 +70,29 @@ public class Controller {
 
     @GetMapping("/user/ping")
     public ResponseMessage userPing() throws JsonProcessingException {
-        if(gameHasStarted){
+        if (gameHasStarted) {
             return new ResponseMessage("Game has started");
         }
-        if(gameReset){
+        if (gameReset) {
             playerGotReseted += 1;
-            if(playerGotReseted >= playerAtReset){
-                playerAtReset =0;
+            if (playerGotReseted >= playerAtReset) {
+                playerAtReset = 0;
                 playerGotReseted = 0;
                 gameReset = false;
             }
-            return new ResponseMessage("game was reseted");
+            return new ResponseMessage("Game was reseted");
         }
-        return new ResponseMessage(mapper.writeValueAsString("nothing happened"));
+        return new ResponseMessage(mapper.writeValueAsString("Nothing happened"));
     }
 
     @GetMapping("/admin/ping")
     public ResponseMessage adminPing() throws JsonProcessingException {
-       return new ResponseMessage(String.valueOf(playersAtTable.size()));
+        return new ResponseMessage(String.valueOf(playersAtTable.size()));
     }
 
     @PostMapping("/admin/sendPassword")
     public ResponseMessage sendPassword(@RequestBody Message postPassword) {
-        if(postPassword.getMessage().equals("1111")){
+        if (postPassword.getMessage().equals("1111")) {
             return new ResponseMessage("true");
         }
         return new ResponseMessage("false");
@@ -111,6 +110,11 @@ public class Controller {
         playerAtReset = playersAtTable.size();
         playersAtTable = new ArrayList<>();
         return new ResponseMessage("true");
+    }
+
+    @GetMapping("/game/ping")
+    public ResponseMessage gamePing() throws JsonProcessingException {
+        return new ResponseMessage(String.valueOf(playersAtTable.size()));
     }
 
     public static class Message {

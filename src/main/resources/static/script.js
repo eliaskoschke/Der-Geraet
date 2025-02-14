@@ -138,5 +138,34 @@ function joinTable(id) {
                         }
                     });
         }
+function pingLobbyAsUser() {
+    console.log('ausgeführt');
+    if(user != null) {
+        fetch('/api/user/ping', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Netzwerkantwort war nicht ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.message) {
+                if(data.message == "Game was reseted"){
+                console.log("Resseted")
+                leave();
+                }
+            } else {
+                console.error('Keine Nachricht in der Antwort gefunden.');
+            }
+        })
+        .catch(error => console.error('Fehler:', error));
+        }
+}
 
-        window.onload = loadTables; // Zuweisung der Funktion, nicht der Aufruf
+window.onload = loadTables; // Zuweisung der Funktion, nicht der Aufruf
+setInterval(pingLobbyAsUser, 1000);
