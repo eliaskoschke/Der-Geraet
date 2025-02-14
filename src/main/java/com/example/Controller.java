@@ -40,18 +40,6 @@ public class Controller {
         return null;
     }
 
-    @GetMapping("/test")
-    public String hello() {
-        return getMessage;
-    }
-
-    @PostMapping("/user/test")
-    public String helloPost(@RequestBody Message postMessage) {
-        getMessage = postMessage.getMessage();
-        System.out.println("message bekommen" + postMessage.getMessage());
-        return "Post bekommen";
-    }
-
     @GetMapping("/onload")
     public ResponseMessage receiveMessageSitzplatz() throws JsonProcessingException {
         System.out.println("Get request bekommen");
@@ -81,6 +69,27 @@ public class Controller {
         return new ResponseMessage(mapper.writeValueAsString("false"));
     }
 
+    @GetMapping("/user/ping")
+    public ResponseMessage userPing() throws JsonProcessingException {
+        if(gameHasStarted){
+            return new ResponseMessage("Game has started");
+        }
+        if(gameReset){
+            playerGotReseted += 1;
+            if(playerGotReseted >= playerAtReset){
+                playerAtReset =0;
+                playerGotReseted = 0;
+                gameReset = false;
+            }
+            return new ResponseMessage("game was reseted");
+        }
+        return new ResponseMessage(mapper.writeValueAsString("nothing happened"));
+    }
+
+    @GetMapping("/admin/ping")
+    public ResponseMessage adminPing() throws JsonProcessingException {
+       return new ResponseMessage(String.valueOf(playersAtTable.size()));
+    }
 
     @PostMapping("/admin/sendPassword")
     public ResponseMessage sendPassword(@RequestBody Message postPassword) {
@@ -89,7 +98,6 @@ public class Controller {
         }
         return new ResponseMessage("false");
     }
-
 
     @PostMapping("/admin/startGame")
     public ResponseMessage startGame(@RequestBody Message postPassword) {
