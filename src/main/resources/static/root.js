@@ -1,7 +1,8 @@
 function leave() {
-    console.log(user + " left the game.");
     window.location.href = 'index.html';
-    fetch('/api/user/playerLeftTheTable', {
+    if(window.location.pathname === "/play.html") {
+        console.log(user + " left the game.");
+        fetch('/api/user/playerLeftTheTable', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -24,8 +25,9 @@ function leave() {
                 .catch(
                 error => console.error('Fehler:', error)
                 );
-    user = null;
-    ingame = false;
+        user = null;
+        ingame = false;
+    }
 }
 
 var reloaded;
@@ -33,4 +35,4 @@ window.onbeforeunload = function() {
     reloaded = true;
     localStorage.setItem(reloaded);
     localStorage.setItem(user)
-};
+}; //unrelevant

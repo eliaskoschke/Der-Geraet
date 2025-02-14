@@ -113,7 +113,7 @@ function startGameForAll() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ message: "start the game" })
+        body: JSON.stringify({ message: gameSel })
     })
     .then(response => {
         if (!response.ok) {
@@ -175,4 +175,15 @@ function sendReset() {
     .catch(
     //error => console.error('Fehler:', error)
     );
+}
+
+var gameSel = "blackjack"
+function setActiveGame(game) {
+    var altSel = document.getElementById(gameSel);
+    altSel.classList.add('deactive') 
+    gameSel = game;
+    var element = document.getElementById(game);
+    if(element.classList.contains('deactive')) {
+        element.classList.remove('deactive')
+    }
 }

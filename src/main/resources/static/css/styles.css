@@ -26,7 +26,6 @@ body {
     border: 2px solid hsl(0, 0%, 85%);
     color: hsl(0, 0%, 85%);
     background-color: rgba(0, 0, 0, 0);
-    transition: border-color 0.3s ease;
 }
 
 .secondary-button:hover {

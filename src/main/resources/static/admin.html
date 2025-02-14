@@ -25,7 +25,11 @@
         </div>
 
         <div class="panel hidden" id="adminPanel">
-            <h2>0/12</h2>
+            <div>
+                <img onclick="setActiveGame(this.id)" id="blackjack" src="img/blackjack.png">
+                <img onclick="setActiveGame(this.id)" id="test" class="deactive" src="img/blackjack.png">
+            </div>
+            <h2 >0/12</h2>
             <button onclick="startGameForAll()" class="main-button">Spiel Starten</button>
             <button onclick="sendReset()" class="secondary-button">Alle nutzer Entfernen</button>
             <h5 class="hidden" id="feedback-message">feedback.message.reset</h5>

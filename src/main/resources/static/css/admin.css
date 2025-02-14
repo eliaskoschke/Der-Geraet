@@ -9,15 +9,19 @@
 
 .passwort-inputs {
     display: flex;
-    gap: 5px;
+    gap: 8px;
 }
 
 
 .psw-in {
-    height: 60px;
-    width: 40px;
+    height: 70px;
+    width: 50px;
     font-size: 2rem;
     text-align: center;
+    background-color: hsl(226, 61%, 70%);
+    color: hsl(208, 100%, 95%);
+    border: none;
+    border-radius: 1.2rem;
 }
 
 .btn-leave {
@@ -31,4 +35,37 @@
     display: block;
     white-space: pre;
     margin: 0 145px;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    gap: 10px;
+}
+
+.panel img {
+    width: 9rem;
+    height: auto;
+    border-radius: 1.8rem;
+    filter: none;
+    cursor: default;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 7px 29px 0px;
+    transition: width 0.3s ease, box-shadow 0.3s ease;
+}
+
+.panel img:hover:not(.deactive) {
+    width: 9.15rem;
+    height: auto;
+}
+
+.deactive {
+    filter: blur(0.8px) saturate(0) !important;
+    transition: filter 0.3s ease !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+}
+
+.deactive:hover {
+    filter: blur(0px) saturate(1) !important;
 }
