@@ -86,6 +86,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         var adminPanel = document.getElementById('adminPanel');
         dots.classList.add('hidden');
         adminPanel.classList.remove('hidden')
+        ping();
     }
 
     window.onload = function() {
@@ -187,3 +188,38 @@ function setActiveGame(game) {
         element.classList.remove('deactive')
     }
 }
+
+
+function ping() {
+    while (true) {
+        pingLobby();
+        setTimeout(1000);
+    }
+}
+
+function pingLobby() {
+    if(window.location.pathname === "/admin.html") {    //um sicher zu gehen.
+        fetch('/api/admin/ping', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Netzwerkantwort war nicht ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.message) {
+                console.log(data.message);
+            } else {
+                console.error('Keine Nachricht in der Antwort gefunden.');
+            }
+        })
+        .catch(error => console.error('Fehler:', error));
+    }
+}
+
+T
