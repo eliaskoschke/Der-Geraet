@@ -65,3 +65,6 @@ h5 {
     display: none !important;
 }
 
+#highlight span {
+    background-color: hsl(226, 61%, 75%);
+}

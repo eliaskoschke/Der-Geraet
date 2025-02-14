@@ -86,7 +86,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         var adminPanel = document.getElementById('adminPanel');
         dots.classList.add('hidden');
         adminPanel.classList.remove('hidden')
-        ping();
     }
 
     window.onload = function() {
@@ -157,13 +156,13 @@ function sendReset() {
             var message = document.getElementById('');
                 
             if (data.message === "true"){
-                message.textContent('Alle Spieler wurden erfolgreich entfernt.');
+                message.textContent = 'Alle Spieler wurden erfolgreich entfernt.';
                 message.classList.remove('hidden');
                 message.style.add('color: green !important;')
                 setTimeout(2300);
                 message.classList.add('hidden');
             } else {
-                message.textContent('Fehler beim entfernen der Spieler.');
+                message.textContent = 'Fehler beim entfernen der Spieler.';
                 message.classList.remove('hidden');
                 message.style.add('color: red !important;')
                 setTimeout(2300);
@@ -190,14 +189,8 @@ function setActiveGame(game) {
 }
 
 
-function ping() {
-    while (true) {
-        pingLobby();
-        setTimeout(1000);
-    }
-}
-
 function pingLobby() {
+    console.log('ausgeführt');
     if(window.location.pathname === "/admin.html") {    //um sicher zu gehen.
         fetch('/api/admin/ping', {
             method: 'GET',
@@ -214,6 +207,8 @@ function pingLobby() {
         .then(data => {
             if (data && data.message) {
                 console.log(data.message);
+                var test = document.getElementById('playerCount');
+                test.textContent = data.message + "/12";
             } else {
                 console.error('Keine Nachricht in der Antwort gefunden.');
             }
@@ -222,4 +217,4 @@ function pingLobby() {
     }
 }
 
-T
+setInterval(pingLobby, 1000);
