@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -16,8 +18,24 @@ public class Controller {
     boolean gameReset = false;
     int playerAtReset = 0;
     int playerGotReseted = 0;
+    String currentPlayer = "";
+    ArrayList<String> dealerHand = (ArrayList<String>) List.of("{\"wert\": \"3\", \"typ\": \"Pik\", \"name\": \"Pik 3\"}",
+            "{\"wert\": \"4\", \"typ\": \"Pik\", \"name\": \"Pik 4\"}",
+            "{\"wert\": \"5\", \"typ\": \"Pik\", \"name\": \"Pik 5\"}",
+            "{\"wert\": \"6\", \"typ\": \"Pik\", \"name\": \"Pik 6\"}");
 
     public Controller() {
+    }
+
+    @GetMapping("/onload")
+    public ResponseMessage receiveMessageSitzplatz() throws JsonProcessingException {
+        System.out.println(playersAtTable);
+        return new ResponseMessage(mapper.writeValueAsString(playersAtTable));
+    }
+
+    @GetMapping("/isConnected")
+    public ResponseMessage isConnected() throws JsonProcessingException {
+        return new ResponseMessage("false");
     }
 
     @PostMapping("/user/playerJoinedTheTable")
@@ -38,12 +56,6 @@ public class Controller {
             System.out.println("Es sollte aus der Liste sein " + playersAtTable);
         }
         return null;
-    }
-
-    @GetMapping("/onload")
-    public ResponseMessage receiveMessageSitzplatz() throws JsonProcessingException {
-        System.out.println(playersAtTable);
-        return new ResponseMessage(mapper.writeValueAsString(playersAtTable));
     }
 
     @GetMapping("/user/hasGameStarted")
@@ -112,10 +124,16 @@ public class Controller {
         return new ResponseMessage("true");
     }
 
-    @GetMapping("/game/ping")
-    public ResponseMessage gamePing() throws JsonProcessingException {
-        return new ResponseMessage(String.valueOf(playersAtTable.size()));
+    @GetMapping("/game/ping/getDealerHand")
+    public ResponseMessage getDealerHand() throws JsonProcessingException {
+        return new ResponseMessage(String.valueOf(dealerHand));
     }
+
+    @GetMapping("/game/ping/getPlayerTurn")
+    public ResponseMessage getPlayerTurn() throws JsonProcessingException {
+        return new ResponseMessage(currentPlayer);
+    }
+
 
     public static class Message {
         private String message;
