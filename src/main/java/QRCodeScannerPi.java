@@ -1,8 +1,15 @@
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.sarxos.webcam.Webcam;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+import org.bytedeco.javacv.*;
+import org.bytedeco.javacv.Frame;
+
+
+import org.bytedeco.javacv.OpenCVFrameGrabber;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.Java2DFrameConverter;
+
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,31 +19,23 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class QRCodeScanner {
 
-    public static void main(String[] args) {
-        // Lade das Bild von den Ressourcen
+public class QRCodeScannerPi {
+
+    public static void main(String[] args) throws FrameGrabber.Exception {
+
+        // Bild von der Kamera laden
+        BufferedImage bufferedImage=captureImage();
+
+        displayImage(bufferedImage);
 
 
-// Öffne die Standard-Webcam
-        Webcam webcam = Webcam.getDefault();
-        if (webcam == null) {
-            System.out.println("Keine Webcam gefunden");
-            return;
-        }
-
-        webcam.open();
-
-        // Erfasse ein Bild von der Webcam
-        BufferedImage bufferedImage = webcam.getImage();
-        ObjectMapper mapper = new ObjectMapper();
         if (bufferedImage != null) {
             try {
                 // Dekodiere den QR-Code
                 String decodedText = decodeQRCode(bufferedImage);
                 if (decodedText != null) {
                     System.out.println("Decoded text: " + decodedText);
-                    Karte karte = mapper.readValue(decodedText, Karte.class);
                     storeInDatabase(decodedText, "DeinZugewiesenerWert", "Dein Typ", "Dein Name");
                 } else {
                     System.out.println("QR-Code nicht gefunden");
@@ -49,9 +48,9 @@ public class QRCodeScanner {
             System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
         }
 
-        // Schließe die Webcam
-        webcam.close();
-        displayImage(bufferedImage);
+
+
+
 
 
 //        String filePath = "/KarteMitCode.png"; // Beachte das führende Slash
@@ -85,6 +84,21 @@ public class QRCodeScanner {
 //        }
     }
 
+    public static BufferedImage captureImage() {
+        try {
+            OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(0); // 0 ist die Standard-Webcam
+            grabber.start();
+            Frame frame = grabber.grab();
+            Java2DFrameConverter converter = new Java2DFrameConverter();
+            BufferedImage bufferedImage = converter.convert(frame);
+            grabber.stop();
+            return bufferedImage;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private static void displayImage(BufferedImage img) {
         ImageIcon icon = new ImageIcon(img);
         JFrame frame = new JFrame();
@@ -96,6 +110,7 @@ public class QRCodeScanner {
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+
 
 
     private static String decodeQRCode(BufferedImage bufferedImage) throws NotFoundException {

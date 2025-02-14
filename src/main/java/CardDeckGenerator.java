@@ -17,7 +17,7 @@ import java.io.IOException;
         private static final int CARD_WIDTH = 822;
         private static final int CARD_HEIGHT = 1122;
         private static final int QR_CODE_SIZE = 150;
-        private static final String BACKGROUND_IMAGE_PATH = "D:\\code\\Programme\\Kamera\\src\\main\\resources\\logo5.png";
+        private static final String BACKGROUND_IMAGE_PATH = "D:\\code\\Programme\\Kamera\\src\\main\\resources\\logo6.png";
 
         public static void main(String[] args) {
             String[] cards = {
