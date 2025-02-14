@@ -70,7 +70,15 @@ h5 {
 }
 
 .secondary-button:disabled {
-    border: 2px solid hsl(0, 0%, 65%);
-    color: hsl(0, 0%, 65%);
+    border: 2px solid hsla(0, 100%, 80%, 0.8) !important;
+    color: hsla(0, 100%, 80%, 0.8) !important;
     background-color: rgba(0, 0, 0, 0);
+    transform: scale(1) !important;
+    cursor: default;
+}
+
+.errortext {
+    text-align: center;
+    font-size: 0.75rem;
+    color: hsla(0, 100%, 80%, 0.8);
 }

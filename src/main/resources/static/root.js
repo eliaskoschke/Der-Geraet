@@ -30,9 +30,38 @@ function leave() {
     }
 }
 
-var reloaded;
-window.onbeforeunload = function() {
-    reloaded = true;
-    localStorage.setItem(reloaded);
-    localStorage.setItem(user)
-}; //unrelevant
+
+
+
+function pingPlayerTurn() {
+
+    fetch('api/game/ping/getPlayerTurn', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+            console.log(data.message);
+            var current = document.getElementById('currentPlayer');
+            if (data.message != user) {
+                current.textContent = "Spieler " + data.message + " ist an der Reihe!";
+            } else {
+                current.textContent = "Du bist an der Reihe!";
+            }
+        } else {
+            console.error('Keine Nachricht in der Antwort gefunden.');
+        }
+    })
+    .catch(error => console.error('Fehler:', error));
+}
+
+setInterval(pingPlayerTurn, 1000);
+

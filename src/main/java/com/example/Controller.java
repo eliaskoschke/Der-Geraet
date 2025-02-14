@@ -18,11 +18,8 @@ public class Controller {
     boolean gameReset = false;
     int playerAtReset = 0;
     int playerGotReseted = 0;
-    String currentPlayer = "";
-    ArrayList<String> dealerHand = (ArrayList<String>) List.of("{\"wert\": \"3\", \"typ\": \"Pik\", \"name\": \"Pik 3\"}",
-            "{\"wert\": \"4\", \"typ\": \"Pik\", \"name\": \"Pik 4\"}",
-            "{\"wert\": \"5\", \"typ\": \"Pik\", \"name\": \"Pik 5\"}",
-            "{\"wert\": \"6\", \"typ\": \"Pik\", \"name\": \"Pik 6\"}");
+    String currentPlayer = "1";
+    List<String> dealerHand =  List.of("\"{\"wert\": \"3\", \"typ\": \"Pik\", \"name\": \"Pik 3\"}\"");
 
     public Controller() {
     }

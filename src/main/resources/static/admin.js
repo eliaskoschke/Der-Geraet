@@ -1,3 +1,5 @@
+var user = 'admin';
+
 document.addEventListener('DOMContentLoaded', (event) => {
     const inputs = document.querySelectorAll('.psw-in');
 
@@ -207,8 +209,8 @@ function pingLobby() {
         .then(data => {
             if (data && data.message) {
                 console.log(data.message);
-                var test = document.getElementById('playerCount');
-                test.textContent = data.message + "/12";
+                var count = document.getElementById('playerCount');
+                count.textContent = data.message + "/12";
             } else {
                 console.error('Keine Nachricht in der Antwort gefunden.');
             }
@@ -216,5 +218,7 @@ function pingLobby() {
         .catch(error => console.error('Fehler:', error));
     }
 }
+
+
 
 setInterval(pingLobby, 1000);
