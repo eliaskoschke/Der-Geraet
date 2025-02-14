@@ -124,9 +124,9 @@ function startGameForAll() {
     .then(data => {
         if (data && data.message) {
             if(data.message === "true"){
-                
+                document.getElementById('adminGame').classList.remove('hidden');
             } else {
-
+                window.location.href = 'error.html?error=gamestarterror';
             }
         } else {
             alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');

@@ -10,6 +10,8 @@ window.onload = function() {
         case 'wrongPassword':
             h1.textContent = "Falsches Passwort!";
             break;
+        case 'gamestarterror':
+            h1.textContent = "Fehler beim Starten des Spiels!";
     }
 }
 
