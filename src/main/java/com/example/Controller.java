@@ -2,6 +2,7 @@ package com.example;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Array;
@@ -12,6 +13,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class Controller {
     ArrayList<String> playersAtTable = new ArrayList<>();
+    private final GameService gameService;
     private ObjectMapper mapper = new ObjectMapper();
     private String getMessage = "";
     private boolean gameHasStarted = false;
@@ -21,7 +23,9 @@ public class Controller {
     String currentPlayer = "1";
     List<String> dealerHand =  List.of("\"{\"wert\": \"3\", \"typ\": \"Pik\", \"name\": \"Pik 3\"}\"");
 
-    public Controller() {
+    @Autowired
+    public Controller(GameService gameService) {
+        this.gameService = gameService;
     }
 
     @GetMapping("/onload")
@@ -38,6 +42,7 @@ public class Controller {
     @PostMapping("/user/playerJoinedTheTable")
     public ResponseMessage playerJoinedTheTable(@RequestBody Message message) {
         System.out.println("Nachricht erhalten: " + message.getMessage());
+        //gameService.buttonClicked();
         if (!playersAtTable.contains(message.getMessage())) {
             playersAtTable.add(message.getMessage());
             return new ResponseMessage("acknowledged");
@@ -110,6 +115,8 @@ public class Controller {
     @PostMapping("/admin/startGame")
     public ResponseMessage startGame(@RequestBody Message postPassword) {
         gameHasStarted = true;
+        playersAtTable.sort(null);
+        currentPlayer = playersAtTable.get(0);
         return new ResponseMessage("true");
     }
 
@@ -129,6 +136,13 @@ public class Controller {
     @GetMapping("/game/ping/getPlayerTurn")
     public ResponseMessage getPlayerTurn() throws JsonProcessingException {
         return new ResponseMessage(currentPlayer);
+    }
+
+    @PostMapping("/logic/buttonIsClicked")
+    public ResponseMessage buttonIsClicked(@RequestBody Message message) {
+        String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ")+1);
+        System.out.println("Es wurde ein Button geklickt: " + buttonId);
+        return new ResponseMessage("true");
     }
 
 

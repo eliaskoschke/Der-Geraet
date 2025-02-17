@@ -12,7 +12,7 @@ import java.util.Base64;
 import static com.pi4j.Pi4J.newAutoContext;
 
 public class Raspberry_Controller {
-    static private String baseURL = "localhost:8080";
+    static private String baseURL = "localhost:8080/api/logic";
     public static void main(String[] args) {
         var pi4j = newAutoContext();
         Client firstClient = ClientBuilder.newClient();
