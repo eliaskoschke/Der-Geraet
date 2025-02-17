@@ -13,11 +13,11 @@ window.onload = function isGeraetInPlace() {
     })
     .then(data => {
         if (data.message === "true") {
-            document.getElementById('admin').setAttribute('disabled', 'true');
-            document.getElementById('deactiveText').classList.remove('hidden');
-        } else {
             document.getElementById('admin').removeAttribute('disabled');
             document.getElementById('deactiveText').classList.add('hidden');
+        } else {
+            document.getElementById('admin').setAttribute('disabled', 'true');
+            document.getElementById('deactiveText').classList.remove('hidden');
         }
     })
     .catch(error => console.error('Fehler:', error));

@@ -219,6 +219,5 @@ function pingLobby() {
     }
 }
 
-
-
 setInterval(pingLobby, 1000);
+

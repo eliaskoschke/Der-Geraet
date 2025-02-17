@@ -65,3 +65,26 @@ function pingPlayerTurn() {
 
 setInterval(pingPlayerTurn, 1000);
 
+
+function pingDealerHand() {
+    fetch('/api/game/ping/getDealerHand', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+            data.message
+        } else {
+            console.error('Keine Nachricht in der Antwort gefunden.');
+        }
+    })
+    .catch(error => console.error('Fehler:', error));
+}
