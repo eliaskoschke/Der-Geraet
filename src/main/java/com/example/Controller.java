@@ -131,6 +131,7 @@ public class Controller {
 
     @PostMapping("/logic/buttonIsClicked")
     public ResponseMessage buttonIsClicked(@RequestBody Message message) {
+        System.out.println("Hallo");
         String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ")+1);
         System.out.println("Es wurde ein Button geklickt: " + buttonId);
         return new ResponseMessage("true");
