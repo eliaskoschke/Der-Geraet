@@ -21,45 +21,46 @@ public class Raspberry_Controller {
     static private String baseURL = "http://localhost:8080/api/logic";
     public static void main(String[] args) throws InterruptedException {
         var pi4j = newAutoContext();
-        int buttonNumber = 22;
-
-        var buttonConfig = DigitalInput.newConfigBuilder(pi4j)
-                .name("Button")
-                .id("Button " + String.valueOf(buttonNumber))
-                .address(buttonNumber)
-                .pull(PullResistance.PULL_DOWN)
-                .debounce(1000L);
-
-        var button = pi4j.create(buttonConfig);
-
-        button.addListener(e -> {
-           if (e.state() == DigitalState.HIGH) {
-               System.out.println("Knopf gedrückt");
-                int thisButtonNumber = buttonNumber;
-               try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                   String message = "{\"message\":\"Button clicked: "+ thisButtonNumber+"\"}";
-
-                   HttpPost postRequest = new HttpPost(baseURL + "/buttonIsClicked");
-                   postRequest.setHeader("Content-Type", "application/json");
-
-                   postRequest.setEntity(new StringEntity(message));
-
-                   // Sende die POST-Anfrage und erhalte die Antwort
-                   try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
-                       // Überprüfe den Status der Antwort und verarbeite sie
-                       int statusCode = response.getStatusLine().getStatusCode();
-                       if (statusCode == 200) {
-                           String responseBody = EntityUtils.toString(response.getEntity());
-                           System.out.println("Antwort erhalten: " + responseBody);
-                       } else {
-                           System.err.println("Fehler: " + statusCode);
-                       }
-                   }
-               } catch (Exception exception){
-                   exception.getStackTrace();
-               }
-           }
-        });
+//        int buttonNumber = 22;
+//
+//        var buttonConfig = DigitalInput.newConfigBuilder(pi4j)
+//                .name("Button")
+//                .id("Button " + String.valueOf(buttonNumber))
+//                .address(buttonNumber)
+//                .pull(PullResistance.PULL_DOWN)
+//                .debounce(1000L);
+//
+//        var button = pi4j.create(buttonConfig);
+//
+//        button.addListener(e -> {
+//           if (e.state() == DigitalState.HIGH) {
+//               System.out.println("Knopf gedrückt");
+//                int thisButtonNumber = buttonNumber;
+//               try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+//                   String message = "{\"message\":\"Button clicked: "+ thisButtonNumber+"\"}";
+//
+//                   HttpPost postRequest = new HttpPost(baseURL + "/buttonIsClicked");
+//                   postRequest.setHeader("Content-Type", "application/json");
+//
+//                   postRequest.setEntity(new StringEntity(message));
+//
+//                   // Sende die POST-Anfrage und erhalte die Antwort
+//                   try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
+//                       // Überprüfe den Status der Antwort und verarbeite sie
+//                       int statusCode = response.getStatusLine().getStatusCode();
+//                       if (statusCode == 200) {
+//                           String responseBody = EntityUtils.toString(response.getEntity());
+//                           System.out.println("Antwort erhalten: " + responseBody);
+//                       } else {
+//                           System.err.println("Fehler: " + statusCode);
+//                       }
+//                   }
+//               } catch (Exception exception){
+//                   exception.getStackTrace();
+//               }
+//           }
+//        });
+        PiButton button = new PiButton(pi4j, 22);
         Thread.sleep(Integer.MAX_VALUE);
         pi4j.shutdown();
     }

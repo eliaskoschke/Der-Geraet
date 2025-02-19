@@ -19,12 +19,12 @@ import static com.pi4j.Pi4J.newAutoContext;
 
 @SpringBootApplication
 public class Web_Client {
-//    static com. pi4j. context. Context pi4j =  Pi4J.newAutoContext();
+    static com. pi4j. context. Context pi4j =  Pi4J.newAutoContext();
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotor;
     static DigitalOutput camera;
     public static void main(String[] args) throws InterruptedException {
-//        controllerConfig();
+        controllerConfig();
         ApplicationContext context = SpringApplication.run(Web_Client.class, args);
         GameService gameService = context.getBean(GameService.class);
         System.out.println(gameService.isButtonClicked());
@@ -41,13 +41,13 @@ public class Web_Client {
     public static void rotateMachine(int angle){
         stepperMotor.blink(1, TimeUnit.HOURS);
     }
-//    public static void controllerConfig(){
-//        var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
-//                .name("Stepper Motor")
-//                .id("Stepper Motor ID")
-//                .address(4) //passende adresse einfügen
-//                .initial(DigitalState.LOW)
-//                .onState(DigitalState.HIGH);
-//        stepperMotor = pi4j.create(stepperMotorConfig);
-//    }
+    public static void controllerConfig(){
+        var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
+                .name("Stepper Motor")
+                .id("Stepper Motor ID")
+                .address(4) //passende adresse einfügen
+                .initial(DigitalState.LOW)
+                .onState(DigitalState.HIGH);
+        stepperMotor = pi4j.create(stepperMotorConfig);
+    }
 }
