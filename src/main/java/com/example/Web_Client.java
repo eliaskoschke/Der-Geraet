@@ -39,13 +39,13 @@ public class Web_Client {
     }
 
     public static void rotateMachine(int angle){
-        stepperMotor.blink(1, TimeUnit.HOURS);
+        stepperMotor.blink(1, TimeUnit.SECONDS);
     }
     public static void controllerConfig(){
         var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
                 .name("Stepper Motor")
                 .id("Stepper Motor ID")
-                .address(4) //passende adresse einfügen
+                .address(14) //passende adresse einfügen
                 .initial(DigitalState.LOW)
                 .onState(DigitalState.HIGH);
         stepperMotor = pi4j.create(stepperMotorConfig);

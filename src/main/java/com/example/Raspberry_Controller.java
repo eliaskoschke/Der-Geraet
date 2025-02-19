@@ -13,7 +13,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.http.MediaType;
 
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 import static com.pi4j.Pi4J.newAutoContext;
 
@@ -60,8 +62,14 @@ public class Raspberry_Controller {
 //               }
 //           }
 //        });
-        PiButton button = new PiButton(pi4j, 22);
-        Thread.sleep(Integer.MAX_VALUE);
-        pi4j.shutdown();
+        //PiButton button = new PiButton(pi4j, 15);
+        List<PiButton> buttonList = List.of(new PiButton(pi4j, 15));
+        while(true){
+            for(PiButton piButton : buttonList){
+                piButton.checkSingleClick();
+            }
+            Thread.sleep(50);
+        }
+
     }
 }
