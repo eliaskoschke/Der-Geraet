@@ -16,5 +16,6 @@ public class Web_Client {
 //        while(true){
 //            System.out.println(gameService.isButtonClicked());
 //        }
+          System.out.println(gameService.isButtonClicked());
     }
 }
