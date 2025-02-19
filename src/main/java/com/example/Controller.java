@@ -134,6 +134,7 @@ public class Controller {
         System.out.println("Hallo");
         String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ")+1);
         System.out.println("Es wurde ein Button geklickt: " + buttonId);
+        gameService.setButtonClicked(true);
         return new ResponseMessage("true");
     }
 
