@@ -75,7 +75,12 @@ import java.io.IOException;
                     "{\"wert\": \"10\", \"typ\": \"Kreuz\", \"name\": \"Kreuz Bube\"}",
                     "{\"wert\": \"10\", \"typ\": \"Kreuz\", \"name\": \"Kreuz Dame\"}",
                     "{\"wert\": \"10\", \"typ\": \"Kreuz\", \"name\": \"Kreuz König\"}",
-                    "{\"wert\": \"11\", \"typ\": \"Kreuz\", \"name\": \"Kreuz Ass\"}"
+                    "{\"wert\": \"11\", \"typ\": \"Kreuz\", \"name\": \"Kreuz Ass\"}",
+
+                    "{\"wert\": \"Joker\", \"typ\": \"rot\", \"name\": \"Joker 1\"}",
+                    "{\"wert\": \"Joker\", \"typ\": \"schwarz\", \"name\": \"Joker 2\"}"
+
+
             };
 
             for (int i = 0; i < cards.length; i++) {

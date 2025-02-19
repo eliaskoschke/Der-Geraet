@@ -36,7 +36,7 @@ public class QRCodeScannerPi {
                 String decodedText = decodeQRCode(bufferedImage);
                 if (decodedText != null) {
                     System.out.println("Decoded text: " + decodedText);
-                    storeInDatabase(decodedText, "DeinZugewiesenerWert", "Dein Typ", "Dein Name");
+                    // storeInDatabase(decodedText, "DeinZugewiesenerWert", "Dein Typ", "Dein Name");
                 } else {
                     System.out.println("QR-Code nicht gefunden");
                 }
@@ -50,38 +50,6 @@ public class QRCodeScannerPi {
 
 
 
-
-
-
-//        String filePath = "/KarteMitCode.png"; // Beachte das führende Slash
-//        InputStream inputStream = QRCodeScanner.class.getResourceAsStream(filePath);
-//
-//        if (inputStream == null) {
-//            System.out.println("Fehler: Die Datei konnte nicht gefunden werden.");
-//            return;
-//        }
-//        try {
-//            // Lade das Bild
-//            BufferedImage bufferedImage = ImageIO.read(inputStream);
-//            if (bufferedImage == null) {
-//                System.out.println("Fehler: Das Bild konnte nicht geladen werden. Überprüfe den Dateipfad und das Dateiformat.");
-//                return;
-//            }
-//            // Dekodiere den QR-Code
-//            String decodedText = decodeQRCode(bufferedImage);
-//            if (decodedText != null) {
-//                System.out.println("Decoded text: " + decodedText);
-//                storeInDatabase(decodedText, "DeinZugewiesenerWert", "Dein Typ", "Dein Name");
-//
-//            } else {
-//                System.out.println("QR-Code nicht gefunden");
-//            }
-//        } catch (IOException e) {
-//            System.out.println("Fehler beim Lesen des Bildes: " + e.getMessage());
-//            e.printStackTrace();
-//        } catch (NotFoundException e) {
-//            System.out.println("QR-Code nicht gefunden");
-//        }
     }
 
     public static BufferedImage captureImage() {
@@ -120,19 +88,19 @@ public class QRCodeScannerPi {
         return result.getText();
     }
 
-    private static void storeInDatabase(String code, String value, String typ, String name) {
-        String url = "jdbc:sqlite:karte.db";
-        String sql = "INSERT INTO Karten (code, value, typ, name) VALUES (?, ?, ?,?)";
-
-        try (Connection conn = DriverManager.getConnection(url);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, code);
-            pstmt.setString(2, value);
-            pstmt.setString(3, typ);
-            pstmt.setString(4, name);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
+//    private static void storeInDatabase(String code, String value, String typ, String name) {
+//        String url = "jdbc:sqlite:karte.db";
+//        String sql = "INSERT INTO Karten (code, value, typ, name) VALUES (?, ?, ?,?)";
+//
+//        try (Connection conn = DriverManager.getConnection(url);
+//             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+//            pstmt.setString(1, code);
+//            pstmt.setString(2, value);
+//            pstmt.setString(3, typ);
+//            pstmt.setString(4, name);
+//            pstmt.executeUpdate();
+//        } catch (SQLException e) {
+//            System.out.println(e.getMessage());
+//        }
+//    }
 }
