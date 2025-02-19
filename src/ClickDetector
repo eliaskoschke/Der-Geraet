@@ -1,0 +1,71 @@
+import com.pi4j.Pi4J;
+import com.pi4j.context.Context;
+import com.pi4j.io.gpio.digital.DigitalInput;
+import com.pi4j.io.gpio.digital.DigitalInputConfig;
+import com.pi4j.io.gpio.digital.DigitalState;
+import com.pi4j.util.Console;
+
+public class ClickDetector {
+
+    private static final long DOUBLE_CLICK_TIME = 300; // Zeit in Millisekunden
+    private long lastPressTime = 0;
+    private boolean isDoubleClick = false;
+
+    public static void main(String[] args) {
+        // Erstelle eine Pi4J-Kontextinstanz
+        final Context pi4j = Pi4J.newAutoContext();
+
+        // Erstelle eine Konsoleninstanz
+        final Console console = new Console();
+        console.title("<-- The Pi4J Project -->", "Basic Click Detector Example");
+
+        // Konfiguriere den GPIO-Eingang
+        DigitalInputConfig inputConfig = DigitalInput.newConfigBuilder(pi4j)
+                .id("button")
+                .name("Button")
+                .address(4) // GPIO-Pin-Nummer
+                .pull(PullResistance.PULL_DOWN)
+                .build();
+
+        DigitalInput button = pi4j.create(inputConfig);
+
+        // Erstelle eine Instanz des ClickDetectors
+        ClickDetector detector = new ClickDetector();
+
+        // Füge einen Listener hinzu, um Klicks zu erkennen
+        button.addListener(e -> {
+            if (e.state() == DigitalState.HIGH) {
+                detector.handleClick();
+            }
+        });
+
+        // Halte das Programm am Laufen
+        while (true) {
+            detector.checkSingleClick();
+            try {
+                Thread.sleep(50); // Kurze Pause, um die CPU-Auslastung zu reduzieren
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void handleClick() {
+        long currentTime = System.currentTimeMillis();
+
+        if ((currentTime - lastPressTime) < DOUBLE_CLICK_TIME) {
+            isDoubleClick = true;
+            System.out.println("Doppelklick erkannt!");
+        } else {
+            isDoubleClick = false;
+            lastPressTime = currentTime;
+        }
+    }
+
+    public void checkSingleClick() {
+        if (!isDoubleClick && (System.currentTimeMillis() - lastPressTime) >= DOUBLE_CLICK_TIME && lastPressTime != 0) {
+            System.out.println("Einfacher Klick erkannt!");
+            lastPressTime = 0; // Zurücksetzen, um zukünftige Klicks korrekt zu erkennen
+        }
+    }
+}
