@@ -39,7 +39,7 @@ public class Controller {
 
     @GetMapping("/isConnected")
     public ResponseMessage isConnected() throws JsonProcessingException {
-        return new ResponseMessage("false");
+        return new ResponseMessage("true");
     }
 
     @PostMapping("/user/playerJoinedTheTable")
