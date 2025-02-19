@@ -1,18 +1,10 @@
 package com.example;
 
 import com.pi4j.Pi4J;
-import com.pi4j.io.gpio.analog.AnalogOutputConfig;
 import com.pi4j.io.gpio.digital.*;
-import com.pi4j.io.gpio.digital.impl.DefaultDigitalOutputConfigBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-
-import javax.naming.Context;
-
-import java.util.concurrent.TimeUnit;
-
-import static com.pi4j.Pi4J.newAutoContext;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -27,20 +19,28 @@ public class Web_Client {
         controllerConfig();
         ApplicationContext context = SpringApplication.run(Web_Client.class, args);
         GameService gameService = context.getBean(GameService.class);
-        System.out.println(gameService.isButtonClicked());
+        System.out.println(gameService.isButtonClickedOnce());
         while(true){
-            if(gameService.isButtonClicked()){
-                rotateMachine(1);
-                gameService.setButtonClicked(false);
+            if(gameService.isButtonClickedOnce()){
+                hitEvent();
+                gameService.setButtonClickedOnce(false);
+            }
+            if(gameService.isButtonClickedTwice()){
+                stayEvent();
+                gameService.setButtonClickedTwice(false);
             }
             Thread.sleep(100);
         }
 
     }
 
-    public static void rotateMachine(int angle){
-        stepperMotor.blink(1, TimeUnit.SECONDS);
+    public static void hitEvent(){
+        stepperMotor.high();
     }
+    public static void stayEvent(){
+        stepperMotor.low();
+    }
+
     public static void controllerConfig(){
         var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
                 .name("Stepper Motor")

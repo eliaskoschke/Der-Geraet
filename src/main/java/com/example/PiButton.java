@@ -15,7 +15,7 @@ public class PiButton {
     private static final long DOUBLE_CLICK_TIME = 300; // Zeit in Millisekunden
     private long lastPressTime = 0;
     private boolean isDoubleClick = false;
-    private int pinNumber;
+    private int pinNumber = 0;
 
     public PiButton(com. pi4j. context. Context pi4j, int pinNumber) throws InterruptedException {
         this.pinNumber = pinNumber;
@@ -35,13 +35,36 @@ public class PiButton {
         });
     }
 
-    private static void singleButtonClick(int pinNumber) {
+
+
+    public void handleClick() {
+        long currentTime = System.currentTimeMillis();
+
+        if ((currentTime - lastPressTime) < DOUBLE_CLICK_TIME) {
+            isDoubleClick = true;
+            System.out.println("Doppelklick erkannt!");
+            doubleButtonClick();
+        } else {
+            isDoubleClick = false;
+            lastPressTime = currentTime;
+        }
+    }
+
+    public void checkSingleClick() {
+        if (!isDoubleClick && (System.currentTimeMillis() - lastPressTime) >= DOUBLE_CLICK_TIME && lastPressTime != 0) {
+            System.out.println("Einfacher Klick erkannt!");
+            singleButtonClick();
+            lastPressTime = 0; // Zurücksetzen, um zukünftige Klicks korrekt zu erkennen
+        }
+    }
+
+    private void singleButtonClick() {
         System.out.println("Knopf gedrückt");
         int thisButtonNumber = pinNumber;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             String message = "{\"message\":\"Button clicked: "+ thisButtonNumber+"\"}";
 
-            HttpPost postRequest = new HttpPost(baseURL + "/buttonIsClicked");
+            HttpPost postRequest = new HttpPost(baseURL + "/buttonIsClickedOnce");
             postRequest.setHeader("Content-Type", "application/json");
 
             postRequest.setEntity(new StringEntity(message));
@@ -62,23 +85,30 @@ public class PiButton {
         }
     }
 
-    public void handleClick() {
-        long currentTime = System.currentTimeMillis();
+    private void doubleButtonClick() {
+        System.out.println("Knopf gedrückt");
+        int thisButtonNumber = pinNumber;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            String message = "{\"message\":\"Button clicked: "+ thisButtonNumber+"\"}";
 
-        if ((currentTime - lastPressTime) < DOUBLE_CLICK_TIME) {
-            isDoubleClick = true;
-            System.out.println("Doppelklick erkannt!");
-        } else {
-            isDoubleClick = false;
-            lastPressTime = currentTime;
-        }
-    }
+            HttpPost postRequest = new HttpPost(baseURL + "/buttonIsClickedTwice");
+            postRequest.setHeader("Content-Type", "application/json");
 
-    public void checkSingleClick() {
-        if (!isDoubleClick && (System.currentTimeMillis() - lastPressTime) >= DOUBLE_CLICK_TIME && lastPressTime != 0) {
-            System.out.println("Einfacher Klick erkannt!");
-            singleButtonClick(pinNumber);
-            lastPressTime = 0; // Zurücksetzen, um zukünftige Klicks korrekt zu erkennen
+            postRequest.setEntity(new StringEntity(message));
+
+            // Sende die POST-Anfrage und erhalte die Antwort
+            try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
+                // Überprüfe den Status der Antwort und verarbeite sie
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode == 200) {
+                    String responseBody = EntityUtils.toString(response.getEntity());
+                    System.out.println("Antwort erhalten: " + responseBody);
+                } else {
+                    System.err.println("Fehler: " + statusCode);
+                }
+            }
+        } catch (Exception exception){
+            exception.getStackTrace();
         }
     }
 }
