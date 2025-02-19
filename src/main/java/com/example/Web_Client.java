@@ -30,6 +30,7 @@ public class Web_Client {
         while(true){
             if(gameService.isButtonClicked()){
                 rotateMachine(1);
+                gameService.setButtonClicked(false);
             }
             Thread.sleep(100);
         }
