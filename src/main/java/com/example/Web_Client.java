@@ -1,9 +1,9 @@
 package com.example;
 
-import com.pi4j.io.gpio.digital.DigitalInput;
-import com.pi4j.io.gpio.digital.DigitalOutput;
-import com.pi4j.io.gpio.digital.DigitalState;
-import com.pi4j.io.gpio.digital.PullResistance;
+import com.pi4j.Pi4J;
+import com.pi4j.io.gpio.analog.AnalogOutputConfig;
+import com.pi4j.io.gpio.digital.*;
+import com.pi4j.io.gpio.digital.impl.DefaultDigitalOutputConfigBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -19,11 +19,12 @@ import static com.pi4j.Pi4J.newAutoContext;
 
 @SpringBootApplication
 public class Web_Client {
-    static com.pi4j.context.Context pi4j = (com.pi4j.context.Context) newAutoContext();
-    static com. pi4j. io. gpio. digital. DigitalOutput stepperMotor;
-    static com. pi4j. io. gpio. digital. DigitalOutput discardMotor;
-    static com. pi4j. io. gpio. digital. DigitalOutput camera;
+    static com. pi4j. context. Context pi4j =  Pi4J.newAutoContext();
+    static DigitalOutput stepperMotor;
+    static DigitalOutput discardMotor;
+    static DigitalOutput camera;
     public static void main(String[] args) throws InterruptedException {
+        controllerConfig();
         ApplicationContext context = SpringApplication.run(Web_Client.class, args);
         GameService gameService = context.getBean(GameService.class);
         System.out.println(gameService.isButtonClicked());
@@ -38,14 +39,15 @@ public class Web_Client {
     }
 
     public static void rotateMachine(int angle){
-        stepperMotor.blink(1, TimeUnit.SECONDS);
+        stepperMotor.blink(1, TimeUnit.HOURS);
     }
     public static void controllerConfig(){
-        stepperMotor = (DigitalOutput) DigitalOutput.newConfigBuilder(pi4j)
+        var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
                 .name("Stepper Motor")
                 .id("Stepper Motor ID")
-                .address(1) //passende adresse einfügen
-                .initial(DigitalState.LOW);
-
+                .address(4) //passende adresse einfügen
+                .initial(DigitalState.LOW)
+                .onState(DigitalState.HIGH);
+        stepperMotor = pi4j.create(stepperMotorConfig);
     }
 }

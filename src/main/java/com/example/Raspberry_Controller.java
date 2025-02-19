@@ -19,9 +19,9 @@ import static com.pi4j.Pi4J.newAutoContext;
 
 public class Raspberry_Controller {
     static private String baseURL = "http://localhost:8080/api/logic";
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         var pi4j = newAutoContext();
-        int buttonNumber = 27;
+        int buttonNumber = 22;
 
         var buttonConfig = DigitalInput.newConfigBuilder(pi4j)
                 .name("Button")
@@ -60,5 +60,7 @@ public class Raspberry_Controller {
                }
            }
         });
+        Thread.sleep(Integer.MAX_VALUE);
+        pi4j.shutdown();
     }
 }
