@@ -13,9 +13,6 @@ public class Web_Client {
     public static void main(String[] args) {
         ApplicationContext context = SpringApplication.run(Web_Client.class, args);
         GameService gameService = context.getBean(GameService.class);
-//        while(true){
-//            System.out.println(gameService.isButtonClicked());
-//        }
-          System.out.println(gameService.isButtonClicked());
+        System.out.println(gameService.isButtonClicked());
     }
 }
