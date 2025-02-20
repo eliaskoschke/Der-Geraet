@@ -28,6 +28,8 @@ public class GameService {
 
     private ArrayList<Player> listOfAllPlayers = new ArrayList<>();
 
+    private int currenPlayerIndex = 0;
+
     public void buttonClicked() {
         this.buttonClickedOnce = true;
     }
@@ -119,5 +121,13 @@ public class GameService {
 
     public void setButtonClickedTwice(boolean buttonClickedTwice) {
         this.buttonClickedTwice = buttonClickedTwice;
+    }
+
+    public int getCurrenPlayerIndex() {
+        return currenPlayerIndex;
+    }
+
+    public void setCurrenPlayerIndex(int currenPlayerIndex) {
+        this.currenPlayerIndex = currenPlayerIndex;
     }
 }
