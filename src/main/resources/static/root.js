@@ -92,37 +92,38 @@ function pingDealerHand() {
     .catch(error => console.error('Fehler:', error));
 
     
-    if (dealerHand === olddealerhand) {
+    if (dealerHand == olddealerhand) {
         console.log('Keine Neuen karten vorhanden');
     } else {
-        olddealerhand = dealerHand;
         updateDealerHand();
-
     }
     
 }
-setInterval(pingDealerHand, 500);
+setInterval(pingDealerHand, 5000);
 
 
 
 function updateDealerHand() {
-
+    console.log('DEALERHAND' + dealerHand)
 
     displayedCards = 0
+
+    let div = document.getElementById('dealerHand');     
+    div.innerHTML = "";
 
     let cardIds = dealerHand.split(',');
     let element = document.getElementById('dealerHand');
 
     console.log('Element gefunden:', element);
     console.log('Karten-IDs:', cardIds);
+    olddealerhand = dealerHand;
 
     for (var i = 0; i < cardIds.length; i++) {
-        try {
-            var current = document.getElementById('karte' + i);
-            current.remove();
-        } catch {}
+        if (cardIds.length <= 1) {
+            break;
+        }
 
         console.log('Füge Bild hinzu für Karte:', cardIds[i]);
-        element.insertAdjacentHTML('beforeend', '<img id="karte' + cardIds[i] + '" src="img/cards/' + cardIds[i] + '.png">');
+        element.insertAdjacentHTML('beforeend', '<img id="karte' + i + '" src="img/cards/' + cardIds[i] + '.png">');
     }
 }
