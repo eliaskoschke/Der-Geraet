@@ -82,3 +82,19 @@ h5 {
     font-size: 0.75rem;
     color: hsla(0, 100%, 80%, 0.8);
 }
+
+#dealerHand {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px; 
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+#dealerHand img {
+    width: 100%; 
+    height: auto; 
+    border-radius: 5px; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}

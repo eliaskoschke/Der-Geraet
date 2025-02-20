@@ -65,6 +65,9 @@ function pingPlayerTurn() {
 
 setInterval(pingPlayerTurn, 1000);
 
+var dealerHand = "";
+var olddealerhand = "";
+var displayedCards = 0;
 
 function pingDealerHand() {
     fetch('/api/game/ping/getDealerHand', {
@@ -81,10 +84,45 @@ function pingDealerHand() {
     })
     .then(data => {
         if (data && data.message) {
-            data.message
+            dealerHand = data.message;
         } else {
             console.error('Keine Nachricht in der Antwort gefunden.');
         }
     })
     .catch(error => console.error('Fehler:', error));
+
+    
+    if (dealerHand === olddealerhand) {
+        console.log('Keine Neuen karten vorhanden');
+    } else {
+        olddealerhand = dealerHand;
+        updateDealerHand();
+
+    }
+    
+}
+setInterval(pingDealerHand, 500);
+
+
+
+function updateDealerHand() {
+
+
+    displayedCards = 0
+
+    let cardIds = dealerHand.split(',');
+    let element = document.getElementById('dealerHand');
+
+    console.log('Element gefunden:', element);
+    console.log('Karten-IDs:', cardIds);
+
+    for (var i = 0; i < cardIds.length; i++) {
+        try {
+            var current = document.getElementById('karte' + i);
+            current.remove();
+        } catch {}
+
+        console.log('Füge Bild hinzu für Karte:', cardIds[i]);
+        element.insertAdjacentHTML('beforeend', '<img id="karte' + cardIds[i] + '" src="img/cards/' + cardIds[i] + '.png">');
+    }
 }
