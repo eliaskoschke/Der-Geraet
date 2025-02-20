@@ -15,6 +15,7 @@ import java.util.List;
 public class Controller {
     private final GameService gameService;
     private ObjectMapper mapper = new ObjectMapper();
+    int counter = 0;
 
 
     @Autowired
@@ -119,7 +120,13 @@ public class Controller {
 
     @GetMapping("/game/ping/getDealerHand")
     public ResponseMessage getDealerHand() throws JsonProcessingException {
-        gameService.setDealerHandBildId(castKartenObjectToBildId(gameService.getDealerHand()));
+        counter++;
+        String idCSV = castKartenObjectToBildId(gameService.getDealerHand());
+        if(counter>=10){
+            counter =0;
+            int randomZahl = (int) (12*Math.random()+101);
+            idCSV += String.valueOf(randomZahl) +",";
+        }
         return new ResponseMessage(String.valueOf(gameService.getDealerHandBildId()));
     }
 
@@ -157,8 +164,8 @@ public class Controller {
         return new ResponseMessage("false");
     }
 
-    public ArrayList<String> castKartenObjectToBildId(ArrayList<Karte>dealerHand){
-        ArrayList dealerHandBildId = new ArrayList();
+    public String castKartenObjectToBildId(ArrayList<Karte>dealerHand){
+        String idCSV ="";
         for(Karte karte : dealerHand){
             int idValue = 0;
             switch (karte.typ){
@@ -192,9 +199,9 @@ public class Controller {
                     idValue += karte.wert;
                     break;
             }
-            dealerHandBildId.add(String.valueOf(idValue));
+            idCSV += String.valueOf(idValue) +",";
         }
-        return  dealerHandBildId;
+        return  idCSV;
     }
 
 

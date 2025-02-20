@@ -11,16 +11,16 @@ import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
 public class Main {
-    static com. pi4j. context. Context pi4j =  Pi4J.newAutoContext();
+    //static com. pi4j. context. Context pi4j =  Pi4J.newAutoContext();
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotor;
     static DigitalOutput camera;
     static GameService gameService;
     public static void main(String[] args) throws InterruptedException {
-        controllerConfig();
+        //controllerConfig();
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
-        gameLogic();
+        //gameLogic();
     }
 
     private static void gameLogic() throws InterruptedException {
@@ -56,13 +56,13 @@ public class Main {
         stepperMotor.low();
     }
 
-    public static void controllerConfig(){
-        var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
-                .name("Stepper Motor")
-                .id("Stepper Motor ID")
-                .address(14) //passende adresse einfügen
-                .initial(DigitalState.LOW)
-                .onState(DigitalState.HIGH);
-        stepperMotor = pi4j.create(stepperMotorConfig);
-    }
+//    public static void controllerConfig(){
+//        var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
+//                .name("Stepper Motor")
+//                .id("Stepper Motor ID")
+//                .address(14) //passende adresse einfügen
+//                .initial(DigitalState.LOW)
+//                .onState(DigitalState.HIGH);
+//        stepperMotor = pi4j.create(stepperMotorConfig);
+//    }
 }
