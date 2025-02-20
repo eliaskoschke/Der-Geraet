@@ -4,6 +4,7 @@ public enum Register {
     GCONF         ((byte) 0x00),
     IHOLD_IRUN    ((byte) 0x10),
     V_ACTUAL      ((byte) 0x22),
+    SGTHRS        ((byte) 0x40),
     SG_RESULT     ((byte) 0x41),
     DRV_STATUS    ((byte) 0x6F);
 

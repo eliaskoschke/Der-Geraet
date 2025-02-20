@@ -32,20 +32,27 @@ public class Tmc2209 {
             System.out.println("Warte auf Serial");
             Thread.sleep(250);
         }
+        setIndexStep(true);
+        setSpreadCycle(false);
         readDriverStatus();
         setCurrent(20, 10, 0.5f);
+        System.out.println(readInt(Register.SGTHRS.address));
+        writeRegister(Register.SGTHRS.address, 15);
 
         var indexConfig = DigitalInput.newConfigBuilder(p4jContext)
                 .id("tmc-index")
                 .name("TMC 2209 - Index Pin")
                 .address(indexPin)
-                .pull(PullResistance.PULL_DOWN)
-                .debounce(100L);
+                .pull(PullResistance.PULL_UP);
+//                .debounce(100L);
         var indexInput = p4jContext.create(indexConfig);
         indexInput.addListener(e -> {
             if (e.state() == DigitalState.HIGH) {
                 if (direction == Direction.FORWARD) position++;
                 else position--;
+
+                System.out.println("Position: "+ position);
+                System.out.println("Target-Position: "+ targetPosition);
 
                 if (position == targetPosition) setVactual(0);
             }
@@ -122,20 +129,26 @@ public class Tmc2209 {
         isHoming = true;
 
         new Thread(() -> {
+            while (true)
             try {
                 int sgResult = readInt(Register.SG_RESULT.address);
                 System.out.println(sgResult);
-            } catch (TMCCommunicationException e) {
+                Thread.sleep(200L);
+            } catch (Exception e) {
                 System.out.println(e);
             }
-        });
+        }).start();
     }
 
     private void setSpreadCycle(boolean enabled) throws TMCCommunicationException {
         int gConf = readInt(Register.GCONF.address);
-
         gConf = setFlag(gConf, 2, enabled);
+        writeRegister(Register.GCONF.address, gConf);
+    }
 
+    private void setIndexStep(boolean enabled) throws TMCCommunicationException {
+        int gConf = readInt(Register.GCONF.address);
+        gConf = setFlag(gConf, 5, enabled);
         writeRegister(Register.GCONF.address, gConf);
     }
 
@@ -190,6 +203,11 @@ public class Tmc2209 {
         if (checkFlag(readInt, 0)) {
             System.out.println("Prewarning: Driver is overheating");
         }
+
+        readInt = readInt(Register.GCONF.address);
+
+        System.out.println("index_otpw is set: " + checkFlag(readInt, 4));
+        System.out.println("index_step is set: " + checkFlag(readInt, 5));
     }
 
     private void setCurrent(float runCurrent, int holdDelay, float holdMultiplier) throws TMCCommunicationException {
@@ -233,10 +251,10 @@ public class Tmc2209 {
             throw new TMCCommunicationException("CRC-Missmatch in Response");
         }
 
-        return  Byte.toUnsignedInt(readRegister[7]) << 24 +
-                Byte.toUnsignedInt(readRegister[8]) << 16 +
-                Byte.toUnsignedInt(readRegister[9]) <<  8 +
-                Byte.toUnsignedInt(readRegister[10]);
+        return  (Byte.toUnsignedInt(readRegister[7]) << 24) +
+                (Byte.toUnsignedInt(readRegister[8]) << 16) +
+                (Byte.toUnsignedInt(readRegister[9]) <<  8) +
+                (Byte.toUnsignedInt(readRegister[10])     );
     }
 
     private synchronized byte[] readRegister(byte address) throws TMCCommunicationException {
@@ -252,6 +270,11 @@ public class Tmc2209 {
         byte[] recvPacket = new byte[12];
         int bytesRead = port.readBytes(recvPacket, 12);
         if (bytesRead != 12) throw new TMCCommunicationException("Expected 12 bytes, but received: " + bytesRead);
+        try {
+            Thread.sleep(100L);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         return recvPacket;
     }

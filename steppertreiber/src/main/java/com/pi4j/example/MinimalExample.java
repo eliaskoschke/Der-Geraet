@@ -28,7 +28,13 @@ package com.pi4j.example;
  */
 
 import com.pi4j.Pi4J;
+import com.pi4j.context.Context;
+import com.pi4j.example.tmc2209.TMCCommunicationException;
+import com.pi4j.example.tmc2209.TMCDeviceIsBusyException;
 import com.pi4j.example.tmc2209.Tmc2209;
+import com.pi4j.io.pwm.Pwm;
+import com.pi4j.io.pwm.PwmConfig;
+import com.pi4j.io.pwm.PwmType;
 
 import java.util.Scanner;
 
@@ -37,13 +43,32 @@ public class MinimalExample {
 
 //    private static final int PIN_ENABLE = 24;
     private static final int PIN_DIAG   = 24; // PIN 18 = BCM 24
-    private static final int PIN_INDEX  = 22; // PIN 15 = BCM 22
+    private static final int PIN_INDEX  = 23; // PIN 15 = BCM 22
 
 
     public static void main(String[] args) throws Exception {
 
         var pi4j = Pi4J.newAutoContext();
 
+        PwmConfig pwmConfig = Pwm.newConfigBuilder(pi4j)
+                .address(18)
+                .pwmType(PwmType.SOFTWARE)
+                .initial(0)
+                .shutdown(0)
+                .provider("pigpio-pwm")
+                .build();
+
+
+        Pwm pwm = pi4j.create(pwmConfig);
+        pwm.on(50, 500);
+        Thread.sleep(30000L);
+
+//        testMotorDriver(pi4j);
+
+        pi4j.shutdown();
+    }
+
+    private static void testMotorDriver(Context pi4j) throws InterruptedException, TMCCommunicationException, TMCDeviceIsBusyException {
         Tmc2209 steppermotor = new Tmc2209(pi4j, 0, PIN_INDEX, PIN_DIAG);
         Scanner scanner = new Scanner(System.in);
 
@@ -64,17 +89,18 @@ public class MinimalExample {
                     System.out.println("Welche Geschwindigkeit? ");
                     int speed = scanner.nextInt();
                     steppermotor.moveToPosition(position, speed);
+                    break;
                 case 2:
                     steppermotor.resetPosition();
+                    break;
                 case 3:
                     System.out.println("Welche Geschwindigkeit (Negative Werte können für Rückwärts verwendet werden)? ");
                     int homeSpeed = scanner.nextInt();
                     steppermotor.homePosition(homeSpeed);
+                    break;
                 case 4:
                     break outer;
             }
         }
-
-        pi4j.shutdown();
     }
 }
