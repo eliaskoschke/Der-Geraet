@@ -99,7 +99,7 @@ function pingDealerHand() {
     }
     
 }
-setInterval(pingDealerHand, 5000);
+setInterval(pingDealerHand, 1000);
 
 
 

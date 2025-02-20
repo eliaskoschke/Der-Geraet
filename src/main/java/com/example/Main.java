@@ -32,7 +32,7 @@ import java.sql.SQLException;
 
 @SpringBootApplication
 public class Main {
-    static com. pi4j. context. Context pi4j =  Pi4J.newAutoContext();
+    //static com. pi4j. context. Context pi4j =  Pi4J.newAutoContext();
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotorIn1;
     static DigitalOutput discardMotorIn2;
@@ -41,10 +41,10 @@ public class Main {
     static Camera camera = new Camera();
     static ObjectMapper mapper = new ObjectMapper();
     public static void main(String[] args) throws InterruptedException {
-        controllerConfig();
+        //controllerConfig();
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
-        gameLogic();
+        //gameLogic();
     }
 
     private static void gameLogic() throws InterruptedException {
@@ -132,32 +132,32 @@ public class Main {
         stepperMotor.low();
     }
 
-    public static void controllerConfig(){
-        var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
-                .name("Stepper Motor")
-                .id("Stepper Motor ID")
-                .address(14) //passende adresse einfügen
-                .initial(DigitalState.LOW)
-                .onState(DigitalState.HIGH);
-        stepperMotor = pi4j.create(stepperMotorConfig);
-
-        int in1PinNumber = 22; // Beispiel-Pin-Nummer für IN1
-        int in2PinNumber = 27; // Beispiel-Pin-Nummer für IN2
-
-        discardMotorIn1 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
-                .id("IN1")
-                .name("Motor IN1")
-                .address(in1PinNumber)
-                .shutdown(DigitalState.LOW)
-                .initial(DigitalState.LOW)
-                .provider("pigpio-digital-output"));
-
-        discardMotorIn2 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
-                .id("IN2")
-                .name("Motor IN2")
-                .address(in2PinNumber)
-                .shutdown(DigitalState.LOW)
-                .initial(DigitalState.LOW)
-                .provider("pigpio-digital-output"));
-    }
+//    public static void controllerConfig(){
+//        var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
+//                .name("Stepper Motor")
+//                .id("Stepper Motor ID")
+//                .address(14) //passende adresse einfügen
+//                .initial(DigitalState.LOW)
+//                .onState(DigitalState.HIGH);
+//        stepperMotor = pi4j.create(stepperMotorConfig);
+//
+//        int in1PinNumber = 22; // Beispiel-Pin-Nummer für IN1
+//        int in2PinNumber = 27; // Beispiel-Pin-Nummer für IN2
+//
+//        discardMotorIn1 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
+//                .id("IN1")
+//                .name("Motor IN1")
+//                .address(in1PinNumber)
+//                .shutdown(DigitalState.LOW)
+//                .initial(DigitalState.LOW)
+//                .provider("pigpio-digital-output"));
+//
+//        discardMotorIn2 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
+//                .id("IN2")
+//                .name("Motor IN2")
+//                .address(in2PinNumber)
+//                .shutdown(DigitalState.LOW)
+//                .initial(DigitalState.LOW)
+//                .provider("pigpio-digital-output"));
+//    }
 }
