@@ -53,6 +53,7 @@ public class Main {
 
     public static void executeComputerTurn(){
         rotateStepperMotor(60);
+        System.out.println("Test");
         gameService.setCurrenPlayerIndex(0);
     }
 
