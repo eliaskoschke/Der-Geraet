@@ -10,16 +10,21 @@ import org.springframework.context.ApplicationContext;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
 @SpringBootApplication
-public class Web_Client {
+public class Main {
     static com. pi4j. context. Context pi4j =  Pi4J.newAutoContext();
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotor;
     static DigitalOutput camera;
+    static GameService gameService;
     public static void main(String[] args) throws InterruptedException {
         controllerConfig();
-        ApplicationContext context = SpringApplication.run(Web_Client.class, args);
-        GameService gameService = context.getBean(GameService.class);
-        System.out.println(gameService.isButtonClickedOnce());
+        ApplicationContext context = SpringApplication.run(Main.class, args);
+        gameService = context.getBean(GameService.class);
+        gameLogic();
+    }
+
+    private static void gameLogic() throws InterruptedException {
+        boolean actionHasBeenTaken = false;
         while(true){
             if(gameService.isButtonClickedOnce()){
                 hitEvent();
@@ -29,8 +34,15 @@ public class Web_Client {
                 stayEvent();
                 gameService.setButtonClickedTwice(false);
             }
+            if (actionHasBeenTaken) {
+                executeComputerTurn();
+                actionHasBeenTaken = false;
+            }
             Thread.sleep(100);
         }
+    }
+
+    public static void executeComputerTurn(){
 
     }
 
@@ -38,6 +50,9 @@ public class Web_Client {
         stepperMotor.high();
     }
     public static void stayEvent(){
+        stepperMotor.low();
+    }
+    public static void rotateStepperMotor(int angle){
         stepperMotor.low();
     }
 
