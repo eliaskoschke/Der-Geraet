@@ -58,11 +58,12 @@ public class Main {
     }
 
     public static void hitEvent() throws InterruptedException {
-        discardMotorIn1.high();
-        discardMotorIn2.low();
-        Thread.sleep(100);
         discardMotorIn1.low();
         discardMotorIn2.high();
+        System.out.println("Motor wurde angesteuert");
+        Thread.sleep(1000);
+        discardMotorIn1.low();
+        discardMotorIn2.low();
     }
     public static void stayEvent() throws InterruptedException {
         stepperMotor.high();
@@ -83,8 +84,8 @@ public class Main {
                 .onState(DigitalState.HIGH);
         stepperMotor = pi4j.create(stepperMotorConfig);
 
-        int in1PinNumber = 17; // Beispiel-Pin-Nummer für IN1
-        int in2PinNumber = 18; // Beispiel-Pin-Nummer für IN2
+        int in1PinNumber = 22; // Beispiel-Pin-Nummer für IN1
+        int in2PinNumber = 27; // Beispiel-Pin-Nummer für IN2
 
         discardMotorIn1 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
                 .id("IN1")
