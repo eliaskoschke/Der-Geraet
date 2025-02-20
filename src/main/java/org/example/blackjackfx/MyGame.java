@@ -21,7 +21,7 @@ public class MyGame extends Application {
 
     private int spielbreite = 800;
     // Angepasst, damit auch die Karten des Spielers sichtbar sind.
-    private int spielhohe = 800;
+    private int spielhohe = 970;
     private boolean takeButtonIsPressed = false;
     private boolean passButtonIsPressed = false;
 
@@ -44,7 +44,7 @@ public class MyGame extends Application {
     private String ausgabeComputer = "";
     private String ausgabeSpieler = "";
 
-    private Kartenstabel kartenstabel;
+    private static Kartenstabel kartenstabel;
     private boolean spielerTurn = true;
     private final int hintegrundbildStartWert = -100;
     private int spielerHandWert = 0;
@@ -207,7 +207,7 @@ public class MyGame extends Application {
                 cardView.setX(291 + hintegrundbildStartWert + (i * 105));
                 cardView.setY(215);
                 Text computerText = new Text(291 + hintegrundbildStartWert + (i * 105), 215, String.valueOf(computerHand.get(i).wert));
-                computerText.setText(String.valueOf(computerHand.get(i).wert));
+                computerText.setText(computerHand.get(i).wert + " " + computerHand.get(i).typ);
                 root.getChildren().add(cardView);
                 root.getChildren().add(computerText);
             }
@@ -234,8 +234,8 @@ public class MyGame extends Application {
             ImageView cardView = new ImageView(spielerHand.get(i).bild);
             cardView.setX(291 + (i * 105));
             cardView.setY(730);
-            Text spielerText = new Text(291 + (i * 105), 730, String.valueOf(spielerHand.get(i)));
-            spielerText.setText(String.valueOf(spielerHand.get(i).wert));
+            Text spielerText = new Text(291 + (i * 105), 730, spielerHand.get(i).toString());
+            spielerText.setText(spielerHand.get(i).wert + " " + spielerHand.get(i).typ);
             root.getChildren().add(cardView);
             root.getChildren().add(spielerText);
         }
@@ -358,58 +358,61 @@ public class MyGame extends Application {
         Thread computerTurnThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                int i = 0;
+                if (spielerHandWert < 21) {
+                    int i = 0;
 
-                if (computerHand.get(1).name.equals("Ass")) {
-                    if (computerHandWert + 11 > 21) {
-                        computerHand.get(1).wert = 1;
-                    } else {
-                        computerHand.get(1).wert = 11;
-                    }
-                }
-                ausgabeComputer = "";
-                for (Kartenstabel.Karte karte1 : computerHand) {
-                    ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
-                }
-                if (computerHand.get(1).wert + computerHand.get(0).wert > 17) {
-                    spielVorbei = true;
-
-                }
-                while (true) {
-                    ausgabeComputer = "";
-                    for (Kartenstabel.Karte karte1 : computerHand) {
-                        ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
-                    }
-                    if (spielVorbei) {
-                        break;
-                    }
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    Kartenstabel.Karte karte = computerHand.get(i);
-
-                    if (computerHandWert < 17) {
-                        Kartenstabel.Karte randomKarte = kartenstabel.gibKarte();
-                        computerHand.add(randomKarte);
-
-                        if (computerHandWert >= 17) {
-                            spielVorbei = true;
+                    if (computerHand.get(1).name.equals("Ass")) {
+                        if (computerHandWert + 11 > 21) {
+                            computerHand.get(1).wert = 1;
+                        } else {
+                            computerHand.get(1).wert = 11;
                         }
                     }
-                    else {
-                        spielVorbei = true;
-                        break;
-                    }
                     ausgabeComputer = "";
                     for (Kartenstabel.Karte karte1 : computerHand) {
                         ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
                     }
+                    if (computerHand.get(1).wert + computerHand.get(0).wert > 17) {
+                        spielVorbei = true;
 
-                    i++;
-                    computerHandWert = countHand(computerHand);
+                    }
+                    while (true) {
+                        ausgabeComputer = "";
+                        for (Kartenstabel.Karte karte1 : computerHand) {
+                            ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
+                        }
+                        if (spielVorbei) {
+                            break;
+                        }
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        Kartenstabel.Karte karte = computerHand.get(i);
 
+                        if (computerHandWert < 17) {
+                            Kartenstabel.Karte randomKarte = kartenstabel.gibKarte();
+                            computerHand.add(randomKarte);
+
+                            if (computerHandWert >= 17) {
+                                spielVorbei = true;
+                            }
+                        } else {
+                            spielVorbei = true;
+                            break;
+                        }
+                        ausgabeComputer = "";
+                        for (Kartenstabel.Karte karte1 : computerHand) {
+                            ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
+                        }
+
+                        i++;
+                        computerHandWert = countHand(computerHand);
+
+                    }
+                } else {
+                    spielVorbei = true;
                 }
             }
         });
@@ -473,6 +476,7 @@ public class MyGame extends Application {
     private void anfangsWerte() {
         spielerHand.clear();
         computerHand.clear();
+        kartenstabel = new Kartenstabel();
         spielerHandWert = 0;
         computerHandWert = 0;
         counter = 0;
@@ -481,7 +485,8 @@ public class MyGame extends Application {
         spielVorbei = false;
         spielerTurn = true;
         restartButton.setVisible(false);
-        root.getChildren().removeIf(node -> node instanceof Text);
+        root.getChildren().removeIf(node ->(node instanceof Text)
+                && (node != ergebnisText && node != ergebnisUhrText));
         spielStart();
     }
 
