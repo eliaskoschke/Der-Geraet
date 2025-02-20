@@ -16,6 +16,8 @@ public class GameService {
 
     boolean gameReset = false;
 
+    Karte nextCardInDeck;
+
     int playerAtReset = 0;
 
     int playerGotReseted = 0;
@@ -129,5 +131,13 @@ public class GameService {
 
     public void setCurrenPlayerIndex(int currenPlayerIndex) {
         this.currenPlayerIndex = currenPlayerIndex;
+    }
+
+    public Karte getNextCardInDeck() {
+        return nextCardInDeck;
+    }
+
+    public void setNextCardInDeck(Karte nextCardInDeck) {
+        this.nextCardInDeck = nextCardInDeck;
     }
 }

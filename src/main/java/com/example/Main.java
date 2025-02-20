@@ -1,10 +1,31 @@
 package com.example;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi4j.Pi4J;
 import com.pi4j.io.gpio.digital.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import com.google.zxing.*;
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import com.google.zxing.common.HybridBinarizer;
+import org.bytedeco.javacv.*;
+import org.bytedeco.javacv.Frame;
+
+
+import org.bytedeco.javacv.OpenCVFrameGrabber;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.Java2DFrameConverter;
+
+
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -15,8 +36,10 @@ public class Main {
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotorIn1;
     static DigitalOutput discardMotorIn2;
-    static DigitalOutput camera;
+    static DigitalOutput cameraOutput;
     static GameService gameService;
+    static Camera camera = new Camera();
+    static ObjectMapper mapper = new ObjectMapper();
     public static void main(String[] args) throws InterruptedException {
         controllerConfig();
         ApplicationContext context = SpringApplication.run(Main.class, args);
@@ -58,6 +81,39 @@ public class Main {
     }
 
     public static void hitEvent() throws InterruptedException {
+        executeCameraScan();
+        executeCardThrow();
+    }
+
+    private static void executeCameraScan(){
+        BufferedImage bufferedImage=camera.captureImage();
+
+        camera.displayImage(bufferedImage);
+
+        if (bufferedImage != null) {
+            try {
+                // Dekodiere den QR-Code
+                String decodedText = camera.decodeQRCode(bufferedImage);
+                if (decodedText != null) {
+                    System.out.println("Decoded text: " + decodedText);
+                    gameService.setNextCardInDeck(mapper.readValue(decodedText, Karte.class));
+                    System.out.println(gameService.getNextCardInDeck().getName());
+                } else {
+                    System.out.println("QR-Code nicht gefunden");
+                }
+            } catch (Exception e) {
+                System.out.println("Fehler beim Dekodieren des QR-Codes: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
+        }
+
+    }
+
+
+
+    private static void executeCardThrow() throws InterruptedException {
         discardMotorIn1.low();
         discardMotorIn2.high();
         System.out.println("Motor wurde angesteuert");
@@ -65,6 +121,7 @@ public class Main {
         discardMotorIn1.low();
         discardMotorIn2.low();
     }
+
     public static void stayEvent() throws InterruptedException {
         stepperMotor.high();
         Thread.sleep(100);
