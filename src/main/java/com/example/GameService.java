@@ -3,11 +3,12 @@ package com.example;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class GameService {
-    private boolean buttonClicked = false;
+    private boolean buttonClickedOnce = false;
+
+    private boolean buttonClickedTwice = false;
 
     private String getMessage = "";
 
@@ -28,11 +29,11 @@ public class GameService {
     private ArrayList<Player> listOfAllPlayers = new ArrayList<>();
 
     public void buttonClicked() {
-        this.buttonClicked = true;
+        this.buttonClickedOnce = true;
     }
 
-    public boolean isButtonClicked() {
-        return buttonClicked;
+    public boolean isButtonClickedOnce() {
+        return buttonClickedOnce;
     }
 
 
@@ -52,8 +53,8 @@ public class GameService {
         this.getMessage = getMessage;
     }
 
-    public void setButtonClicked(boolean buttonClicked) {
-        this.buttonClicked = buttonClicked;
+    public void setButtonClickedOnce(boolean buttonClickedOnce) {
+        this.buttonClickedOnce = buttonClickedOnce;
     }
 
     public boolean isGameReset() {
@@ -110,5 +111,13 @@ public class GameService {
 
     public void setDealerHandBildId(ArrayList<String> dealerHandBildId) {
         this.dealerHandBildId = dealerHandBildId;
+    }
+
+    public boolean isButtonClickedTwice() {
+        return buttonClickedTwice;
+    }
+
+    public void setButtonClickedTwice(boolean buttonClickedTwice) {
+        this.buttonClickedTwice = buttonClickedTwice;
     }
 }

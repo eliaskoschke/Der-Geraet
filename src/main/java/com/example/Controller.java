@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -129,12 +128,21 @@ public class Controller {
         return new ResponseMessage(gameService.getCurrentPlayer().getId());
     }
 
-    @PostMapping("/logic/buttonIsClicked")
-    public ResponseMessage buttonIsClicked(@RequestBody Message message) {
+    @PostMapping("/logic/buttonIsClickedOnce")
+    public ResponseMessage buttonIsClickedOnce(@RequestBody Message message) {
         System.out.println("Hallo");
         String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ")+1);
         System.out.println("Es wurde ein Button geklickt: " + buttonId);
-        gameService.setButtonClicked(true);
+        gameService.setButtonClickedOnce(true);
+        return new ResponseMessage("true");
+    }
+
+    @PostMapping("/logic/buttonIsClickedTwice")
+    public ResponseMessage buttonIsClickedTwice(@RequestBody Message message) {
+        System.out.println("Hallo");
+        String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ")+1);
+        System.out.println("Es wurde ein Button geklickt: " + buttonId);
+        gameService.setButtonClickedTwice(true);
         return new ResponseMessage("true");
     }
 
