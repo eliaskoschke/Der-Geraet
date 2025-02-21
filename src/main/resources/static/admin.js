@@ -190,6 +190,15 @@ function setActiveGame(game) {
     }
 }
 
+function playerCountTest(players) {
+    var elementBtn = document.getElementById('start-game');
+    if (players >= 2) {
+        elementBtn.disabled = false;
+    } else {
+        elementBtn.disabled = true;
+    }
+}
+
 
 function pingLobby() {
     console.log('ausgeführt');
@@ -211,6 +220,7 @@ function pingLobby() {
                 console.log(data.message);
                 var count = document.getElementById('playerCount');
                 count.textContent = data.message + "/12";
+                playerCountTest(data.message);
             } else {
                 console.error('Keine Nachricht in der Antwort gefunden.');
             }
@@ -220,4 +230,6 @@ function pingLobby() {
 }
 
 setInterval(pingLobby, 1000);
+
+
 
