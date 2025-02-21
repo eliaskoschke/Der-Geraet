@@ -21,6 +21,7 @@ public class Controller {
     @Autowired
     public Controller(GameService gameService) {
         this.gameService = gameService;
+
 //        gameService.setDealerHand( List.of(
 //                new Karte("5", "Kreuz", "Kreuz 5"),
 //                new Karte("10", "Karo", "Karo 10"),
@@ -128,12 +129,15 @@ public class Controller {
     @GetMapping("/game/ping/getDealerHand")
     public ResponseMessage getDealerHand() throws JsonProcessingException {
         counter++;
-        String idCSV = castKartenObjectToBildId(gameService.getDealerHand());
-        if(counter>=10){
-            counter =0;
-            gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() + 1);
+        if(gameService.getDealerHand() != null) {
+            String idCSV = castKartenObjectToBildId(gameService.getDealerHand());
+            if (counter >= 10) {
+                counter = 0;
+                gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() + 1);
+            }
+            return new ResponseMessage(idCSV);
         }
-        return new ResponseMessage(idCSV);
+        return new ResponseMessage("");
     }
 
     @GetMapping("/game/ping/getPlayerTurn")
@@ -207,7 +211,7 @@ public class Controller {
                         break;
                 }
             } else {
-                idValue += 500;
+                idValue = 500;
             }
             idCSV += String.valueOf(idValue) +",";
         }
