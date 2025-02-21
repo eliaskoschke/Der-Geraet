@@ -4,6 +4,8 @@ module org.example.blackjackfx {
     requires com.google.zxing;
     requires com.google.zxing.javase;
     requires org.bytedeco.javacv;
+    requires com.pi4j;
+    requires com.fasterxml.jackson.databind;
     requires java.desktop;
 
 

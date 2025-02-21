@@ -1,5 +1,8 @@
 package org.example.blackjackfx;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.NotFoundException;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -16,11 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MyGame extends Application {
-    private List<Character> pressedNormalKeys = new ArrayList<>();
-    private List<Integer> pressedSpecialKeys = new ArrayList<>();
-
     private int spielbreite = 800;
-    // Angepasst, damit auch die Karten des Spielers sichtbar sind.
     private int spielhohe = 970;
     private boolean takeButtonIsPressed = false;
     private boolean passButtonIsPressed = false;
@@ -44,27 +43,26 @@ public class MyGame extends Application {
     private String ausgabeComputer = "";
     private String ausgabeSpieler = "";
 
-    private static Kartenstabel kartenstabel;
     private boolean spielerTurn = true;
     private final int hintegrundbildStartWert = -100;
     private int spielerHandWert = 0;
     private int computerHandWert = 0;
     private boolean spielVorbei = false;
 
-    private ArrayList<Kartenstabel.Karte> computerHand = new ArrayList<>();
-    private ArrayList<Kartenstabel.Karte> spielerHand = new ArrayList<>();
+    private ArrayList<Karte> computerHand = new ArrayList<>();
+    private ArrayList<Karte> spielerHand = new ArrayList<>();
 
     private Pane root;
     private Text ergebnisText;
     private Text ergebnisUhrText;
 
+    private MotorController controller = new MotorController();
+    private ObjectMapper mapper = new ObjectMapper();
+
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws NotFoundException, InterruptedException, JsonProcessingException {
         root = new Pane();
         Scene scene = new Scene(root, spielbreite, spielhohe);
-
-        // Kartenstapel initialisieren – dabei werden 52 einzelne Kartenbilder geladen.
-        kartenstabel = new Kartenstabel();
 
         // Bilder laden
         hintergrundBild = new Image("file:D:\\projekte\\BlackJackFx\\src\\main\\resources\\Bilder\\HintergrundTisch.png");
@@ -89,7 +87,7 @@ public class MyGame extends Application {
         takeButton.setOnAction(e -> {
             try {
                 takebuttonFunktion();
-            } catch (InterruptedException ex) {
+            } catch (InterruptedException | NotFoundException | JsonProcessingException ex) {
                 throw new RuntimeException(ex);
             }
         });
@@ -114,7 +112,13 @@ public class MyGame extends Application {
         restartButton.setLayoutX(400);
         restartButton.setLayoutY(135);
         restartButton.setPrefSize(buttonbreite, buttonHohe);
-        restartButton.setOnAction(e -> anfangsWerte());
+        restartButton.setOnAction(e -> {
+            try {
+                anfangsWerte();
+            } catch (NotFoundException | InterruptedException | JsonProcessingException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         if (spielVorbei) {
             restartButton.setVisible(true);
         } else {
@@ -249,30 +253,11 @@ public class MyGame extends Application {
     // --- Spiellogik-Methoden ---
 
     // Initialisiert bzw. startet ein neues Spiel
-    private void spielStart() {
-//        spielerHand.clear();
-//        computerHand.clear();
-//        spielerHandWert = 0;
-//        computerHandWert = 0;
-//        spielVorbei = false;
-//        spielerTurn = true;
-//
-//        // Jeder erhält zwei Karten
-//        spielerHand.add(kartenstabel.gibKarte());
-//        spielerHand.add(kartenstabel.gibKarte());
-//        computerHand.add(kartenstabel.gibKarte());
-//        computerHand.add(kartenstabel.gibKarte());
-//
-//        spielerHandWert = countHand(spielerHand);
-//        computerHandWert = countHand(computerHand);
-//
-//        ergebnis = "";
-//        restartButton.setVisible(false);
-        spielerHand.clear();
+    private void spielStart() throws NotFoundException, InterruptedException, JsonProcessingException {
         computerHand.clear();
 
-        computerHand.add(kartenstabel.gibKarte());
-        computerHand.add(kartenstabel.gibKarte());
+        computerHand.add(Karte.gibKarte(controller, mapper));
+        computerHand.add(Karte.gibKarte(controller, mapper));
 
         spielVorbei = false;
         spielerTurn = true;
@@ -293,8 +278,8 @@ public class MyGame extends Application {
         ausgabeComputer = computerHand.get(0).name + "-" + computerHand.get(0).typ;
 
 
-        spielerHand.add(kartenstabel.gibKarte());
-        spielerHand.add(kartenstabel.gibKarte());
+        spielerHand.add(Karte.gibKarte(controller, mapper));
+        spielerHand.add(Karte.gibKarte(controller, mapper));
 
 
         spielerHandWert += spielerHand.get(0).wert;
@@ -310,14 +295,14 @@ public class MyGame extends Application {
 
         spielerHandWert += spielerHand.get(1).wert;
         ausgabeSpieler = "";
-        for (Kartenstabel.Karte karte : spielerHand) {
+        for (Karte karte : spielerHand) {
             ausgabeSpieler += karte.name + "-" + karte.typ + "\n";
         }
         if (spielerHandWert == 21) {
             spielVorbei = true;
             spielerTurn = false;
             ausgabeComputer = "";
-            for (Kartenstabel.Karte karte1 : computerHand) {
+            for (Karte karte1 : computerHand) {
                 ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
             }
         }
@@ -325,10 +310,10 @@ public class MyGame extends Application {
     }
 
     // Aktion, wenn der "Hit"-Button gedrückt wird
-    private void takebuttonFunktion() throws InterruptedException {
+    private void takebuttonFunktion() throws InterruptedException, NotFoundException, JsonProcessingException {
         if (!spielerTurn || spielVorbei) return;
 
-        spielerHand.add(kartenstabel.gibKarte());
+        spielerHand.add(Karte.gibKarte(controller, mapper));
         spielerHandWert = countHand(spielerHand);
 
         // Falls der Spieler 21 erreicht oder überkauft, wird der Zug beendet
@@ -347,14 +332,6 @@ public class MyGame extends Application {
 
     // Simuliert den Zug des Computers
     private void computerTurn() throws InterruptedException {
-        // Der Computer zieht solange bis sein Wert mindestens 17 beträgt
-//        while (computerHandWert < 17) {
-//            computerHand.add(kartenstabel.gibKarte());
-//            computerHandWert = countHand(computerHand);
-//            // Kurze Pause, um den Zug visuell nachvollziehen zu können
-//            Thread.sleep(1000);
-//        }
-//        spielVorbei = true;
         Thread computerTurnThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -369,7 +346,7 @@ public class MyGame extends Application {
                         }
                     }
                     ausgabeComputer = "";
-                    for (Kartenstabel.Karte karte1 : computerHand) {
+                    for (Karte karte1 : computerHand) {
                         ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
                     }
                     if (computerHand.get(1).wert + computerHand.get(0).wert > 17) {
@@ -378,7 +355,7 @@ public class MyGame extends Application {
                     }
                     while (true) {
                         ausgabeComputer = "";
-                        for (Kartenstabel.Karte karte1 : computerHand) {
+                        for (Karte karte1 : computerHand) {
                             ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
                         }
                         if (spielVorbei) {
@@ -389,10 +366,15 @@ public class MyGame extends Application {
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
-                        Kartenstabel.Karte karte = computerHand.get(i);
+                        Karte karte = computerHand.get(i);
 
                         if (computerHandWert < 17) {
-                            Kartenstabel.Karte randomKarte = kartenstabel.gibKarte();
+                            Karte randomKarte = null;
+                            try {
+                                randomKarte = Karte.gibKarte(controller, mapper);
+                            } catch (NotFoundException | InterruptedException | JsonProcessingException e) {
+                                throw new RuntimeException(e);
+                            }
                             computerHand.add(randomKarte);
 
                             if (computerHandWert >= 17) {
@@ -403,7 +385,7 @@ public class MyGame extends Application {
                             break;
                         }
                         ausgabeComputer = "";
-                        for (Kartenstabel.Karte karte1 : computerHand) {
+                        for (Karte karte1 : computerHand) {
                             ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
                         }
 
@@ -421,21 +403,15 @@ public class MyGame extends Application {
 
 
     // Zählt den Gesamtwert einer Hand
-    private int countHand(List<Kartenstabel.Karte> kartenHand) {
-//        int sum = 0;
-//        for (Kartenstabel.Karte k : hand) {
-//            sum += k.wert;
-//        }
-//        return sum;
-
+    private int countHand(List<Karte> kartenHand) {
         boolean sonderRegel = false;
         if (kartenHand.get(0).name.equals("Ass") || kartenHand.get(1).name.equals("Ass")) {
             sonderRegel = true;
         }
-        ArrayList<Kartenstabel.Karte> listOfAss = new ArrayList<>();
+        ArrayList<Karte> listOfAss = new ArrayList<>();
         int handWert = 0;
 
-        for (Kartenstabel.Karte karte : kartenHand) {
+        for (Karte karte : kartenHand) {
             if (karte.name.equals("Ass")) {
                 listOfAss.add(karte);
             } else {
@@ -445,7 +421,7 @@ public class MyGame extends Application {
         if (listOfAss.size() > 1 && sonderRegel) {
             int i = 1;
 
-            for (Kartenstabel.Karte karte : listOfAss) {
+            for (Karte karte : listOfAss) {
                 int anzahlAsse = listOfAss.size() - i;
                 i++;
                 if (handWert + 11 + anzahlAsse > 21) {
@@ -457,7 +433,7 @@ public class MyGame extends Application {
 
             }
         } else {
-            for (Kartenstabel.Karte karte : listOfAss) {
+            for (Karte karte : listOfAss) {
 
                 if (handWert + 11 > 21) {
                     karte.wert = 1;
@@ -473,10 +449,9 @@ public class MyGame extends Application {
     }
 
     // Setzt die Spielwerte zurück und startet ein neues Spiel
-    private void anfangsWerte() {
+    private void anfangsWerte() throws NotFoundException, InterruptedException, JsonProcessingException {
         spielerHand.clear();
         computerHand.clear();
-        kartenstabel = new Kartenstabel();
         spielerHandWert = 0;
         computerHandWert = 0;
         counter = 0;
