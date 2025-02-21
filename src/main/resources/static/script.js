@@ -1,6 +1,6 @@
 var user = null;
 var ingame = false;
-
+var gameStarted = false;
 function sitzplatzClicked(index) {
     var sitzplaetze = document.getElementById('btns-sitzplaetze');
     sitzplaetze.classList.add('hidden');
@@ -9,12 +9,6 @@ function sitzplatzClicked(index) {
     ingame = true;
     var start = document.getElementById('start');
     start.classList.remove('hidden');
-}
-
-
-
-function isUserLoggedIn() {
-    // Wenn spieler nicht ingame aber auf dem part der seite dann zurück zum start
 }
 
 window.onload = function() {
@@ -30,114 +24,134 @@ window.onload = function() {
 };
 
 function inGame() {
-    if (gameAlreadyStarted) {
-        window.location.href = 'error.html?error=gameAlreadyStarted';
-    }
+    //if (gameAlreadyStarted) {
+    //    window.location.href = 'error.html?error=gameAlreadyStarted';
+    //}
+    console.log('ingame vor fetch');
 
-    var gameStarted = false;
-    while(!gameStarted) {
-        fetch('/api/hasGameStarted', {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Netzwerkantwort war nicht ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data && data.message) {
-                            handleServerResponse(data.message);
-                        } else {
-                            console.error('Keine Nachricht in der Antwort gefunden.');
-                        }
-                    })
-                    .catch(error => console.error('Fehler:', error));
+    fetch('/api/user/ping', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+            if (data.message == 'Game has started') {
+                gameStarted = true;
+                console.log('Spiel wurde gestartet');
+            } else if(data.message == "Game was reseted"){
+                gameStarted = false;
+                console.log("Resetted")
+                leave();
+            } 
+        } else {
+            console.error('Keine Nachricht in der Antwort gefunden!');
+        }
+    })
+    .catch(error => console.error('Fehler:', error));
 
-        setTimeout(1000);
-    }
-
-    //
+    setTimeout(1000);
 }
 
-function startGame() {
-    inGame.gameStarted = true;
+
+function Game() {
+    if (gameStarted != true) {
+        inGame();
+    } else if ((user != null) && (gameStarted = true)) {
+        if (!document.getElementById('start').classList.contains('hidden')){document.getElementById('start').classList.add('hidden');}
+        if (document.getElementById('playerGame').classList.contains('hidden')){document.getElementById('playerGame').classList.remove('hidden');}
+
+
+        if(userPick == user) {
+            document.getElementById('pickBtn1').disabled = false;
+            document.getElementById('pickBtn2').disabled = false;
+        } else {
+            document.getElementById('pickBtn1').disabled = true;
+            document.getElementById('pickBtn2').disabled = true;
+        }
+    }
 }
+setInterval(Game, 100);
 
 function joinTable(id) {
-            sitzplatzClicked(id)
-            const button = document.getElementById(id);
-            if (button) {
-                button.disabled = true;
-            } else {
-                console.warn(`Button mit ID ${id} nicht gefunden.`);
+    sitzplatzClicked(id)
+    const button = document.getElementById(id);
+    if (button) {
+        button.disabled = true;
+    } else {
+        console.warn(`Button mit ID ${id} nicht gefunden.`);
+    }
+    fetch('/api/user/playerJoinedTheTable', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: id })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+            if(data.message == "not acknowledged"){
+                window.location.reload();
             }
-            fetch('/api/user/playerJoinedTheTable', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ message: id })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Netzwerkantwort war nicht ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data && data.message) {
-                    if(data.message == "not acknowledged"){
-                        window.location.reload();
-                    }
-                } else {
-                    alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
-                }
-            })
-            .catch(
-            //error => console.error('Fehler:', error)
-            );
+        } else {
+            alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
         }
+    })
+    .catch(
+    //error => console.error('Fehler:', error)
+    );
+}
 
-        function loadTables() {
-            fetch('/api/onload', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Netzwerkantwort war nicht ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data && data.message) {
-                    handleServerResponse(data.message);
-                } else {
-                    console.error('Keine Nachricht in der Antwort gefunden.');
-                }
-            })
-            .catch(error => console.error('Fehler:', error));
+function loadTables() {
+    fetch('/api/onload', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
         }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+            handleServerResponse(data.message);
+        } else {
+            console.error('Keine Nachricht in der Antwort gefunden.');
+        }
+    })
+    .catch(error => console.error('Fehler:', error));
+}
 
-         function handleServerResponse(message) {
-            console.log('Serverantwort:', message);
-            const buttonIds = JSON.parse(message);
-                    buttonIds.forEach(id => {
-                        console.log(id)
-                        const button = document.getElementById(id);
-                        if (button) {
-                            button.disabled = true;
-                        } else {
-                            console.warn(`Button mit ID ${id} nicht gefunden.`);
-                        }
-                    });
-        }
+    function handleServerResponse(message) {
+    console.log('Serverantwort:', message);
+    const buttonIds = JSON.parse(message);
+            buttonIds.forEach(id => {
+                console.log(id)
+                const button = document.getElementById(id);
+                if (button) {
+                    button.disabled = true;
+                } else {
+                    console.warn(`Button mit ID ${id} nicht gefunden.`);
+                }
+            });
+}
+
 function pingLobbyAsUser() {
     console.log('ausgeführt');
     if(user != null) {
@@ -169,3 +183,58 @@ function pingLobbyAsUser() {
 
 window.onload = loadTables; // Zuweisung der Funktion, nicht der Aufruf
 setInterval(pingLobbyAsUser, 1000);
+
+
+
+function get() {
+    fetch('/api/user/getCard', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: user })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+
+        } else {
+            alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
+        }
+    })
+    .catch(
+    error => console.error('Fehler:', error)
+    );
+}
+
+
+function hold() {
+    fetch('/api/user/holdCard', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: user })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+
+        } else {
+            alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
+        }
+    })
+    .catch(
+    error => console.error('Fehler:', error)
+    );
+}

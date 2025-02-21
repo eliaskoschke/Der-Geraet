@@ -96,6 +96,7 @@ h5 {
 
 
 #dealerHand {
+    animation: fadeIn 1s;
     display: grid;
     grid-template-columns: repeat(5, minmax(80px, 1fr)); 
     gap: 10px;

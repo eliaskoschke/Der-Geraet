@@ -30,7 +30,7 @@ function leave() {
     }
 }
 
-
+var userPick;
 
 
 function pingPlayerTurn() {
@@ -51,6 +51,7 @@ function pingPlayerTurn() {
         if (data && data.message) {
             console.log(data.message);
             var current = document.getElementById('currentPlayer');
+            userPick = data.message;
             if (data.message != user) {
                 current.textContent = "Spieler " + data.message + " ist an der Reihe!";
             } else {
@@ -110,20 +111,22 @@ function updateDealerHand() {
 
     let div = document.getElementById('dealerHand');     
     div.innerHTML = "";
+    if (dealerHand != "") {
+        let cardIds = dealerHand.split(',');
+        let element = document.getElementById('dealerHand');
 
-    let cardIds = dealerHand.split(',');
-    let element = document.getElementById('dealerHand');
+        console.log('Element gefunden:', element);
+        console.log('Karten-IDs:', cardIds);
+        olddealerhand = dealerHand;
 
-    console.log('Element gefunden:', element);
-    console.log('Karten-IDs:', cardIds);
-    olddealerhand = dealerHand;
+        for (var i = 0; i < cardIds.length; i++) {
+            if (cardIds.length < 1) {
+                break;
+            }
 
-    for (var i = 0; i < cardIds.length; i++) {
-        if (cardIds.length <= 1) {
-            break;
+            console.log('Füge Bild hinzu für Karte:', cardIds[i]);
+            element.insertAdjacentHTML('beforeend', '<img id="karte' + i + '" src="img/cards/' + cardIds[i] + '.png">');
         }
-
-        console.log('Füge Bild hinzu für Karte:', cardIds[i]);
-        element.insertAdjacentHTML('beforeend', '<img id="karte' + i + '" src="img/cards/' + cardIds[i] + '.png">');
-    }
+    } 
+    
 }
