@@ -14,6 +14,10 @@ public class Player {
     public Player() {
     }
 
+    public String toString(){
+        return id;
+    }
+
     public Player(String id) {
         this.id = id;
     }

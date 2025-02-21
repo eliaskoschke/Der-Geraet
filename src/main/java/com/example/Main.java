@@ -39,6 +39,7 @@ public class Main {
     static DigitalOutput discardMotorIn1;
     static DigitalOutput discardMotorIn2;
     static DigitalOutput cameraOutput;
+    static DigitalInput connectionInput;
     static GameService gameService;
     static Camera camera = new Camera();
     static ObjectMapper mapper = new ObjectMapper();
@@ -46,11 +47,26 @@ public class Main {
         controllerConfig();
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
+        if(connectionInput.isHigh()){
+            gameService.setConnected(true);
+        }
+        registerPlayer();
         gameLogic();
+    }
+
+    public static void registerPlayer(){
+        //Alle taster High
+        while(true){
+            if(gameService.isGameStarted()){
+                //alle Taster low
+                break;
+            }
+        }
     }
 
     private static void gameLogic() throws InterruptedException {
         boolean actionHasBeenTaken = false;
+        // Taster vom ersten Spieler HIgh
         while(true){
             if(gameService.isButtonClickedOnce()){
                 hitEvent();
@@ -166,5 +182,11 @@ public class Main {
                 .shutdown(DigitalState.LOW)
                 .initial(DigitalState.LOW)
                 .provider("pigpio-digital-output"));
+        connectionInput = pi4j.create(DigitalInput.newConfigBuilder(pi4j)
+                .name("Connection Input")
+                .id("Connection Input ID")
+                .address(22)
+                .pull(PullResistance.PULL_DOWN)
+                .debounce(150L));
     }
 }

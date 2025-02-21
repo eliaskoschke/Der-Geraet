@@ -22,13 +22,13 @@ public class Controller {
     public Controller(GameService gameService) {
         this.gameService = gameService;
 
-//        gameService.setDealerHand( List.of(
-//                new Karte("5", "Kreuz", "Kreuz 5"),
-//                new Karte("10", "Karo", "Karo 10"),
-//                new Karte("2", "Pik", "Pik 2"),
-//                new Karte("10", "Herz", "Herz 10"),
-//                new Karte("11", "Pik", "Pik Ass")
-//        ));
+        gameService.setDealerHand( List.of(
+                new Karte("5", "Kreuz", "Kreuz 5"),
+                new Karte("10", "Karo", "Karo 10"),
+                new Karte("2", "Pik", "Pik 2"),
+                new Karte("10", "Herz", "Herz 10"),
+                new Karte("11", "Pik", "Pik Ass")
+        ));
     }
 
     @GetMapping("/onload")
@@ -47,7 +47,7 @@ public class Controller {
 
     @GetMapping("/isConnected")
     public ResponseMessage isConnected() throws JsonProcessingException {
-        return new ResponseMessage("true");
+        return new ResponseMessage(mapper.writeValueAsString(gameService.isConnected()));
     }
 
     @PostMapping("/user/playerJoinedTheTable")
@@ -91,6 +91,12 @@ public class Controller {
         return new ResponseMessage(mapper.writeValueAsString("false"));
     }
 
+    @GetMapping("/user/stay")
+    public ResponseMessage stay() throws JsonProcessingException {
+
+        return new ResponseMessage(mapper.writeValueAsString("false"));
+    }
+
     @GetMapping("/admin/ping")
     public ResponseMessage adminPing() throws JsonProcessingException {
         return new ResponseMessage(String.valueOf(gameService.getListOfAllPlayers().size()));
@@ -105,8 +111,13 @@ public class Controller {
     }
 
     @PostMapping("/admin/startGame")
-    public ResponseMessage startGame(@RequestBody Message postPassword) {
+    public ResponseMessage startGame(@RequestBody Message message) {
         gameService.setGameStarted(true);
+        if (message.getMessage().toLowerCase().equals("blackjack")){
+            gameService.setGamemode(Gamemode.BLACKJACK);
+        } else{
+            gameService.setGamemode(Gamemode.POKER);
+        }
         Collections.sort(gameService.getListOfAllPlayers(), new Comparator<Player>() {
             @Override
             public int compare(Player p1, Player p2) {
@@ -126,10 +137,29 @@ public class Controller {
         return new ResponseMessage("true");
     }
 
+    @GetMapping("/admin/kickCurrentPlayer")
+    public ResponseMessage kickCurrentPlayer() {
+        if (gameService.getCurrenPlayerIndex() + 1 >= gameService.getListOfAllPlayers().size()) {
+            gameService.setCurrenPlayerIndex(0);
+        } else {
+            gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex() + 1);
+            //setze den taster der nächste Person auf high
+        }
+        Player playerWhoHasToBeKicked = gameService.getCurrentPlayer();
+        gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(gameService.getCurrenPlayerIndex()));
+        gameService.getListOfAllPlayers().remove(playerWhoHasToBeKicked);
+        return new ResponseMessage("Spieler wurde gekickt");
+    }
+
     @GetMapping("/game/ping/getDealerHand")
     public ResponseMessage getDealerHand() throws JsonProcessingException {
+        counter++;
         if(gameService.getDealerHand() != null) {
-            gameService.setNumberOfCardFaceup(gameService.getDealerHand().size() -1);
+            if(counter >= 10){
+                counter = 0;
+                gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() +1);
+            }
+//            gameService.setNumberOfCardFaceup(gameService.getDealerHand().size() -1);
             String idCSV = castKartenObjectToBildId(gameService.getDealerHand());
             return new ResponseMessage(idCSV);
         }
@@ -141,7 +171,9 @@ public class Controller {
         return new ResponseMessage(gameService.getCurrentPlayer().getId());
     }
 
-    @PostMapping("/logic/buttonIsClickedOnce")
+
+
+    @PostMapping({"/logic/buttonIsClickedOnce", "/user/hit"})
     public ResponseMessage buttonIsClickedOnce(@RequestBody Message message) {
         System.out.println("Hallo");
         String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ")+1);
@@ -150,7 +182,7 @@ public class Controller {
         return new ResponseMessage("true");
     }
 
-    @PostMapping("/logic/buttonIsClickedTwice")
+    @PostMapping({"/logic/buttonIsClickedTwice", "/user/hit"})
     public ResponseMessage buttonIsClickedTwice(@RequestBody Message message) {
         System.out.println("Hallo");
         String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ")+1);
@@ -168,6 +200,18 @@ public class Controller {
 
         }
         return new ResponseMessage("false");
+    }
+
+    @PostMapping("/logic/registerPlayerAtTable")
+    public ResponseMessage registerPlayerAtTable(@RequestBody Message message) throws JsonProcessingException {
+        System.out.println("Nachricht erhalten: " + message.getMessage());
+        //gameService.buttonClicked();
+        List<String> playerIds = getListOfAllActiveID();
+        if (!playerIds.contains(message.getMessage())) {
+            gameService.getListOfAllPlayers().add(new Player(message.getMessage()));
+            return new ResponseMessage("acknowledged");
+        }
+        return new ResponseMessage("not acknowledged");
     }
 
     public String castKartenObjectToBildId(List<Karte>dealerHand){
