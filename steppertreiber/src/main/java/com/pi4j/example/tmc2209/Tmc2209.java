@@ -130,11 +130,12 @@ public class Tmc2209 {
         if (speed > 0) {
             direction.set(Direction.FORWARD);
             dirPin.on();
+            stepPin.on(50, speed);
         } else {
             direction.set(Direction.BACKWARD);
             dirPin.off();
+            stepPin.on(50, -speed);
         }
-        stepPin.on(50, speed);
 
         new Thread(() -> {
             while (isHoming.get())
