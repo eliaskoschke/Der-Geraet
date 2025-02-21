@@ -41,35 +41,22 @@ import java.util.Scanner;
 
 public class MinimalExample {
 
-//    private static final int PIN_ENABLE = 24;
-    private static final int PIN_DIAG   = 24; // PIN 18 = BCM 24
-    private static final int PIN_INDEX  = 23; // PIN 15 = BCM 22
+    private static final int PIN_INDEX  = 23;
+    private static final int PIN_STEP  = 18;
+    private static final int PIN_DIR  = 24;
 
 
     public static void main(String[] args) throws Exception {
 
         var pi4j = Pi4J.newAutoContext();
 
-        PwmConfig pwmConfig = Pwm.newConfigBuilder(pi4j)
-                .address(18)
-                .pwmType(PwmType.SOFTWARE)
-                .initial(0)
-                .shutdown(0)
-                .provider("pigpio-pwm")
-                .build();
-
-
-        Pwm pwm = pi4j.create(pwmConfig);
-        pwm.on(50, 500);
-        Thread.sleep(30000L);
-
-//        testMotorDriver(pi4j);
+        testMotorDriver(pi4j);
 
         pi4j.shutdown();
     }
 
     private static void testMotorDriver(Context pi4j) throws InterruptedException, TMCCommunicationException, TMCDeviceIsBusyException {
-        Tmc2209 steppermotor = new Tmc2209(pi4j, 0, PIN_INDEX, PIN_DIAG);
+        Tmc2209 steppermotor = new Tmc2209(pi4j, PIN_INDEX, PIN_DIR, PIN_STEP);
         Scanner scanner = new Scanner(System.in);
 
         outer: while (true) {
@@ -96,7 +83,9 @@ public class MinimalExample {
                 case 3:
                     System.out.println("Welche Geschwindigkeit (Negative Werte können für Rückwärts verwendet werden)? ");
                     int homeSpeed = scanner.nextInt();
-                    steppermotor.homePosition(homeSpeed);
+                    System.out.println("Stall-Detection-Threshold? ");
+                    int threshold = scanner.nextInt();
+                    steppermotor.homePosition(homeSpeed, threshold);
                     break;
                 case 4:
                     break outer;

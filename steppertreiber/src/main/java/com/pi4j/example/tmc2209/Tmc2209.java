@@ -2,11 +2,16 @@ package com.pi4j.example.tmc2209;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.pi4j.context.Context;
-import com.pi4j.io.gpio.digital.DigitalInput;
-import com.pi4j.io.gpio.digital.DigitalState;
-import com.pi4j.io.gpio.digital.PullResistance;
+import com.pi4j.io.gpio.digital.*;
+import com.pi4j.io.pwm.Pwm;
+import com.pi4j.io.pwm.PwmConfig;
+import com.pi4j.io.pwm.PwmType;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.fazecast.jSerialComm.SerialPort.TIMEOUT_READ_BLOCKING;
 import static java.lang.Math.round;
@@ -14,14 +19,15 @@ import static java.lang.Math.round;
 public class Tmc2209 {
     SerialPort port;
 
-    private boolean isHoming = false;
-    private long position = 0;
-    private long targetPosition = 0;
-    private Direction direction = Direction.FORWARD;
+    private final AtomicBoolean isHoming = new AtomicBoolean(false);
+    private final AtomicLong position = new AtomicLong();
+    private final AtomicLong targetPosition = new AtomicLong();
+    private final AtomicReference<Direction> direction = new AtomicReference<>(Direction.FORWARD);
+    private final Pwm stepPin;
+    private final DigitalOutput dirPin;
+    private final AtomicInteger currSpeed = new AtomicInteger();
 
-    private static final int SGTHRS = 0xAFFEE;
-
-    public Tmc2209(Context p4jContext, int enablePin, int indexPin, int diagPin) throws InterruptedException, TMCCommunicationException {
+    public Tmc2209(Context p4jContext, int indexPin, int dirPin, int stepPin) throws InterruptedException, TMCCommunicationException {
         port = SerialPort.getCommPorts()[0];
         port.setBaudRate(115200);
         port.setNumStopBits(1);
@@ -32,60 +38,46 @@ public class Tmc2209 {
             System.out.println("Warte auf Serial");
             Thread.sleep(250);
         }
-        setIndexStep(true);
         setSpreadCycle(false);
         readDriverStatus();
         setCurrent(20, 10, 0.5f);
-        System.out.println(readInt(Register.SGTHRS.address));
-        writeRegister(Register.SGTHRS.address, 15);
+
+        PwmConfig pwmConfig = Pwm.newConfigBuilder(p4jContext)
+                .id("tmx-step")
+                .name("TMC 2209 - STEP Pin")
+                .address(stepPin)
+                .pwmType(PwmType.SOFTWARE) // Hier kann man mal probieren ob HARDWARE auch geht
+                .initial(0)
+                .shutdown(0)
+                .provider("pigpio-pwm")
+                .build();
+        this.stepPin = p4jContext.create(pwmConfig);
 
         var indexConfig = DigitalInput.newConfigBuilder(p4jContext)
                 .id("tmc-index")
                 .name("TMC 2209 - Index Pin")
                 .address(indexPin)
-                .pull(PullResistance.PULL_UP);
-//                .debounce(100L);
+                .pull(PullResistance.PULL_UP)
+                .debounce(100L);
         var indexInput = p4jContext.create(indexConfig);
         indexInput.addListener(e -> {
             if (e.state() == DigitalState.HIGH) {
-                if (direction == Direction.FORWARD) position++;
-                else position--;
+                if (direction.get() == Direction.FORWARD) position.getAndIncrement();
+                else position.getAndDecrement();
 
                 System.out.println("Position: "+ position);
                 System.out.println("Target-Position: "+ targetPosition);
 
-                if (position == targetPosition) setVactual(0);
+                if (position.get() == targetPosition.get()) this.stepPin.off();
             }
         });
 
-        var diagConfig = DigitalInput.newConfigBuilder(p4jContext)
-                .id("tmc-diag")
-                .name("TMC 2209 - Diag Pin")
-                .address(diagPin)
-                .pull(PullResistance.PULL_DOWN)
-                .debounce(100L);
-        var diagInput = p4jContext.create(diagConfig);
-        diagInput.addListener(e -> {
-            if (e.state() == DigitalState.HIGH && isHoming) {
-                System.out.println("Diag-Flanke while Homing");
-
-//                int sgResult = readInt(Register.SG_RESULT.address);
-
-//                // TODO: double SGTHRS?
-//                if (sgResult <= SGTHRS) {
-//
-//                }
-
-                setVactual(0);
-                position = 0;
-                isHoming = false;
-                try {
-                    setSpreadCycle(false);
-                } catch (TMCCommunicationException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
+        DigitalOutputConfig dirConfig = DigitalOutput.newConfigBuilder(p4jContext)
+                .id("tmc-dir")
+                .name("TMC 2209 - Dir Pin")
+                .address(dirPin)
+                .build();
+        this.dirPin = p4jContext.create(dirConfig);
     }
 
     /**
@@ -95,26 +87,31 @@ public class Tmc2209 {
      */
     public void moveToPosition(long targetPosition, int speed) throws TMCDeviceIsBusyException {
         if (speed < 1) throw new IllegalArgumentException("Speed must be positive");
-        if (isHoming) throw new TMCDeviceIsBusyException("Motor is busy with homing");
+        if (isHoming.get()) throw new TMCDeviceIsBusyException("Motor is busy with homing");
 
-        setVactual(0);
-        this.targetPosition = targetPosition;
-        if (position < targetPosition) {
-            direction = Direction.FORWARD;
-            setVactual(speed);
-        } else if (position > targetPosition) {
-            direction = Direction.BACKWARD;
-            setVactual(-speed);
+        stepPin.off();
+        this.targetPosition.set(targetPosition);
+        if (position.get() < targetPosition) {
+            currSpeed.set(speed);
+            direction.set(Direction.FORWARD);
+            dirPin.on();
+            stepPin.on(50, speed);
+        } else if (position.get() > targetPosition) {
+            currSpeed.set(-speed);
+            direction.set(Direction.BACKWARD);
+            dirPin.off();
+            stepPin.on(50, speed);
+        } else {
+            currSpeed.set(0);
         }
     }
 
     /**
      * Setzt den internet Positionszähler zurück. Die aktuelle Postion wird als Nullpunkt gesetzt.
      */
-    public void resetPosition() throws TMCCommunicationException, TMCDeviceIsBusyException {
-        int vActual = readInt(Register.V_ACTUAL.address);
-        if (vActual != 0) throw new TMCDeviceIsBusyException("Can't reset position while Motor is moving");
-        position = 0;
+    public void resetPosition() throws TMCDeviceIsBusyException {
+        if (currSpeed.get() != 0) throw new TMCDeviceIsBusyException("Can't reset position while Motor is moving");
+        position.set(0);
     }
 
     /**
@@ -122,21 +119,35 @@ public class Tmc2209 {
      *
      * @param speed Die Geschwindigkeit, mit der der Motor zum Endstopp gefahren werden soll. Negative Werte können verwendet werden, um rückwärtszufahren.
      */
-    public void homePosition(int speed) throws TMCCommunicationException {
-        setVactual(0);
-        setSpreadCycle(false);
-        setVactual(speed);
-        isHoming = true;
+    public synchronized void homePosition(int speed, int threshold) throws TMCDeviceIsBusyException {
+        if (currSpeed.get() != 0) throw new TMCDeviceIsBusyException("Can't home position while Motor is moving");
+        if (isHoming.get()) throw new TMCDeviceIsBusyException("Motor is already homing");
+        if (speed == 0) throw new IllegalArgumentException("Speed must not be 0");
+        isHoming.set(true);
+        stepPin.off();
+
+        if (speed > 0) {
+            direction.set(Direction.FORWARD);
+            dirPin.on();
+        } else {
+            direction.set(Direction.BACKWARD);
+            dirPin.off();
+        }
+        stepPin.on(50, speed);
 
         new Thread(() -> {
-            while (true)
-            try {
-                int sgResult = readInt(Register.SG_RESULT.address);
-                System.out.println(sgResult);
-                Thread.sleep(200L);
-            } catch (Exception e) {
-                System.out.println(e);
-            }
+            while (isHoming.get())
+                try {
+                    Thread.sleep(0);
+                    int sgResult = readInt(Register.SG_RESULT.address);
+                    if (sgResult <= threshold) {
+                        stepPin.off();
+                        position.set(0);
+                        isHoming.set(false);
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
         }).start();
     }
 
@@ -144,16 +155,6 @@ public class Tmc2209 {
         int gConf = readInt(Register.GCONF.address);
         gConf = setFlag(gConf, 2, enabled);
         writeRegister(Register.GCONF.address, gConf);
-    }
-
-    private void setIndexStep(boolean enabled) throws TMCCommunicationException {
-        int gConf = readInt(Register.GCONF.address);
-        gConf = setFlag(gConf, 5, enabled);
-        writeRegister(Register.GCONF.address, gConf);
-    }
-
-    private void setVactual(int vActual) {
-        writeRegister(Register.V_ACTUAL.address, vActual);
     }
 
     private void readDriverStatus() throws TMCCommunicationException {
