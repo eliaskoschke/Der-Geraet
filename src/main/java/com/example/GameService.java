@@ -3,9 +3,15 @@ package com.example;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class GameService {
+
+    private Gamemode gamemode = Gamemode.BLACKJACK;
+
+    private int numberOfCardFaceup = 1;
+
     private boolean buttonClickedOnce = false;
 
     private boolean buttonClickedTwice = false;
@@ -22,7 +28,7 @@ public class GameService {
 
     int playerGotReseted = 0;
 
-    ArrayList<Karte> dealerHand = new ArrayList<>();
+    List<Karte> dealerHand;
 
     ArrayList<String> dealerHandBildId = new ArrayList<>();
 
@@ -85,11 +91,11 @@ public class GameService {
         this.playerGotReseted = playerGotReseted;
     }
 
-    public ArrayList<Karte> getDealerHand() {
+    public List<Karte> getDealerHand() {
         return dealerHand;
     }
 
-    public void setDealerHand(ArrayList<Karte> dealerHand) {
+    public void setDealerHand(List<Karte> dealerHand) {
         this.dealerHand = dealerHand;
     }
 
@@ -139,5 +145,21 @@ public class GameService {
 
     public void setNextCardInDeck(Karte nextCardInDeck) {
         this.nextCardInDeck = nextCardInDeck;
+    }
+
+    public Gamemode getGamemode() {
+        return gamemode;
+    }
+
+    public void setGamemode(Gamemode gamemode) {
+        this.gamemode = gamemode;
+    }
+
+    public int getNumberOfCardFaceup() {
+        return numberOfCardFaceup;
+    }
+
+    public void setNumberOfCardFaceup(int numberOfCardFaceup) {
+        this.numberOfCardFaceup = numberOfCardFaceup;
     }
 }

@@ -21,6 +21,13 @@ public class Controller {
     @Autowired
     public Controller(GameService gameService) {
         this.gameService = gameService;
+        gameService.setDealerHand( List.of(
+                new Karte(5, "Kreuz 5", "Kreuz"),
+                new Karte(10, "Karo 10", "Karo"),
+                new Karte(2, "Pik 2", "Pik"),
+                new Karte(10, "Herz 10", "Herz"),
+                new Karte(11, "Pik Ass", "Pik")
+        ));
     }
 
     @GetMapping("/onload")
@@ -124,10 +131,9 @@ public class Controller {
         String idCSV = castKartenObjectToBildId(gameService.getDealerHand());
         if(counter>=10){
             counter =0;
-            int randomZahl = (int) (12*Math.random()+101);
-            idCSV += String.valueOf(randomZahl) +",";
+            gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() + 1);
         }
-        return new ResponseMessage(String.valueOf(gameService.getDealerHandBildId()));
+        return new ResponseMessage(idCSV);
     }
 
     @GetMapping("/game/ping/getPlayerTurn")
@@ -164,43 +170,48 @@ public class Controller {
         return new ResponseMessage("false");
     }
 
-    public String castKartenObjectToBildId(ArrayList<Karte>dealerHand){
+    public String castKartenObjectToBildId(List<Karte>dealerHand){
         String idCSV ="";
-        for(Karte karte : dealerHand){
+        for(int i = 0; i < dealerHand.size(); i++){
             int idValue = 0;
-            switch (karte.typ){
-                case "Karo":
-                    idValue += 100;
-                    break;
-                case "Pik":
-                    idValue += 200;
-                    break;
-                case "Herz":
-                    idValue += 300;
-                    break;
-                case "Kreuz":
-                    idValue += 400;
-                    break;
-            }
-            switch (karte.name.substring(karte.name.indexOf(" ")+1)){
-                case "Ass":
-                    idValue += 1;
-                    break;
-                case "Bube":
-                    idValue += 11;
-                    break;
-                case "Dame":
-                    idValue += 12;
-                    break;
-                case "König":
-                    idValue += 13;
-                    break;
-                default:
-                    idValue += karte.wert;
-                    break;
+            if(i< gameService.getNumberOfCardFaceup()) {
+                switch (dealerHand.get(i).typ) {
+                    case "Karo":
+                        idValue += 100;
+                        break;
+                    case "Pik":
+                        idValue += 200;
+                        break;
+                    case "Herz":
+                        idValue += 300;
+                        break;
+                    case "Kreuz":
+                        idValue += 400;
+                        break;
+                }
+                switch (dealerHand.get(i).name.substring(dealerHand.get(i).name.indexOf(" ") + 1)) {
+                    case "Ass":
+                        idValue += 1;
+                        break;
+                    case "Bube":
+                        idValue += 11;
+                        break;
+                    case "Dame":
+                        idValue += 12;
+                        break;
+                    case "König":
+                        idValue += 13;
+                        break;
+                    default:
+                        idValue += dealerHand.get(i).wert;
+                        break;
+                }
+            } else {
+                idValue += 500;
             }
             idCSV += String.valueOf(idValue) +",";
         }
+        idCSV = idCSV.substring(0, idCSV.length()-1);
         return  idCSV;
     }
 
