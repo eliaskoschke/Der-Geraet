@@ -58,17 +58,18 @@ public class Tmc2209 {
                 .name("TMC 2209 - Index Pin")
                 .address(indexPin)
                 .pull(PullResistance.PULL_UP)
-                .debounce(100L);
+                .debounce(10L);
         var indexInput = p4jContext.create(indexConfig);
         indexInput.addListener(e -> {
             if (e.state() == DigitalState.HIGH) {
+                if (isHoming.get()) return;
                 if (direction.get() == Direction.FORWARD) position.getAndIncrement();
                 else position.getAndDecrement();
 
-                System.out.println("Position: "+ position);
-                System.out.println("Target-Position: "+ targetPosition);
-
-                if (position.get() == targetPosition.get()) this.stepPin.off();
+                if (position.get() == targetPosition.get()) {
+                    this.stepPin.off();
+                    this.currSpeed.set(0);
+                }
             }
         });
 
