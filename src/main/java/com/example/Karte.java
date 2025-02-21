@@ -2,30 +2,25 @@ package com.example;
 
 public class Karte {
 
-    int wert;
-    String name;
+    String wert;
     String typ;
+    String name;
 
-    public Karte(int wert, String name, String typ) {
-        this.wert = wert;
-        this.name = name;
-        this.typ = typ;
+    public Karte() {
     }
 
-    public int getWert() {
+    public Karte(String wert, String typ, String name) {
+        this.wert = wert;
+        this.typ = typ;
+        this.name = name;
+    }
+
+    public String getWert() {
         return wert;
     }
 
-    public void setWert(int wert) {
+    public void setWert(String wert) {
         this.wert = wert;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getTyp() {
@@ -34,5 +29,13 @@ public class Karte {
 
     public void setTyp(String typ) {
         this.typ = typ;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -44,17 +44,17 @@ public class Camera {
         }
     }
 
-    static void displayImage(BufferedImage img) {
-        ImageIcon icon = new ImageIcon(img);
-        JFrame frame = new JFrame();
-        frame.setLayout(new FlowLayout());
-        frame.setSize(img.getWidth(), img.getHeight());
-        JLabel lbl = new JLabel();
-        lbl.setIcon(icon);
-        frame.add(lbl);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
+//    static void displayImage(BufferedImage img) {
+//        ImageIcon icon = new ImageIcon(img);
+//        JFrame frame = new JFrame();
+//        frame.setLayout(new FlowLayout());
+//        frame.setSize(img.getWidth(), img.getHeight());
+//        JLabel lbl = new JLabel();
+//        lbl.setIcon(icon);
+//        frame.add(lbl);
+//        frame.setVisible(true);
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//    }
 
     static String decodeQRCode(BufferedImage bufferedImage) throws NotFoundException {
         LuminanceSource source = new BufferedImageLuminanceSource(bufferedImage);
