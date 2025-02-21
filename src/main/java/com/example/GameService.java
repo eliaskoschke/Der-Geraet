@@ -28,7 +28,7 @@ public class GameService {
 
     int playerGotReseted = 0;
 
-    List<Karte> dealerHand;
+    List<Karte> dealerHand ;
 
     ArrayList<String> dealerHandBildId = new ArrayList<>();
 

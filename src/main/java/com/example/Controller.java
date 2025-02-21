@@ -21,13 +21,13 @@ public class Controller {
     @Autowired
     public Controller(GameService gameService) {
         this.gameService = gameService;
-        gameService.setDealerHand( List.of(
-                new Karte("5", "Kreuz 5", "Kreuz"),
-                new Karte("10", "Karo 10", "Karo"),
-                new Karte("2", "Pik 2", "Pik"),
-                new Karte("10", "Herz 10", "Herz"),
-                new Karte("11", "Pik Ass", "Pik")
-        ));
+//        gameService.setDealerHand( List.of(
+//                new Karte("5", "Kreuz", "Kreuz 5"),
+//                new Karte("10", "Karo", "Karo 10"),
+//                new Karte("2", "Pik", "Pik 2"),
+//                new Karte("10", "Herz", "Herz 10"),
+//                new Karte("11", "Pik", "Pik Ass")
+//        ));
     }
 
     @GetMapping("/onload")
