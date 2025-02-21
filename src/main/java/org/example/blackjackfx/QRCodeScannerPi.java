@@ -13,21 +13,25 @@ import java.awt.image.BufferedImage;
 
 public class QRCodeScannerPi {
 
-    public static String scan() throws NotFoundException, InterruptedException {
+    public static String scan() {
         BufferedImage image;
         int counter = 0;
-
         while (counter <= 10) {
-            image = captureImage();
-            counter++;
-            if (image != null) {
-                String decodedText = decodeQRCode(image);
-                if (decodedText != null && !decodedText.isEmpty()) {
-                    System.out.println(decodedText);
-                    return decodedText;
-                } else {
-                    System.out.println("QR-Code nicht gefunden");
+            try {
+                image = captureImage();
+                counter++;
+                if (image != null) {
+                    String decodedText = decodeQRCode(image);
+                    if (decodedText != null && !decodedText.isEmpty()) {
+                        System.out.println(decodedText);
+                        return decodedText;
+                    } else {
+                        System.out.println("QR-Code nicht gefunden");
+                    }
                 }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return "";

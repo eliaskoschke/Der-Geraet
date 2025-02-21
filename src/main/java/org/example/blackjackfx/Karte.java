@@ -1,5 +1,6 @@
 package org.example.blackjackfx;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.NotFoundException;
@@ -9,6 +10,15 @@ public class Karte {
     int wert;
     String name;
     String typ;
+    @JsonIgnore
+    public Image getBild() {
+        return bild;
+    }
+    @JsonIgnore
+    public void setBild(Image bild) {
+        this.bild = bild;
+    }
+
     Image bild;
 
     public Image castKartenObjectToBildId() {
@@ -45,7 +55,10 @@ public class Karte {
                 idValue += wert;
                 break;
         }
-        return new Image("D:\\projekte\\BlackJackFx\\src\\main\\resources\\Karten\\" + idValue + ".png");
+        //home/pi/BlackJackFX/Der-Geraet/src/main/resources/Karten/202.png
+        System.out.println("file:/home/pi/BlackJackFX/Der-Geraet/src/main/resources/Karten/" + idValue + ".png");
+        return new Image("file:/home/pi/BlackJackFX/Der-Geraet/src/main/resources/Karten/" + idValue + ".png");
+
     }
 
     public Karte(String wert, String typ, String name) {
@@ -57,9 +70,15 @@ public class Karte {
 
     public static Karte gibKarte(MotorController motorController, ObjectMapper mapper) throws NotFoundException, InterruptedException, JsonProcessingException {
         String jsonKarte = QRCodeScannerPi.scan();
-        Karte karte = mapper.readValue(jsonKarte, Karte.class);
-        motorController.spin();
-        return karte;
+        if (!jsonKarte.isEmpty()) {
+            Karte karte = mapper.readValue(jsonKarte, Karte.class);
+            karte.bild = karte.castKartenObjectToBildId();
+            motorController.spin();
+            Thread.sleep(2000);
+            return karte;
+        }
+        System.out.println("Es wuid null gekackt");
+        return null;
     }
     public Karte() {
     }

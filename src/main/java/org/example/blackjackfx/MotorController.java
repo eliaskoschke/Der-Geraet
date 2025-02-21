@@ -18,7 +18,7 @@ public class MotorController {
     DigitalOutputConfigBuilder config2 = DigitalOutput.newConfigBuilder(pi4j)
             .name("Pin2")
             .id("2")
-            .address(22)
+            .address(27)
             .initial(DigitalState.LOW);
 
     DigitalOutput pin1;

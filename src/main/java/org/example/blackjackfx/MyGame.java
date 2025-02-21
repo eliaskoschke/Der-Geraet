@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.NotFoundException;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -56,21 +57,23 @@ public class MyGame extends Application {
     private Text ergebnisText;
     private Text ergebnisUhrText;
 
-    private MotorController controller = new MotorController();
-    private ObjectMapper mapper = new ObjectMapper();
+     static MotorController controller = new MotorController();
+     static ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public void start(Stage primaryStage) throws NotFoundException, InterruptedException, JsonProcessingException {
         root = new Pane();
         Scene scene = new Scene(root, spielbreite, spielhohe);
+        root.setPrefHeight(spielhohe);
+        root.setPrefWidth(spielbreite);
 
         // Bilder laden
-        hintergrundBild = new Image("file:D:\\projekte\\BlackJackFx\\src\\main\\resources\\Bilder\\HintergrundTisch.png");
-        buttonStay = new Image("file:D:\\projekte\\BlackJackFx\\src\\main\\resources\\Bilder\\stay.png");
-        buttonHit = new Image("file:D:\\projekte\\BlackJackFx\\src\\main\\resources\\Bilder\\holen.png");
-        karteUmgedreht = new Image("file:D:\\projekte\\BlackJackFx\\src\\main\\resources\\Bilder\\UmgedrehteKarte.png",
+        hintergrundBild = new Image("file:/home/pi/BlackJackFX/Der-Geraet/src/main/resources/Bilder/HintergrundTisch.png");
+        buttonStay = new Image("file:/home/pi/BlackJackFX/Der-Geraet/src/main/resources/Bilder/stay.png");
+        buttonHit = new Image("file:/home/pi/BlackJackFX/Der-Geraet/src/main/resources/Bilder/holen.png");
+        karteUmgedreht = new Image("file:/home/pi/BlackJackFX/Der-Geraet/src/main/resources/Bilder/UmgedrehteKarte.png",
                 100, 150, false, true);
-        karteUmgedrehtHand = new Image("file:D:\\projekte\\BlackJackFx\\src\\main\\resources\\Bilder\\Karten\\UmgedrehteKarteHand.png",
+        karteUmgedrehtHand = new Image("file:/home/pi/BlackJackFX/Der-Geraet/src/main/resources/Bilder/Karten/UmgedrehteKarteHand.png",
                 100, 150, false, true);
         // Hintergrundbild erstellen
         ImageView background = new ImageView(hintergrundBild);
@@ -101,6 +104,7 @@ public class MyGame extends Application {
         passButton.setOnAction(e -> {
             try {
                 passButtonFunktion();
+                System.out.println(computerHandWert + " spieler: " + spielerHandWert);
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
@@ -151,7 +155,12 @@ public class MyGame extends Application {
         // Spiel initialisieren
         spielStart();
 
+
         primaryStage.setScene(scene);
+        Platform.runLater(() -> {
+            primaryStage.setHeight(spielhohe);
+            primaryStage.setWidth(spielbreite);
+        });
         primaryStage.show();
     }
 
@@ -206,6 +215,7 @@ public class MyGame extends Application {
 
         // Computer-Karten anzeigen
         if (!spielerTurn) {
+            if (!computerHand.isEmpty()) {
             for (int i = 0; i < computerHand.size(); i++) {
                 ImageView cardView = new ImageView(computerHand.get(i).bild);
                 cardView.setX(291 + hintegrundbildStartWert + (i * 105));
@@ -216,32 +226,34 @@ public class MyGame extends Application {
                 root.getChildren().add(computerText);
             }
         } else {
-            // Während des Spielers: Zeige nur die erste Karte und die Rückseite der zweiten Karte
-            ImageView firstCard = new ImageView(computerHand.get(0).bild);
-            firstCard.setX(291 + hintegrundbildStartWert-25);
-            firstCard.setY(215);
-            firstCard.setFitHeight(150);
-            firstCard.setFitWidth(100);
+                // Während des Spielers: Zeige nur die erste Karte und die Rückseite der zweiten Karte
+                ImageView firstCard = new ImageView(computerHand.get(0).bild);
+                firstCard.setX(291 + hintegrundbildStartWert - 25);
+                firstCard.setY(215);
+                firstCard.setFitHeight(150);
+                firstCard.setFitWidth(100);
 
 
-            ImageView backCard = new ImageView(karteUmgedrehtHand);
-            backCard.setX(291 + hintegrundbildStartWert + 83);
-            backCard.setFitHeight(150);
-            backCard.setFitWidth(100);
-            backCard.setY(215);
+                ImageView backCard = new ImageView(karteUmgedrehtHand);
+                backCard.setX(291 + hintegrundbildStartWert + 83);
+                backCard.setFitHeight(150);
+                backCard.setFitWidth(100);
+                backCard.setY(215);
 
-            root.getChildren().addAll(firstCard, backCard);
-        }
-
-        // Spieler-Karten anzeigen
-        for (int i = 0; i < spielerHand.size(); i++) {
-            ImageView cardView = new ImageView(spielerHand.get(i).bild);
-            cardView.setX(291 + (i * 105));
-            cardView.setY(730);
-            Text spielerText = new Text(291 + (i * 105), 730, spielerHand.get(i).toString());
-            spielerText.setText(spielerHand.get(i).wert + " " + spielerHand.get(i).typ);
-            root.getChildren().add(cardView);
-            root.getChildren().add(spielerText);
+                root.getChildren().addAll(firstCard, backCard);
+            }
+            }
+        if (spielerHand.size() != 0) {
+            // Spieler-Karten anzeigen
+            for (int i = 0; i < spielerHand.size(); i++) {
+                ImageView cardView = new ImageView(spielerHand.get(i).bild);
+                cardView.setX(291 + (i * 105));
+                cardView.setY(730);
+                Text spielerText = new Text(291 + (i * 105), 730, spielerHand.get(i).toString());
+                spielerText.setText(spielerHand.get(i).wert + " " + spielerHand.get(i).typ);
+                root.getChildren().add(cardView);
+                root.getChildren().add(spielerText);
+            }
         }
     }
 
@@ -264,8 +276,9 @@ public class MyGame extends Application {
         spielerHandWert = 0;
         computerHandWert = 0;
 
+        System.out.println(computerHand.get(0).wert);
         computerHandWert += computerHand.get(0).wert;
-        if (computerHand.get(1).name.equals("Ass")) {
+        if (computerHand.get(1).name.contains("Ass")) {
             if (computerHandWert + 11 > 21) {
                 computerHand.get(1).wert = 1;
             } else {
@@ -284,7 +297,7 @@ public class MyGame extends Application {
 
         spielerHandWert += spielerHand.get(0).wert;
 
-        if (spielerHand.get(1).name.equals("Ass")) {
+        if (spielerHand.get(1).name.contains("Ass")) {
             if (spielerHandWert + 11 > 21) {
                 spielerHand.get(1).wert = 1;
             } else {
@@ -338,7 +351,7 @@ public class MyGame extends Application {
                 if (spielerHandWert < 21) {
                     int i = 0;
 
-                    if (computerHand.get(1).name.equals("Ass")) {
+                    if (computerHand.get(1).name.contains("Ass")) {
                         if (computerHandWert + 11 > 21) {
                             computerHand.get(1).wert = 1;
                         } else {
@@ -405,14 +418,14 @@ public class MyGame extends Application {
     // Zählt den Gesamtwert einer Hand
     private int countHand(List<Karte> kartenHand) {
         boolean sonderRegel = false;
-        if (kartenHand.get(0).name.equals("Ass") || kartenHand.get(1).name.equals("Ass")) {
+        if (kartenHand.get(0).name.substring(kartenHand.get(0).name.indexOf(" ")+1).equals("Ass") || kartenHand.get(1).name.substring(kartenHand.get(1).name.indexOf(" ")+1).equals("Ass")) {
             sonderRegel = true;
         }
         ArrayList<Karte> listOfAss = new ArrayList<>();
         int handWert = 0;
 
         for (Karte karte : kartenHand) {
-            if (karte.name.equals("Ass")) {
+            if (karte.name.substring(karte.name.indexOf(" ")+1).equals("Ass")) {
                 listOfAss.add(karte);
             } else {
                 handWert += karte.wert;
