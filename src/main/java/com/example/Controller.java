@@ -203,7 +203,7 @@ public class Controller {
                         idValue += 13;
                         break;
                     default:
-                        idValue += Integer.parseInt(dealerHand.get(i).wert);
+                        idValue += dealerHand.get(i).wert;
                         break;
                 }
             } else {

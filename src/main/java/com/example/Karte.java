@@ -2,7 +2,7 @@ package com.example;
 
 public class Karte {
 
-    String wert;
+    int wert;
     String typ;
     String name;
 
@@ -10,16 +10,16 @@ public class Karte {
     }
 
     public Karte(String wert, String typ, String name) {
-        this.wert = wert;
+        this.wert = Integer.parseInt(wert);
         this.typ = typ;
         this.name = name;
     }
 
-    public String getWert() {
+    public int getWert() {
         return wert;
     }
 
-    public void setWert(String wert) {
+    public void setWert(int wert) {
         this.wert = wert;
     }
 

@@ -98,7 +98,7 @@ public class Main {
                     System.out.println("Decoded text: " + decodedText);
                     Karte karte = mapper.readValue(decodedText, Karte.class);
                     gameService.setNextCardInDeck(karte);
-                    System.out.println(gameService.getNextCardInDeck().getName());
+                    System.out.println(gameService.getNextCardInDeck().getName() +" "+ gameService.getNextCardInDeck().getWert());
                 } else {
                     System.out.println("QR-Code nicht gefunden");
                 }
