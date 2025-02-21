@@ -10,6 +10,8 @@ public class GameService {
 
     private Gamemode gamemode = Gamemode.BLACKJACK;
 
+    private boolean connected = false;
+
     private int numberOfCardFaceup = 1;
 
     private boolean buttonClickedOnce = false;
@@ -161,5 +163,13 @@ public class GameService {
 
     public void setNumberOfCardFaceup(int numberOfCardFaceup) {
         this.numberOfCardFaceup = numberOfCardFaceup;
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
     }
 }
