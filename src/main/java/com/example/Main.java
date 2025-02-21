@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -98,7 +99,8 @@ public class Main {
                     Karte karte = mapper.readValue(decodedText, Karte.class);
                     gameService.setNextCardInDeck(karte);
                     if(gameService.getDealerHand() == null){
-                        gameService.setDealerHand(List.of(karte));
+                        gameService.setDealerHand(new ArrayList<Karte>());
+                        gameService.getDealerHand().add(karte);
                     } else {
                         gameService.getDealerHand().add(karte);
                     }

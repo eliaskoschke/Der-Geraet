@@ -128,13 +128,9 @@ public class Controller {
 
     @GetMapping("/game/ping/getDealerHand")
     public ResponseMessage getDealerHand() throws JsonProcessingException {
-        counter++;
         if(gameService.getDealerHand() != null) {
+            gameService.setNumberOfCardFaceup(gameService.getDealerHand().size() -1);
             String idCSV = castKartenObjectToBildId(gameService.getDealerHand());
-            if (counter >= 10) {
-                counter = 0;
-                gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() + 1);
-            }
             return new ResponseMessage(idCSV);
         }
         return new ResponseMessage("");
