@@ -5,6 +5,8 @@ import com.pi4j.io.gpio.digital.DigitalState;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+import com.pi4j.io.pwm.Pwm;
+import com.pi4j.io.pwm.PwmType;
 import org.bytedeco.javacv.*;
 import org.bytedeco.javacv.Frame;
 
@@ -37,23 +39,36 @@ public class CardDispenser {
                 .initial(DigitalState.LOW)
                 .provider("pigpio-digital-output"));
 
+        // PWM für Geschwindigkeitsregelung konfigurieren
+        Pwm pwm = pi4j.pwm().create(Pwm.newConfigBuilder(pi4j)
+                .id("PWM")
+                .name("Motor PWM")
+                .address(in1PinNumber) // oder in2PinNumber, je nach Schaltung
+                .pwmType(PwmType.HARDWARE)
+                .initial(0)
+                .shutdown(0)
+                .provider("pigpio-pwm"));
+
         // QR-Code scannen
         boolean qrCodeScanned = scanQRCode();
 
         if (qrCodeScanned) {
-            // Motor vorwärts drehen
+            // Motor vorwärts drehen mit 50% Geschwindigkeit
+            setMotorSpeed(pwm, 50);
             in1.high();
             in2.low();
-            System.out.println("Motor dreht vorwärts");
-            Thread.sleep(2000); // Geschwindigkeit anpassen
+            System.out.println("Motor dreht vorwärts mit 50% Geschwindigkeit");
+            Thread.sleep(2000);
 
-            // Motor rückwärts drehen
+            // Motor rückwärts drehen mit 30% Geschwindigkeit
+            setMotorSpeed(pwm, 30);
             in1.low();
             in2.high();
-            System.out.println("Motor dreht rückwärts");
-            Thread.sleep(500); // Rückzugszeit anpassen
+            System.out.println("Motor dreht rückwärts mit 30% Geschwindigkeit");
+            Thread.sleep(500);
 
             // Motor stoppen
+            setMotorSpeed(pwm, 0);
             in1.low();
             in2.low();
             System.out.println("Motor gestoppt");
@@ -61,6 +76,12 @@ public class CardDispenser {
 
         // Pi4J-Kontext beenden
         pi4j.shutdown();
+    }
+
+    // Methode zur Einstellung der Motorgeschwindigkeit
+    public static void setMotorSpeed(Pwm pwm, int speedPercentage) {
+        int pwmValue = (int) (speedPercentage * 10.23); // Umrechnung in PWM-Wert (0-1023)
+        pwm.dutyCycle(pwmValue);
     }
 
     // Methode zum Scannen eines QR-Codes
