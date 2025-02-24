@@ -5,6 +5,8 @@ import com.pi4j.example.tmc2209.TMCCommunicationException;
 import com.pi4j.example.tmc2209.TMCDeviceIsBusyException;
 import com.pi4j.example.tmc2209.Tmc2209;
 
+import java.util.Scanner;
+
 public class SepperController {
     private static final int PIN_INDEX = 23;
     private static final int PIN_STEP = 18;
@@ -24,5 +26,15 @@ public class SepperController {
     private int calc(int grad) {
         int result = (int) (grad * 2.6 * 4);
         return result;
+    }
+
+    public static void main(String[] args) throws TMCCommunicationException, InterruptedException, TMCDeviceIsBusyException {
+        Scanner x = new Scanner(System.in);
+
+        SepperController motor = new SepperController();
+
+        while (true) {
+            motor.turn(x.nextInt());
+        }
     }
 }
