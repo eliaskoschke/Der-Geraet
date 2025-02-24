@@ -12,7 +12,7 @@ window.onload = function isGeraetInPlace() {
         return response.json();
     })
     .then(data => {
-        if (data.message === "true") {
+        if (data.message === "false") {
             document.getElementById('admin').removeAttribute('disabled');
             document.getElementById('deactiveText').classList.add('hidden');
         } else {
