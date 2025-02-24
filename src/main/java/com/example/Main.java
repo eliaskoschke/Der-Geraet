@@ -11,6 +11,8 @@ import org.springframework.context.ApplicationContext;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -29,31 +31,34 @@ public class Main {
     static ObjectMapper mapper = new ObjectMapper();
     static Gamemode gamemode;
     static boolean turnHasEnded = false;
-    static HashMap<String, DigitalOutput> playerButtonMap;
+    static HashMap<String, DigitalOutput> playerButtonMap = new HashMap<>();
 
     public static void main(String[] args) throws InterruptedException {
         controllerConfig();
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
         //Initialize Methode für ersten kamera Scan etc.
-        if(connectionInput.isHigh()){
-            gameService.setConnected(true);
-        }
+//        if(connectionInput.isHigh()){
+//            gameService.setConnected(true);
+//        }
         registerPlayer();
         initializeGame();
         gameLogic();
     }
 
     public static void registerPlayer() throws InterruptedException {
+        gameService.setWaiting(true);
         System.out.println("Spieler werden registriert");
         for(DigitalOutput output : playerButtonMap.values()){
             output.high();
         }
+        Thread.sleep(2000);
+        gameService.setWaiting(false);
         while(true){
+            Thread.sleep(15000);
             for (Player player : gameService.getListOfAllPlayers()){
                 playerButtonMap.get(player.getId()).low();
             }
-            Thread.sleep(10000);
             gameService.setGameStarted(true);
             if(gameService.isGameStarted()){
                 gamemode = gameService.getGamemode();
@@ -67,7 +72,14 @@ public class Main {
     }
 
     private static void gameLogic() throws InterruptedException {
-        // Taster vom ersten Spieler HIgh
+        Collections.sort(gameService.getListOfAllPlayers(), new Comparator<Player>() {
+            @Override
+            public int compare(Player p1, Player p2) {
+                return Integer.compare(Integer.parseInt(p1.getId()),Integer.parseInt(p2.getId()));
+            }
+        });
+        gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
+        activateCurrentPlayerButton();
         while(true){
             if(gameService.isButtonClickedOnce()){
                 hitEvent();
@@ -86,6 +98,12 @@ public class Main {
         }
     }
 
+    private static void activateCurrentPlayerButton() {
+        gameService.setWaiting(true);
+        playerButtonMap.get(gameService.getCurrentPlayer().getId()).high();
+        gameService.setWaiting(false);
+    }
+
     public static void executeNextTurn() throws InterruptedException {
         if(gameService.getCurrenPlayerIndex()+1 >= gameService.getListOfAllPlayers().size()){
             executeComputerTurn();
@@ -95,7 +113,8 @@ public class Main {
                 deleteThisPlayer = gameService.getCurrentPlayer();
             }
             gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex()+1);
-            //Taster des nächsten Spielers High
+            gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(gameService.getCurrenPlayerIndex()));
+            activateCurrentPlayerButton();
             if(deleteThisPlayer != null){
                 gameService.getListOfAllPlayers().remove(deleteThisPlayer);
             }
@@ -127,8 +146,10 @@ public class Main {
             case BLACKJACK -> {
                 rotateStepperMotor(1000);
                 executeCardThrow();
+                giveCurrentPlayerNextCard();
                 executeCameraScan();
                 gameService.getCurrentPlayer().countHand();
+                System.out.println(gameService.getCurrentPlayer().getKartenhandWert());
                 if(gameService.getCurrentPlayer().getKartenhandWert() >= 21){
                     stayEvent();
                 }
@@ -183,7 +204,7 @@ public class Main {
     }
 
     private static void giveCurrentPlayerNextCard() {
-        if(gameService.getDealer().getDealerHand() == null){
+        if(gameService.getCurrentPlayer().getKartenhand() == null){
 //                        gameService.getDealer().setDealerHand(new ArrayList<Karte>());
 //                        gameService.getDealer().getDealerHand().add(karte);
             gameService.getCurrentPlayer().setKartenhand(new ArrayList<Karte>());
@@ -196,6 +217,7 @@ public class Main {
 
     public static void stayEvent() throws InterruptedException {
         turnHasEnded = true;
+        playerButtonMap.get(gameService.getCurrentPlayer().getId()).low();
         switch(gamemode){
             case BLACKJACK -> {
 
@@ -207,7 +229,7 @@ public class Main {
     }
     public static void rotateStepperMotor(int angle) throws InterruptedException {
         stepperMotor.high();
-        Thread.sleep(angle);
+        Thread.sleep(angle/10);
         stepperMotor.low();
     }
 
@@ -215,13 +237,13 @@ public class Main {
         var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
                 .name("Stepper Motor")
                 .id("Stepper Motor ID")
-                .address(14) //passende adresse einfügen
+                .address(21) //passende adresse einfügen
                 .initial(DigitalState.LOW)
                 .onState(DigitalState.HIGH);
         stepperMotor = pi4j.create(stepperMotorConfig);
 
-        int in1PinNumber = 22; // Beispiel-Pin-Nummer für IN1
-        int in2PinNumber = 27; // Beispiel-Pin-Nummer für IN2
+        int in1PinNumber = 18; // Beispiel-Pin-Nummer für IN1
+        int in2PinNumber = 23; // Beispiel-Pin-Nummer für IN2
 
         discardMotorIn1 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
                 .id("IN1")
@@ -238,19 +260,19 @@ public class Main {
                 .shutdown(DigitalState.LOW)
                 .initial(DigitalState.LOW)
                 .provider("pigpio-digital-output"));
-        connectionInput = pi4j.create(DigitalInput.newConfigBuilder(pi4j)
-                .name("Connection Input")
-                .id("Connection Input ID")
-                .address(22)
-                .pull(PullResistance.PULL_DOWN)
-                .debounce(150L));
+//        connectionInput = pi4j.create(DigitalInput.newConfigBuilder(pi4j)
+//                .name("Connection Input")
+//                .id("Connection Input ID")
+//                .address(22)
+//                .pull(PullResistance.PULL_DOWN)
+//                .debounce(150L));
 
         addButtonOutputs("1", 20);
         addButtonOutputs("2", 16);
         addButtonOutputs("3", 12);
         addButtonOutputs("4", 7);
         addButtonOutputs("5", 8);
-        addButtonOutputs("6", 6);
+        addButtonOutputs("6", 25);
 
     }
 
@@ -276,7 +298,7 @@ public class Main {
                     executeCardThrow();
                     giveDealerNextCard();
                     executeCameraScan();
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 }
                 for (Player player : gameService.getListOfAllPlayers()){
                     gameService.setCurrentPlayer(player);
@@ -285,15 +307,16 @@ public class Main {
                         executeCardThrow();
                         giveCurrentPlayerNextCard();
                         executeCameraScan();
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     }
                 }
-                gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
+
             }
             case POKER -> {
 
             }
         }
+
         System.out.println("Karten wurden ausgeteilt");
     }
 }

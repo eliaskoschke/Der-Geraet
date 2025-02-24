@@ -4,22 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Computer {
-    List<Karte> dealerHand ;
+    ArrayList<Karte> dealerHand ;
     int dealerHandWert;
 
     public Computer() {
     }
 
-    public Computer(List<Karte> dealerHand, int dealerHandWert) {
+    public Computer(ArrayList<Karte> dealerHand, int dealerHandWert) {
         this.dealerHand = dealerHand;
         this.dealerHandWert = dealerHandWert;
     }
 
-    public List<Karte> getDealerHand() {
+    public ArrayList<Karte> getDealerHand() {
         return dealerHand;
     }
 
-    public void setDealerHand(List<Karte> dealerHand) {
+    public void setDealerHand(ArrayList<Karte> dealerHand) {
         this.dealerHand = dealerHand;
     }
 

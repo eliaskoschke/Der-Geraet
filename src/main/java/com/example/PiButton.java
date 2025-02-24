@@ -12,7 +12,7 @@ import org.apache.http.util.EntityUtils;
 
 public class PiButton {
     private static final String baseURL = "http://localhost:8080/api/logic";
-    private static final long DOUBLE_CLICK_TIME = 300; // Zeit in Millisekunden
+    private static final long DOUBLE_CLICK_TIME = 500; // Zeit in Millisekunden
     private long lastPressTime = 0;
     private boolean isDoubleClick = false;
     private int pinNumber = 0;
@@ -27,21 +27,22 @@ public class PiButton {
                 .id("Button ID: " + String.valueOf(pinNumber))
                 .address(pinNumber)
                 .pull(PullResistance.PULL_DOWN)
-                .debounce(150L);
+                .debounce(300L);
 
         var button = pi4j.create(buttonConfig);
 
         button.addListener(e -> {
             if (e.state() == DigitalState.HIGH) {
                 handleClick();
+//                System.out.println("Button "+playerNumber +" wurde geklickt");
             }
         });
     }
 
     public int convertPinNumberToPlayerNumber(){
         return switch (pinNumber) {
-            case 2 -> 1;
-            case 3 -> 2;
+            case 26 -> 1;
+            case 24 -> 2;
             case 4 -> 3;
             case 14 -> 4;
             case 17 -> 5;
@@ -94,13 +95,13 @@ public class PiButton {
             // Sende die POST-Anfrage und erhalte die Antwort
             try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
                 // Überprüfe den Status der Antwort und verarbeite sie
-                int statusCode = response.getStatusLine().getStatusCode();
-                if (statusCode == 200) {
+                System.out.println(EntityUtils.toString(response.getEntity()));
+                if (EntityUtils.toString(response.getEntity()).equals("{\"message\":\"acknowledged\"}")) {
                     String responseBody = EntityUtils.toString(response.getEntity());
                     System.out.println("Antwort erhalten: " + responseBody);
-                    buttonRegistered = false;
+                    buttonRegistered = true;
                 } else {
-                    System.err.println("Fehler: " + statusCode);
+                    System.out.println("Fehler: ");
                 }
             }
         } catch (Exception exception) {

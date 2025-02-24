@@ -52,14 +52,14 @@ public class Player {
     public void countHand() {
         List<Karte> kartenHand = kartenhand;
         boolean sonderRegel = false;
-        if (kartenHand.get(0).name.substring(kartenHand.get(0).name.indexOf(" ")+1).contains("Ass") || kartenHand.get(1).name.substring(kartenHand.get(1).name.indexOf(" ")+1).contains("Ass")) {
+        if (kartenHand.get(0).name.contains("Ass") || kartenHand.get(1).name.contains("Ass")) {
             sonderRegel = true;
         }
         ArrayList<Karte> listOfAss = new ArrayList<>();
         int handWert = 0;
 
         for (Karte karte : kartenHand) {
-            if (karte.name.substring(karte.name.indexOf(" ")+1).contains("Ass")) {
+            if (karte.name.contains("Ass")) {
                 listOfAss.add(karte);
             } else {
                 handWert += karte.wert;

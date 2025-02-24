@@ -64,8 +64,8 @@ public class Raspberry_Controller {
 //        });
         //PiButton button = new PiButton(pi4j, 15);
         ArrayList<PiButton> buttonList = new ArrayList<>();
-        buttonList.add(new PiButton(pi4j, 2));
-        buttonList.add(new PiButton(pi4j, 3));
+        buttonList.add(new PiButton(pi4j, 26));
+        buttonList.add(new PiButton(pi4j, 24));
         buttonList.add(new PiButton(pi4j, 4));
         buttonList.add(new PiButton(pi4j, 14));
         buttonList.add(new PiButton(pi4j, 17));

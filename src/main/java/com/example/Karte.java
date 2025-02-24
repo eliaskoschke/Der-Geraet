@@ -1,5 +1,7 @@
 package com.example;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.swing.text.html.ImageView;
 
 public class Karte {
@@ -42,11 +44,11 @@ public class Karte {
     public void setName(String name) {
         this.name = name;
     }
-
+    @JsonIgnore
     public ImageView getBild() {
         return bild;
     }
-
+    @JsonIgnore
     public void setBild(ImageView bild) {
         this.bild = bild;
     }

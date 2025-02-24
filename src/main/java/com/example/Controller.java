@@ -22,13 +22,7 @@ public class Controller {
     public Controller(GameService gameService) {
         this.gameService = gameService;
 
-        gameService.getDealer().setDealerHand( List.of(
-                new Karte("5", "Kreuz", "Kreuz 5"),
-                new Karte("10", "Karo", "Karo 10"),
-                new Karte("2", "Pik", "Pik 2"),
-                new Karte("10", "Herz", "Herz 10"),
-                new Karte("11", "Pik", "Pik Ass")
-        ));
+
     }
 
     @GetMapping("/onload")
@@ -175,19 +169,23 @@ public class Controller {
 
     @PostMapping({"/logic/buttonIsClickedOnce", "/user/hit"})
     public ResponseMessage buttonIsClickedOnce(@RequestBody Message message) {
-        System.out.println("Hallo");
-        String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ")+1);
-        System.out.println("Es wurde ein Button geklickt: " + buttonId);
-        gameService.setButtonClickedOnce(true);
+        if(gameService.isWaiting()==false) {
+            System.out.println("Hallo");
+            String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ") + 1);
+            System.out.println("Es wurde ein Button geklickt: " + buttonId);
+            gameService.setButtonClickedOnce(true);
+        }
         return new ResponseMessage("true");
     }
 
     @PostMapping({"/logic/buttonIsClickedTwice", "/user/hit"})
     public ResponseMessage buttonIsClickedTwice(@RequestBody Message message) {
-        System.out.println("Hallo");
-        String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ")+1);
-        System.out.println("Es wurde ein Button geklickt: " + buttonId);
-        gameService.setButtonClickedTwice(true);
+        if(gameService.isWaiting()==false) {
+            System.out.println("Hallo");
+            String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ") + 1);
+            System.out.println("Es wurde ein Button geklickt: " + buttonId);
+            gameService.setButtonClickedTwice(true);
+        }
         return new ResponseMessage("true");
     }
 
@@ -204,12 +202,14 @@ public class Controller {
 
     @PostMapping("/logic/registerPlayerAtTable")
     public ResponseMessage registerPlayerAtTable(@RequestBody Message message) throws JsonProcessingException {
-        System.out.println("Nachricht erhalten: " + message.getMessage());
-        //gameService.buttonClicked();
-        List<String> playerIds = getListOfAllActiveID();
-        if (!playerIds.contains(message.getMessage())) {
-            gameService.getListOfAllPlayers().add(new Player(message.getMessage()));
-            return new ResponseMessage("acknowledged");
+        if(!gameService.isWaiting()) {
+            System.out.println("Nachricht erhalten: " + message.getMessage());
+            //gameService.buttonClicked();
+            List<String> playerIds = getListOfAllActiveID();
+            if (!playerIds.contains(message.getMessage())) {
+                gameService.getListOfAllPlayers().add(new Player(message.getMessage()));
+                return new ResponseMessage("acknowledged");
+            }
         }
         return new ResponseMessage("not acknowledged");
     }
