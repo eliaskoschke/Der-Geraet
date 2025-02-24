@@ -243,7 +243,7 @@ public class MyGame extends Application {
                 root.getChildren().addAll(firstCard, backCard);
             }
             }
-        if (spielerHand.size() != 0) {
+        if (!spielerHand.isEmpty()) {
             // Spieler-Karten anzeigen
             for (int i = 0; i < spielerHand.size(); i++) {
                 ImageView cardView = new ImageView(spielerHand.get(i).bild);
@@ -344,71 +344,68 @@ public class MyGame extends Application {
     }
 
     // Simuliert den Zug des Computers
-    private void computerTurn() throws InterruptedException {
-        Thread computerTurnThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (spielerHandWert < 21) {
-                    int i = 0;
+    private void computerTurn() {
+        Thread computerTurnThread = new Thread(() -> {
+            if (spielerHandWert < 21) {
+                int i = 0;
 
-                    if (computerHand.get(1).name.contains("Ass")) {
-                        if (computerHandWert + 11 > 21) {
-                            computerHand.get(1).wert = 1;
-                        } else {
-                            computerHand.get(1).wert = 11;
+                if (computerHand.get(1).name.contains("Ass")) {
+                    if (computerHandWert + 11 > 21) {
+                        computerHand.get(1).wert = 1;
+                    } else {
+                        computerHand.get(1).wert = 11;
+                    }
+                }
+                ausgabeComputer = "";
+                for (Karte karte1 : computerHand) {
+                    ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
+                }
+                if (computerHand.get(1).wert + computerHand.get(0).wert > 17) {
+                    spielVorbei = true;
+
+                }
+                while (true) {
+                    ausgabeComputer = "";
+                    for (Karte karte1 : computerHand) {
+                        ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
+                    }
+                    if (spielVorbei) {
+                        break;
+                    }
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Karte karte = computerHand.get(i);
+
+                    if (computerHandWert < 17) {
+                        Karte randomKarte = null;
+                        try {
+                            randomKarte = Karte.gibKarte(controller, mapper);
+                        } catch (NotFoundException | InterruptedException | JsonProcessingException e) {
+                            throw new RuntimeException(e);
                         }
+                        computerHand.add(randomKarte);
+
+                        if (computerHandWert >= 17) {
+                            spielVorbei = true;
+                        }
+                    } else {
+                        spielVorbei = true;
+                        break;
                     }
                     ausgabeComputer = "";
                     for (Karte karte1 : computerHand) {
                         ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
                     }
-                    if (computerHand.get(1).wert + computerHand.get(0).wert > 17) {
-                        spielVorbei = true;
 
-                    }
-                    while (true) {
-                        ausgabeComputer = "";
-                        for (Karte karte1 : computerHand) {
-                            ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
-                        }
-                        if (spielVorbei) {
-                            break;
-                        }
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                        Karte karte = computerHand.get(i);
+                    i++;
+                    computerHandWert = countHand(computerHand);
 
-                        if (computerHandWert < 17) {
-                            Karte randomKarte = null;
-                            try {
-                                randomKarte = Karte.gibKarte(controller, mapper);
-                            } catch (NotFoundException | InterruptedException | JsonProcessingException e) {
-                                throw new RuntimeException(e);
-                            }
-                            computerHand.add(randomKarte);
-
-                            if (computerHandWert >= 17) {
-                                spielVorbei = true;
-                            }
-                        } else {
-                            spielVorbei = true;
-                            break;
-                        }
-                        ausgabeComputer = "";
-                        for (Karte karte1 : computerHand) {
-                            ausgabeComputer += karte1.name + "-" + karte1.typ + "\n";
-                        }
-
-                        i++;
-                        computerHandWert = countHand(computerHand);
-
-                    }
-                } else {
-                    spielVorbei = true;
                 }
+            } else {
+                spielVorbei = true;
             }
         });
         computerTurnThread.start();
