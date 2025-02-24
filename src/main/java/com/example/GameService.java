@@ -30,15 +30,13 @@ public class GameService {
 
     int playerGotReseted = 0;
 
-    List<Karte> dealerHand ;
-
-    ArrayList<String> dealerHandBildId = new ArrayList<>();
-
     private Player currentPlayer = new Player();
 
     private ArrayList<Player> listOfAllPlayers = new ArrayList<>();
 
     private int currenPlayerIndex = 0;
+
+    Computer dealer = new Computer();
 
     public void buttonClicked() {
         this.buttonClickedOnce = true;
@@ -93,14 +91,6 @@ public class GameService {
         this.playerGotReseted = playerGotReseted;
     }
 
-    public List<Karte> getDealerHand() {
-        return dealerHand;
-    }
-
-    public void setDealerHand(List<Karte> dealerHand) {
-        this.dealerHand = dealerHand;
-    }
-
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
@@ -115,14 +105,6 @@ public class GameService {
 
     public void setListOfAllPlayers(ArrayList<Player> listOfAllPlayers) {
         this.listOfAllPlayers = listOfAllPlayers;
-    }
-
-    public ArrayList<String> getDealerHandBildId() {
-        return dealerHandBildId;
-    }
-
-    public void setDealerHandBildId(ArrayList<String> dealerHandBildId) {
-        this.dealerHandBildId = dealerHandBildId;
     }
 
     public boolean isButtonClickedTwice() {
@@ -171,5 +153,13 @@ public class GameService {
 
     public void setConnected(boolean connected) {
         this.connected = connected;
+    }
+
+    public Computer getDealer() {
+        return dealer;
+    }
+
+    public void setDealer(Computer dealer) {
+        this.dealer = dealer;
     }
 }

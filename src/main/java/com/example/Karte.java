@@ -1,10 +1,13 @@
 package com.example;
 
+import javax.swing.text.html.ImageView;
+
 public class Karte {
 
     int wert;
     String typ;
     String name;
+    ImageView bild;
 
     public Karte() {
     }
@@ -13,6 +16,7 @@ public class Karte {
         this.wert = Integer.parseInt(wert);
         this.typ = typ;
         this.name = name;
+
     }
 
     public int getWert() {
@@ -37,5 +41,52 @@ public class Karte {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ImageView getBild() {
+        return bild;
+    }
+
+    public void setBild(ImageView bild) {
+        this.bild = bild;
+    }
+
+    public String castKartenObjectToBildId(){
+        String idCSV ="";
+
+        int idValue = 0;
+        switch (typ){
+            case "Karo":
+                idValue += 100;
+                break;
+            case "Pik":
+                idValue += 200;
+                break;
+            case "Herz":
+                idValue += 300;
+                break;
+            case "Kreuz":
+                idValue += 400;
+                break;
+        }
+        switch (name.substring(name.indexOf(" ")+1)){
+            case "Ass":
+                idValue += 1;
+                break;
+            case "Bube":
+                idValue += 11;
+                break;
+            case "Dame":
+                idValue += 12;
+                break;
+            case "König":
+                idValue += 13;
+                break;
+            default:
+                idValue += wert;
+                break;
+        }
+        idCSV += "D:\\DEV_Ausbildung_24\\Der-Geraet-Maven\\src\\main\\resources\\static\\img\\cards\\"+String.valueOf(idValue) +".png";
+        return  idCSV;
     }
 }

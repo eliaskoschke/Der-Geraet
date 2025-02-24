@@ -3,54 +3,36 @@ package com.example;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
-    private String id;
-    private ArrayList<Karte> kartenhand;
-    private int kartenhandWert;
+public class Computer {
+    List<Karte> dealerHand ;
+    int dealerHandWert;
 
-    public Player(String id, ArrayList<Karte> kartenhand, int kartenhandWert) {
-        this.id = id;
-        this.kartenhand = kartenhand;
-        this.kartenhandWert = kartenhandWert;
+    public Computer() {
     }
 
-    public Player() {
+    public Computer(List<Karte> dealerHand, int dealerHandWert) {
+        this.dealerHand = dealerHand;
+        this.dealerHandWert = dealerHandWert;
     }
 
-    public int getKartenhandWert() {
-        return kartenhandWert;
+    public List<Karte> getDealerHand() {
+        return dealerHand;
     }
 
-    public void setKartenhandWert(int kartenhandWert) {
-        this.kartenhandWert = kartenhandWert;
+    public void setDealerHand(List<Karte> dealerHand) {
+        this.dealerHand = dealerHand;
     }
 
-    public String toString(){
-        return id;
+    public int getDealerHandWert() {
+        return dealerHandWert;
     }
 
-    public Player(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public ArrayList<Karte> getKartenhand() {
-        return kartenhand;
-    }
-
-    public void setKartenhand(ArrayList<Karte> kartenhand) {
-        this.kartenhand = kartenhand;
+    public void setDealerHandWert(int dealerHandWert) {
+        this.dealerHandWert = dealerHandWert;
     }
 
     public void countHand() {
-        List<Karte> kartenHand = kartenhand;
+        List<Karte> kartenHand = dealerHand;
         boolean sonderRegel = false;
         if (kartenHand.get(0).name.substring(kartenHand.get(0).name.indexOf(" ")+1).contains("Ass") || kartenHand.get(1).name.substring(kartenHand.get(1).name.indexOf(" ")+1).contains("Ass")) {
             sonderRegel = true;
@@ -91,7 +73,7 @@ public class Player {
 
             }
         }
-        kartenhandWert = handWert;
+        dealerHandWert = handWert;
 
     }
 }
