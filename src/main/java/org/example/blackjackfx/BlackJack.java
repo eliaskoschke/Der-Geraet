@@ -27,6 +27,7 @@ public class BlackJack extends Application {
 
     private Image karteUmgedreht;
     private Image karteUmgedrehtHand;
+    private ImageView backCard;
     private Image hintergrundBild;
     private int buttonbreite = 200;
     private int buttonHohe = 70;
@@ -63,6 +64,7 @@ public class BlackJack extends Application {
     static MotorController controller = new MotorController();
     static ObjectMapper mapper = new ObjectMapper();
 
+    private boolean netMachen = false;
     @Override
     public void start(Stage primaryStage) throws NotFoundException, InterruptedException, JsonProcessingException {
         this.primaryStageReference = primaryStage;
@@ -236,13 +238,17 @@ public class BlackJack extends Application {
                 firstCard.setFitHeight(150);
                 firstCard.setFitWidth(100);
 
-                ImageView backCard = new ImageView(karteUmgedrehtHand);
-                backCard.setX(291 + hintegrundbildStartWert + 83);
-                backCard.setFitHeight(150);
-                backCard.setFitWidth(100);
-                backCard.setY(215);
+                if (!netMachen) {
+                    backCard = new ImageView(karteUmgedrehtHand);
+                    backCard.setX(291 + hintegrundbildStartWert + 83);
+                    backCard.setFitHeight(150);
+                    backCard.setFitWidth(100);
+                    backCard.setY(215);
 
-                root.getChildren().addAll(firstCard, backCard);
+                    root.getChildren().addAll(firstCard, backCard);
+                } else {
+                    root.getChildren().add(firstCard);
+                }
             }
         }
         // Spieler-Karten anzeigen
@@ -317,16 +323,18 @@ public class BlackJack extends Application {
 
     // Aktion, wenn der "Hit"-Button gedrückt wird
     private void takebuttonFunktion() throws InterruptedException, NotFoundException, JsonProcessingException {
+        removeUmgedrehteKarte();
+        addDealerCard(Karte.gibKarte(controller, mapper));
         if (!spielerTurn || spielVorbei) return;
 
         spielerHand.add(Karte.gibKarte(controller, mapper));
         spielerHandWert = countHand(spielerHand);
-
         // Falls der Spieler 21 erreicht oder überkauft, wird der Zug beendet
         if (spielerHandWert >= 21) {
             spielerTurn = false;
             computerTurn();
         }
+
     }
 
     // Aktion, wenn der "Stay"-Button gedrückt wird
@@ -455,6 +463,7 @@ public class BlackJack extends Application {
         ergebnisUhr = "";
         spielVorbei = false;
         spielerTurn = true;
+        netMachen = false;
         restartButton.setVisible(false);
         root.getChildren().removeIf(node -> (node instanceof Text)
                 && (node != ergebnisText && node != ergebnisUhrText));
@@ -496,8 +505,16 @@ public class BlackJack extends Application {
      * Entfernt alle Instanzen der verdeckten Dealer-Karte vom Bildschirm.
      */
     public void removeUmgedrehteKarte() {
-        root.getChildren().removeIf(node -> node instanceof ImageView &&
-                ((ImageView) node).getImage().equals(karteUmgedrehtHand));
+        netMachen = true;
+        Platform.runLater(() -> {
+            root.getChildren().removeIf(node -> {
+                if (node instanceof ImageView) {
+                    ImageView imageView = (ImageView) node;
+                    return imageView.getImage().equals(karteUmgedreht); // Wenn das Bild der umgedrehten Karte angezeigt wird
+                }
+                return false;
+            });
+        });
     }
 
     /**
@@ -505,13 +522,8 @@ public class BlackJack extends Application {
      * @param card Das Kartenobjekt, das angezeigt werden soll.
      */
     public void addDealerCard(Karte card) {
-        // Bestimme den Index basierend auf der aktuellen Anzahl an Dealer-Karten.
-        int index = computerHand.size();
-        ImageView cardView = new ImageView(card.bild);
-        cardView.setX(291 + hintegrundbildStartWert + (index * 105));
-        cardView.setY(215);
-        Text cardText = new Text(291 + hintegrundbildStartWert + (index * 105), 215, card.wert + " " + card.typ);
-        root.getChildren().addAll(cardView, cardText);
+        computerHand.add(card);
+        updateCardDisplay();
     }
 
     /**

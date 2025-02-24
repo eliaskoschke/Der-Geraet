@@ -74,7 +74,7 @@ public class Karte {
             Karte karte = mapper.readValue(jsonKarte, Karte.class);
             karte.bild = karte.castKartenObjectToBildId();
             motorController.spin();
-            Thread.sleep(2000);
+            Thread.sleep(200);
             return karte;
         }
         System.out.println("Es wuid null gekackt");
