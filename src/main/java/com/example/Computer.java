@@ -6,6 +6,7 @@ import java.util.List;
 public class Computer {
     ArrayList<Karte> dealerHand ;
     int dealerHandWert;
+    final String id = "Dealer";
 
     public Computer() {
     }
@@ -74,6 +75,9 @@ public class Computer {
             }
         }
         dealerHandWert = handWert;
+    }
 
+    public String getId() {
+        return id;
     }
 }

@@ -13,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -112,6 +111,25 @@ public class Main {
                     gameService.getDealer().countHand();
                     executeCameraScan();
                     Thread.sleep(1000);
+                }
+                int dealerHandWert = gameService.getDealer().getDealerHandWert();
+                for (Player player : gameService.getListOfAllPlayers()){
+                    if(dealerHandWert > 21){
+                        //Alle gewinnen
+                        gameService.getMapOfAllWinners().put(player.getId(), "hat gewonnen");
+                    } else if (dealerHandWert == 21) {
+                        //schauen ob jemand mitziehen kann
+                        if(player.getKartenhandWert() == 21){
+                            gameService.getMapOfAllWinners().put(player.getId(), "hat unentschieden gespielt");
+                        }
+                    } else{
+                        //ganz normal vergleichen
+                        if (player.getKartenhandWert() > dealerHandWert){
+                            gameService.getMapOfAllWinners().put(player.getId(), "hat gewonnen");
+                        } else if (player.getKartenhandWert() == dealerHandWert) {
+                            gameService.getMapOfAllWinners().put(player.getId(), "hat unentschieden gespielt");
+                        }
+                    }
                 }
             }
             case POKER -> {

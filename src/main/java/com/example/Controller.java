@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class Controller {
-    private final GameService gameService;
+    private GameService gameService;
     private ObjectMapper mapper = new ObjectMapper();
     int counter = 0;
 
@@ -21,8 +21,6 @@ public class Controller {
     @Autowired
     public Controller(GameService gameService) {
         this.gameService = gameService;
-
-
     }
 
     @GetMapping("/onload")
@@ -248,4 +246,5 @@ public class Controller {
         idCSV = idCSV.substring(0, idCSV.length() - 1);
         return idCSV;
     }
+
 }

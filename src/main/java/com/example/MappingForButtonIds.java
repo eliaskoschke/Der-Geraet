@@ -8,7 +8,6 @@ import java.util.HashMap;
 
 public class MappingForButtonIds {
 
-
     //        addButtonOutputs("1", 20);
     //        addButtonOutputs("2", 16);
     //        addButtonOutputs("3", 12);

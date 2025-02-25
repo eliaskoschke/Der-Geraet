@@ -3,10 +3,12 @@ package com.example;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 @Service
 public class GameService {
+
+    private HashMap<String, String> mapOfAllWinners = new HashMap<>();
 
     private Gamemode gamemode = Gamemode.BLACKJACK;
 
@@ -163,4 +165,11 @@ public class GameService {
         this.dealer = dealer;
     }
 
+    public HashMap<String, String> getMapOfAllWinners() {
+        return mapOfAllWinners;
+    }
+
+    public void setMapOfAllWinners(HashMap<String, String> mapOfAllWinners) {
+        this.mapOfAllWinners = mapOfAllWinners;
+    }
 }
