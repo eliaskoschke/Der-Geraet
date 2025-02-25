@@ -20,8 +20,7 @@ public class SepperController {
     }
 
     void turn(int grad) throws TMCDeviceIsBusyException {
-       // steppermotor.moveToPosition(calc(grad),SPEED);
-        System.out.println(calc(grad));
+        steppermotor.moveToPosition(calc(grad),SPEED);
     }
 
     private int calc(int grad) {
