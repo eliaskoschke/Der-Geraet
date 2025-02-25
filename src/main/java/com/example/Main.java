@@ -290,7 +290,6 @@ public class Main {
                         Thread.sleep(500);
                     }
                 }
-
             }
             case POKER -> {
 

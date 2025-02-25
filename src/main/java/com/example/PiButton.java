@@ -174,30 +174,6 @@ public class PiButton {
         }
     }
 
-    private boolean hasGameStarted() {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            String message = "{\"message\":\"Button clicked: "+ playerNumber+"\"}";
-
-            HttpPost postRequest = new HttpPost(baseURL + "/buttonIsClickedTwice");
-            postRequest.setHeader("Content-Type", "application/json");
-
-            postRequest.setEntity(new StringEntity(message));
-
-            // Sende die POST-Anfrage und erhalte die Antwort
-            try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
-                // Überprüfe den Status der Antwort und verarbeite sie
-                int statusCode = response.getStatusLine().getStatusCode();
-                if (statusCode == 200) {
-                    String responseBody = EntityUtils.toString(response.getEntity());
-                    System.out.println("Antwort erhalten: " + responseBody);
-                } else {
-                    System.err.println("Fehler: " + statusCode);
-                }
-            }
-        } catch (Exception exception){
-            exception.getStackTrace();
-        }
-    }
 
     public int getPlayerNumber() {
         return playerNumber;

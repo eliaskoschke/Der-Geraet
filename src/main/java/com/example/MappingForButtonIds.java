@@ -17,12 +17,12 @@ public class MappingForButtonIds {
 
     public static int getLEDPinAdressForPlayerID(String playerID){
         return switch (playerID) {
-            case "1" -> 20;
-            case "2" -> 16;
-            case "3" -> 12;
-            case "4" -> 7;
-            case "5" -> 8;
-            case "6" -> 25;
+            case "1" -> 6;
+            case "2" -> 7;
+            case "3" -> 8;
+            case "4" -> 9;
+            case "5" -> 10;
+            case "6" -> 11;
             default -> 0;
         };
     }
