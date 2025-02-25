@@ -1,9 +1,11 @@
 package com.example;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi4j.io.gpio.digital.DigitalInput;
 import com.pi4j.io.gpio.digital.DigitalState;
 import com.pi4j.io.gpio.digital.PullResistance;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -18,6 +20,8 @@ public class PiButton {
     private int pinNumber = 0;
     private boolean buttonRegistered = false;
     private final int playerNumber;
+    private ObjectMapper mapper = new ObjectMapper();
+    private boolean locked = true;
 
     public PiButton(com. pi4j. context. Context pi4j, int pinNumber) throws InterruptedException {
         this.pinNumber = pinNumber;
@@ -76,7 +80,7 @@ public class PiButton {
 
     private void singleButtonClick() {
         System.out.println("Knopf gedrückt");
-        if(buttonRegistered) {
+        if(buttonRegistered && !locked) {
             sendMessageButtonClickedOnce();
         } else{
             resgiterPlayerAtTable();
@@ -96,7 +100,9 @@ public class PiButton {
             try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
                 // Überprüfe den Status der Antwort und verarbeite sie
                 System.out.println(EntityUtils.toString(response.getEntity()));
-                if (EntityUtils.toString(response.getEntity()).equals("{\"message\":\"acknowledged\"}")) {
+                Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
+                System.out.println(responseMessage);
+                if (responseMessage.getMessage().equals("acknowledged")) {
                     String responseBody = EntityUtils.toString(response.getEntity());
                     System.out.println("Antwort erhalten: " + responseBody);
                     buttonRegistered = true;
@@ -136,7 +142,7 @@ public class PiButton {
 
     private void doubleButtonClick() {
         System.out.println("Knopf gedrückt");
-        if(buttonRegistered) {
+        if(buttonRegistered && !locked) {
             sendMessageButtonClickedTwice();
         } else{
             resgiterPlayerAtTable();
@@ -166,5 +172,50 @@ public class PiButton {
         } catch (Exception exception){
             exception.getStackTrace();
         }
+    }
+
+    private boolean hasGameStarted() {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            String message = "{\"message\":\"Button clicked: "+ playerNumber+"\"}";
+
+            HttpPost postRequest = new HttpPost(baseURL + "/buttonIsClickedTwice");
+            postRequest.setHeader("Content-Type", "application/json");
+
+            postRequest.setEntity(new StringEntity(message));
+
+            // Sende die POST-Anfrage und erhalte die Antwort
+            try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
+                // Überprüfe den Status der Antwort und verarbeite sie
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode == 200) {
+                    String responseBody = EntityUtils.toString(response.getEntity());
+                    System.out.println("Antwort erhalten: " + responseBody);
+                } else {
+                    System.err.println("Fehler: " + statusCode);
+                }
+            }
+        } catch (Exception exception){
+            exception.getStackTrace();
+        }
+    }
+
+    public int getPlayerNumber() {
+        return playerNumber;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    public boolean isButtonRegistered() {
+        return buttonRegistered;
+    }
+
+    public void setButtonRegistered(boolean buttonRegistered) {
+        this.buttonRegistered = buttonRegistered;
     }
 }

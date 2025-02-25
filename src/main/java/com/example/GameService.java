@@ -8,8 +8,6 @@ import java.util.List;
 @Service
 public class GameService {
 
-    private boolean isWaiting = true;
-
     private Gamemode gamemode = Gamemode.BLACKJACK;
 
     private boolean connected = false;
@@ -165,12 +163,4 @@ public class GameService {
         this.dealer = dealer;
     }
 
-    public boolean isWaiting() {
-        return isWaiting;
-    }
-
-    public void setWaiting(boolean waiting) {
-        System.out.println("Es wurde auf true geändert");
-        isWaiting = waiting;
-    }
 }

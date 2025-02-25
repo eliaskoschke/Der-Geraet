@@ -31,7 +31,6 @@ public class Main {
     static ObjectMapper mapper = new ObjectMapper();
     static Gamemode gamemode;
     static boolean turnHasEnded = false;
-    static HashMap<String, DigitalOutput> playerButtonMap = new HashMap<>();
 
     public static void main(String[] args) throws InterruptedException {
         controllerConfig();
@@ -47,24 +46,12 @@ public class Main {
     }
 
     public static void registerPlayer() throws InterruptedException {
-        gameService.setWaiting(true);
         System.out.println("Spieler werden registriert");
-        for(DigitalOutput output : playerButtonMap.values()){
-            output.high();
-        }
-        Thread.sleep(2000);
-        gameService.setWaiting(false);
         while(true){
             Thread.sleep(15000);
-            for (Player player : gameService.getListOfAllPlayers()){
-                playerButtonMap.get(player.getId()).low();
-            }
             gameService.setGameStarted(true);
             if(gameService.isGameStarted()){
                 gamemode = gameService.getGamemode();
-                for(DigitalOutput output : playerButtonMap.values()){
-                    output.low();
-                }
                 //alle Taster low
                 break;
             }
@@ -79,7 +66,6 @@ public class Main {
             }
         });
         gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
-        activateCurrentPlayerButton();
         while(true){
             if(gameService.isButtonClickedOnce()){
                 hitEvent();
@@ -98,12 +84,6 @@ public class Main {
         }
     }
 
-    private static void activateCurrentPlayerButton() {
-        gameService.setWaiting(true);
-        playerButtonMap.get(gameService.getCurrentPlayer().getId()).high();
-        gameService.setWaiting(false);
-    }
-
     public static void executeNextTurn() throws InterruptedException {
         if(gameService.getCurrenPlayerIndex()+1 >= gameService.getListOfAllPlayers().size()){
             executeComputerTurn();
@@ -114,7 +94,6 @@ public class Main {
             }
             gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex()+1);
             gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(gameService.getCurrenPlayerIndex()));
-            activateCurrentPlayerButton();
             if(deleteThisPlayer != null){
                 gameService.getListOfAllPlayers().remove(deleteThisPlayer);
             }
@@ -122,8 +101,10 @@ public class Main {
     }
 
     public static void executeComputerTurn() throws InterruptedException {
+        gameService.setCurrentPlayer(new Player("0"));
         switch (gamemode){
             case BLACKJACK -> {
+                gameService.getDealer().countHand();
                 while(gameService.getDealer().getDealerHandWert() < 17){
                     rotateStepperMotor(1000);
                     System.out.println("Karte bekommen");
@@ -192,8 +173,6 @@ public class Main {
         }
     }
 
-
-
     private static void executeCardThrow() throws InterruptedException {
         discardMotorIn1.low();
         discardMotorIn2.high();
@@ -217,7 +196,6 @@ public class Main {
 
     public static void stayEvent() throws InterruptedException {
         turnHasEnded = true;
-        playerButtonMap.get(gameService.getCurrentPlayer().getId()).low();
         switch(gamemode){
             case BLACKJACK -> {
 
@@ -267,25 +245,9 @@ public class Main {
 //                .pull(PullResistance.PULL_DOWN)
 //                .debounce(150L));
 
-        addButtonOutputs("1", 20);
-        addButtonOutputs("2", 16);
-        addButtonOutputs("3", 12);
-        addButtonOutputs("4", 7);
-        addButtonOutputs("5", 8);
-        addButtonOutputs("6", 25);
-
     }
 
-    private static void addButtonOutputs(String playerID, int adresse) {
-        var buttonOutput = pi4j.create(DigitalOutput.newConfigBuilder(pi4j)
-                .name("Freigabe für Player "+ playerID)
-                .id("Freigabe "+String.valueOf(adresse))
-                .address(adresse) //passende adresse einfügen
-                .initial(DigitalState.LOW)
-                .onState(DigitalState.HIGH));
 
-        playerButtonMap.put(playerID, buttonOutput);
-    }
 
     private static void initializeGame() throws InterruptedException {
 
