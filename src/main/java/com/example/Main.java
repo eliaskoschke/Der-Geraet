@@ -23,7 +23,6 @@ public class Main {
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotorIn1;
     static DigitalOutput discardMotorIn2;
-    static DigitalOutput cameraOutput;
     static DigitalInput connectionInput;
     static GameService gameService;
     static Camera camera = new Camera();
@@ -233,18 +232,17 @@ public class Main {
         var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
                 .name("Stepper Motor")
                 .id("Stepper Motor ID")
-                .address(21) //passende adresse einfügen
+                .address(24) //passende adresse einfügen
                 .initial(DigitalState.LOW)
                 .onState(DigitalState.HIGH);
         stepperMotor = pi4j.create(stepperMotorConfig);
 
-        int in1PinNumber = 18; // Beispiel-Pin-Nummer für IN1
-        int in2PinNumber = 23; // Beispiel-Pin-Nummer für IN2
+
 
         discardMotorIn1 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
                 .id("IN1")
                 .name("Motor IN1")
-                .address(in1PinNumber)
+                .address(MappingForAdress.getMotorAdress("1"))
                 .shutdown(DigitalState.LOW)
                 .initial(DigitalState.LOW)
                 .provider("pigpio-digital-output"));
@@ -252,16 +250,17 @@ public class Main {
         discardMotorIn2 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
                 .id("IN2")
                 .name("Motor IN2")
-                .address(in2PinNumber)
+                .address(MappingForAdress.getMotorAdress("2"))
                 .shutdown(DigitalState.LOW)
                 .initial(DigitalState.LOW)
                 .provider("pigpio-digital-output"));
-//        connectionInput = pi4j.create(DigitalInput.newConfigBuilder(pi4j)
-//                .name("Connection Input")
-//                .id("Connection Input ID")
-//                .address(22)
-//                .pull(PullResistance.PULL_DOWN)
-//                .debounce(150L));
+
+        connectionInput = pi4j.create(DigitalInput.newConfigBuilder(pi4j)
+                .name("Connection Input")
+                .id("Connection Input ID")
+                .address(MappingForAdress.getConnectionAdress())
+                .pull(PullResistance.PULL_DOWN)
+                .debounce(150L));
 
     }
 

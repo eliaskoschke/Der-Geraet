@@ -2,25 +2,16 @@ package com.example;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi4j.context.Context;
-import com.pi4j.io.gpio.digital.DigitalInput;
 import com.pi4j.io.gpio.digital.DigitalOutput;
 import com.pi4j.io.gpio.digital.DigitalState;
-import com.pi4j.io.gpio.digital.PullResistance;
-import jakarta.ws.rs.client.*;
-import jakarta.ws.rs.core.Response;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.springframework.http.MediaType;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 
 import static com.pi4j.Pi4J.newAutoContext;
 
@@ -72,20 +63,20 @@ public class Raspberry_Controller {
 //           }
 //        });
         //PiButton button = new PiButton(pi4j, 15);
-        addButtonOutputs("1", MappingForButtonIds.getLEDPinAdressForPlayerID("1"));
-        addButtonOutputs("2", MappingForButtonIds.getLEDPinAdressForPlayerID("2"));
-        addButtonOutputs("3", MappingForButtonIds.getLEDPinAdressForPlayerID("3"));
-        addButtonOutputs("4", MappingForButtonIds.getLEDPinAdressForPlayerID("4"));
-        addButtonOutputs("5", MappingForButtonIds.getLEDPinAdressForPlayerID("5"));
-        addButtonOutputs("6", MappingForButtonIds.getLEDPinAdressForPlayerID("6"));
+        addButtonOutputs("1", MappingForAdress.getLEDPinAdressForPlayerID("1"));
+        addButtonOutputs("2", MappingForAdress.getLEDPinAdressForPlayerID("2"));
+        addButtonOutputs("3", MappingForAdress.getLEDPinAdressForPlayerID("3"));
+        addButtonOutputs("4", MappingForAdress.getLEDPinAdressForPlayerID("4"));
+        addButtonOutputs("5", MappingForAdress.getLEDPinAdressForPlayerID("5"));
+        addButtonOutputs("6", MappingForAdress.getLEDPinAdressForPlayerID("6"));
 
         ArrayList<PiButton> buttonList = new ArrayList<>();
-        buttonList.add(new PiButton(pi4j, MappingForButtonIds.getButtonPinAdressForPlayerID("1")));
-        buttonList.add(new PiButton(pi4j, MappingForButtonIds.getButtonPinAdressForPlayerID("2")));
-        buttonList.add(new PiButton(pi4j, MappingForButtonIds.getButtonPinAdressForPlayerID("3")));
-        buttonList.add(new PiButton(pi4j, MappingForButtonIds.getButtonPinAdressForPlayerID("4")));
-        buttonList.add(new PiButton(pi4j, MappingForButtonIds.getButtonPinAdressForPlayerID("5")));
-        buttonList.add(new PiButton(pi4j, MappingForButtonIds.getButtonPinAdressForPlayerID("6")));
+        buttonList.add(new PiButton(pi4j, MappingForAdress.getButtonPinAdressForPlayerID("1")));
+        buttonList.add(new PiButton(pi4j, MappingForAdress.getButtonPinAdressForPlayerID("2")));
+        buttonList.add(new PiButton(pi4j, MappingForAdress.getButtonPinAdressForPlayerID("3")));
+        buttonList.add(new PiButton(pi4j, MappingForAdress.getButtonPinAdressForPlayerID("4")));
+        buttonList.add(new PiButton(pi4j, MappingForAdress.getButtonPinAdressForPlayerID("5")));
+        buttonList.add(new PiButton(pi4j, MappingForAdress.getButtonPinAdressForPlayerID("6")));
 
         while(true){
             if(gameHasStarted()) {
@@ -93,7 +84,8 @@ public class Raspberry_Controller {
                 for (PiButton piButton : buttonList) {
                     piButton.checkSingleClick();
                     if (currentPlayerId.equals(String.valueOf(piButton.getPlayerNumber()))) {
-                        activateButton(piButton);
+                        if(playerButtonMap.get(currentPlayerId).isLow())
+                            activateButton(piButton);
                     } else if (playerButtonMap.get(String.valueOf(piButton.getPlayerNumber())).isHigh()) {
                         deactivateButton(piButton);
                     }
