@@ -2,26 +2,7 @@ package com.example;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.swing.text.html.ImageView;
-import java.awt.*;
-import javax.swing.text.html.ImageView;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.zxing.NotFoundException;
-import javafx.animation.AnimationTimer;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.Pane;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Karte {
 

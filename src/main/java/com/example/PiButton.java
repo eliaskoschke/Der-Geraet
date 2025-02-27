@@ -5,7 +5,6 @@ import com.pi4j.io.gpio.digital.DigitalInput;
 import com.pi4j.io.gpio.digital.DigitalState;
 import com.pi4j.io.gpio.digital.PullResistance;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -22,10 +21,11 @@ public class PiButton {
     private final int playerNumber;
     private ObjectMapper mapper = new ObjectMapper();
     private boolean locked = true;
+    private static boolean isClicked = false;
 
-    public PiButton(com. pi4j. context. Context pi4j, int pinNumber) throws InterruptedException {
-        this.pinNumber = pinNumber;
-        this.playerNumber = convertPinNumberToPlayerNumber();
+    public PiButton(com. pi4j. context. Context pi4j, String playerNumber) throws InterruptedException {
+        this.pinNumber = MappingForAdress.getButtonPinAdressForPlayerID(playerNumber);
+        this.playerNumber = Integer.parseInt(playerNumber);
         var buttonConfig = DigitalInput.newConfigBuilder(pi4j)
                 .name("Button Name: " + String.valueOf(pinNumber))
                 .id("Button ID: " + String.valueOf(pinNumber))
@@ -37,41 +37,45 @@ public class PiButton {
 
         button.addListener(e -> {
             if (e.state() == DigitalState.HIGH) {
-                handleClick();
+                if(!buttonRegistered){
+                    singleButtonClick();
+                } else {
+                    if (!locked) {
+                        handleClick();
+                        try {
+                            Thread.sleep(DOUBLE_CLICK_TIME+300);
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        checkSingleClick();
+                    }
+                }
 //                System.out.println("Button "+playerNumber +" wurde geklickt");
             }
         });
     }
 
-    public int convertPinNumberToPlayerNumber(){
-        return switch (pinNumber) {
-            case 26 -> 1;
-            case 24 -> 2;
-            case 4 -> 3;
-            case 14 -> 4;
-            case 17 -> 5;
-            case 27 -> 6;
-            default -> 0;
-        };
-    }
+
 
 
 
     public void handleClick() {
         long currentTime = System.currentTimeMillis();
-
         if ((currentTime - lastPressTime) < DOUBLE_CLICK_TIME) {
             isDoubleClick = true;
             System.out.println("Doppelklick erkannt!");
             doubleButtonClick();
+            isClicked = false;
         } else {
+            isClicked = true;
             isDoubleClick = false;
             lastPressTime = currentTime;
         }
     }
 
     public void checkSingleClick() {
-        if (!isDoubleClick && (System.currentTimeMillis() - lastPressTime) >= DOUBLE_CLICK_TIME && lastPressTime != 0) {
+        if (!isDoubleClick && (System.currentTimeMillis() - lastPressTime) >= DOUBLE_CLICK_TIME && lastPressTime != 0 && isClicked) {
+            isClicked = false;
             System.out.println("Einfacher Klick erkannt!");
             singleButtonClick();
             lastPressTime = 0; // Zurücksetzen, um zukünftige Klicks korrekt zu erkennen
@@ -79,11 +83,13 @@ public class PiButton {
     }
 
     private void singleButtonClick() {
-        System.out.println("Knopf gedrückt");
-        if(buttonRegistered && !locked) {
-            sendMessageButtonClickedOnce();
-        } else{
-            resgiterPlayerAtTable();
+        if(!locked) {
+            if (buttonRegistered) {
+                sendMessageButtonClickedOnce();
+            } else {
+                System.out.println("Ich bin im Einzel klick und regestriere gleich");
+                resgiterPlayerAtTable();
+            }
         }
     }
 
@@ -99,12 +105,8 @@ public class PiButton {
             // Sende die POST-Anfrage und erhalte die Antwort
             try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
                 // Überprüfe den Status der Antwort und verarbeite sie
-                System.out.println(EntityUtils.toString(response.getEntity()));
                 Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
-                System.out.println(responseMessage);
                 if (responseMessage.getMessage().equals("acknowledged")) {
-                    String responseBody = EntityUtils.toString(response.getEntity());
-                    System.out.println("Antwort erhalten: " + responseBody);
                     buttonRegistered = true;
                 } else {
                     System.out.println("Fehler: ");
@@ -141,11 +143,13 @@ public class PiButton {
     }
 
     private void doubleButtonClick() {
-        System.out.println("Knopf gedrückt");
-        if(buttonRegistered && !locked) {
-            sendMessageButtonClickedTwice();
-        } else{
-            resgiterPlayerAtTable();
+        if(!locked) {
+            if (buttonRegistered) {
+                sendMessageButtonClickedTwice();
+            } else {
+                System.out.println("Ich bin im Doppelbutton klick und regestriere gleich");
+                resgiterPlayerAtTable();
+            }
         }
     }
 

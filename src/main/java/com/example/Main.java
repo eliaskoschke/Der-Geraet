@@ -49,9 +49,10 @@ public class Main {
     public static void registerPlayer() throws InterruptedException {
         System.out.println("Spieler werden registriert");
         while(true){
-            Thread.sleep(15000);
+            Thread.sleep(30000);
             gameService.setGameStarted(true);
             if(gameService.isGameStarted()){
+                gameService.setCurrentPlayer(new Player("0"));
                 gamemode = gameService.getGamemode();
                 //alle Taster low
                 break;
@@ -60,12 +61,14 @@ public class Main {
     }
 
     private static void gameLogic() throws InterruptedException {
-        Collections.sort(gameService.getListOfAllPlayers(), new Comparator<Player>() {
-            @Override
-            public int compare(Player p1, Player p2) {
-                return Integer.compare(Integer.parseInt(p1.getId()),Integer.parseInt(p2.getId()));
-            }
-        });
+        if(gameService.getListOfAllPlayers().size()>=2) {
+            Collections.sort(gameService.getListOfAllPlayers(), new Comparator<Player>() {
+                @Override
+                public int compare(Player p1, Player p2) {
+                    return Integer.compare(Integer.parseInt(p1.getId()), Integer.parseInt(p2.getId()));
+                }
+            });
+        }
         gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
         while(true){
             if(gameService.isButtonClickedOnce()){

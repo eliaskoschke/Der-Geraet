@@ -1,5 +1,6 @@
 package com.example;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -83,4 +84,8 @@ public class BlackJack extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+
+
+
+
 }

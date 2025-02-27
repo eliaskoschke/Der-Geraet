@@ -38,6 +38,7 @@ public class MappingForAdress {
         };
     }
 
+
     //        int in1PinNumber = 12;
     //        int in2PinNumber = 5;
     public static int getMotorAdress(String motorID){
