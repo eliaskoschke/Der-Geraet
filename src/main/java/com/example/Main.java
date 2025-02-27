@@ -19,7 +19,7 @@ import java.util.Comparator;
 
 @SpringBootApplication
 public class Main {
-    static Context pi4j =  Pi4J.newAutoContext();
+    //static Context pi4j =  Pi4J.newAutoContext();
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotorIn1;
     static DigitalOutput discardMotorIn2;
@@ -31,7 +31,7 @@ public class Main {
     static boolean turnHasEnded = false;
 
     public static void main(String[] args) throws InterruptedException {
-        controllerConfig();
+        //controllerConfig();
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
         //Initialize Methode für ersten kamera Scan etc.
@@ -228,41 +228,41 @@ public class Main {
         stepperMotor.low();
     }
 
-    public static void controllerConfig(){
-        var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
-                .name("Stepper Motor")
-                .id("Stepper Motor ID")
-                .address(24) //passende adresse einfügen
-                .initial(DigitalState.LOW)
-                .onState(DigitalState.HIGH);
-        stepperMotor = pi4j.create(stepperMotorConfig);
-
-
-
-        discardMotorIn1 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
-                .id("IN1")
-                .name("Motor IN1")
-                .address(MappingForAdress.getMotorAdress("1"))
-                .shutdown(DigitalState.LOW)
-                .initial(DigitalState.LOW)
-                .provider("pigpio-digital-output"));
-
-        discardMotorIn2 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
-                .id("IN2")
-                .name("Motor IN2")
-                .address(MappingForAdress.getMotorAdress("2"))
-                .shutdown(DigitalState.LOW)
-                .initial(DigitalState.LOW)
-                .provider("pigpio-digital-output"));
-
-        connectionInput = pi4j.create(DigitalInput.newConfigBuilder(pi4j)
-                .name("Connection Input")
-                .id("Connection Input ID")
-                .address(MappingForAdress.getConnectionAdress())
-                .pull(PullResistance.PULL_DOWN)
-                .debounce(150L));
-
-    }
+//    public static void controllerConfig(){
+//        var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
+//                .name("Stepper Motor")
+//                .id("Stepper Motor ID")
+//                .address(24) //passende adresse einfügen
+//                .initial(DigitalState.LOW)
+//                .onState(DigitalState.HIGH);
+//        stepperMotor = pi4j.create(stepperMotorConfig);
+//
+//
+//
+//        discardMotorIn1 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
+//                .id("IN1")
+//                .name("Motor IN1")
+//                .address(MappingForAdress.getMotorAdress("1"))
+//                .shutdown(DigitalState.LOW)
+//                .initial(DigitalState.LOW)
+//                .provider("pigpio-digital-output"));
+//
+//        discardMotorIn2 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
+//                .id("IN2")
+//                .name("Motor IN2")
+//                .address(MappingForAdress.getMotorAdress("2"))
+//                .shutdown(DigitalState.LOW)
+//                .initial(DigitalState.LOW)
+//                .provider("pigpio-digital-output"));
+//
+//        connectionInput = pi4j.create(DigitalInput.newConfigBuilder(pi4j)
+//                .name("Connection Input")
+//                .id("Connection Input ID")
+//                .address(MappingForAdress.getConnectionAdress())
+//                .pull(PullResistance.PULL_DOWN)
+//                .debounce(150L));
+//
+//    }
 
 
 
