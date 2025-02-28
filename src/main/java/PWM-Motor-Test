@@ -1,0 +1,48 @@
+import com.pi4j.Pi4J;
+import com.pi4j.context.Context;
+import com.pi4j.io.gpio.digital.DigitalOutput;
+import com.pi4j.io.pwm.Pwm;
+import com.pi4j.io.pwm.PwmType;
+
+public class MotorControl {
+
+    public static void main(String[] args) throws InterruptedException {
+        // Pi4J Context erstellen
+        Context pi4j = Pi4J.newAutoContext();
+
+        // GPIO-Pins definieren
+        int directionPin = 23; // Pin für die Richtung
+        int pwmPin = 25;       // Pin für PWM
+
+        // DigitalOutput für Richtung
+        DigitalOutput direction = pi4j.dout().create(directionPin);
+
+        // PWM für Geschwindigkeit
+        Pwm pwm = pi4j.pwm().create(pwmPin, PwmType.HARDWARE);
+
+        try {
+            // Vorwärts
+            direction.high();
+            pwm.on(75); // 75% Duty Cycle
+            Thread.sleep(5000);
+
+            // Stopp
+            pwm.off();
+            Thread.sleep(2000);
+
+            // Rückwärts
+            direction.low();
+            pwm.on(75);
+            Thread.sleep(5000);
+
+            // Stopp
+            pwm.off();
+            Thread.sleep(2000);
+
+        } finally {
+            // Ressourcen freigeben
+            pwm.off();
+            pi4j.shutdown();
+        }
+    }
+}
