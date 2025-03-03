@@ -11,7 +11,8 @@ public class StepperController {
     private static final int PIN_STEP = 18;
     private static final int PIN_DIR = 24;
     private static final int SPEED = 500;
-    private static final int TRESHOLD = 35; //TODO: Rausfinden, wieviel ein Treshold haben sollte
+    private static final int HOMESPEED = 500;
+    private static final int TRESHOLD = 40; //TODO: Rausfinden, wieviel ein Treshold haben sollte
     Tmc2209 steppermotor;
 
     Context pi4j;
@@ -22,7 +23,7 @@ public class StepperController {
     }
 
     public void orientieren() throws TMCDeviceIsBusyException {
-        steppermotor.homePosition(SPEED,TRESHOLD);
+        steppermotor.homePosition(HOMESPEED,TRESHOLD);
     }
 
     void turn(int grad) throws TMCDeviceIsBusyException {
