@@ -122,7 +122,7 @@
             <artifactId>core</artifactId>
             <version>3.4.1</version>
         </dependency>
-        <!-- Webcam Bibliothek -->
+        <!-- Webcam Bibliothek das ist ein Test2-->
         <dependency>
             <groupId>com.github.sarxos</groupId>
             <artifactId>webcam-capture</artifactId>
@@ -131,7 +131,7 @@
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv-platform</artifactId>
-            <version>1.5.9</version>
+            <version>1.5.8</version>
         </dependency>
         <!-- SQLite JDBC Bibliothek -->
         <dependency>
