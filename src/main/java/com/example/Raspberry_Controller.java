@@ -72,7 +72,7 @@ public class Raspberry_Controller {
 
         ArrayList<PiButton> buttonList = new ArrayList<>();
         buttonList.add(new PiButton(pi4j, "1"));
-//        buttonList.add(new PiButton(pi4j, "2")); das ist ein test
+//        buttonList.add(new PiButton(pi4j, "2")); das ist ein test2
 //        buttonList.add(new PiButton(pi4j, "3"));
         buttonList.add(new PiButton(pi4j, "4"));
         buttonList.add(new PiButton(pi4j, "5"));

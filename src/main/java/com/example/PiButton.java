@@ -13,7 +13,7 @@ import org.apache.http.util.EntityUtils;
 
 public class PiButton {
     private static final String baseURL = "http://localhost:8080/api/logic";
-    private static final long DOUBLE_CLICK_TIME = 1000; // Zeit in Millisekunden das ist ein test
+    private static final long DOUBLE_CLICK_TIME = 1000; // Zeit in Millisekunden das ist ein test2
     private long lastPressTime = 0;
     private boolean isDoubleClick = false;
     private int pinNumber = 0;
