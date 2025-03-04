@@ -16,11 +16,11 @@ public class BlackJack extends Application {
 
     private static HBox cardTable;
     private static ImageView faceDownCard;
-    private final int cardWidth = 150;
-    private final int cardHeight = 225;
-    private final int screenWidth = 1024;
-    private final int screenHeight = 600;
-    private Karte karte = new Karte();
+    int mult = 2;
+    private final int cardWidth = 150 *mult;
+    private final int cardHeight = 225 *mult;
+    private final int screenWidth = 955 *mult;
+    private final int screenHeight = 582 *mult;
 
     public BlackJack() {
     }
@@ -31,13 +31,12 @@ public class BlackJack extends Application {
         Platform.runLater(()->{
             primaryStage.setHeight(screenHeight);
             primaryStage.setWidth(screenWidth);
+//            primaryStage.setFullScreen(true);
         });
         show(primaryStage);
     }
 
     public void show(Stage primaryStage) {
-        karte = new Karte("4", "Herz", "Herz 4");
-        karte.castKartenObjectToBildId();
         cardTable = new HBox();
         cardTable.setSpacing(20); // Abstand zwischen den Karten
         cardTable.setPadding(new Insets(20)); // Innenabstand um die Karten herum
@@ -48,16 +47,6 @@ public class BlackJack extends Application {
                 "-fx-background-size: cover;");
 
         // Karte links von der umgedrehten Karte hinzufügen
-        ImageView cardImageView = new ImageView(karte.getBild());
-        cardImageView.setFitWidth(cardWidth);
-        cardImageView.setFitHeight(cardHeight);
-        cardTable.getChildren().add(cardImageView);
-
-        // Umgedrehte Karte hinzufügen
-        faceDownCard = new ImageView(new Image("file:/home/pi/Main-Branch/Der-Geraet/src/main/resources/static/img/cards/500.png"));
-        faceDownCard.setFitWidth(cardWidth);
-        faceDownCard.setFitHeight(cardHeight);
-        cardTable.getChildren().add(faceDownCard);
 
         StackPane root = new StackPane();
         root.getChildren().add(cardTable);
@@ -66,6 +55,26 @@ public class BlackJack extends Application {
         primaryStage.setTitle("BlackJack");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public void addBeginningCards(){
+        Platform.runLater(()-> {
+            faceDownCard = new ImageView(new Image("file:/home/pi/Main-Branch/Der-Geraet/src/main/resources/static/img/cards/500.png"));
+            faceDownCard.setFitWidth(cardWidth);
+            faceDownCard.setFitHeight(cardHeight);
+            cardTable.getChildren().add(faceDownCard);
+        });
+
+    }
+
+    public void addBeginningCards(Karte card){
+        Platform.runLater(()-> {
+        ImageView cardImageView = new ImageView(card.getBild());
+        cardImageView.setFitWidth(cardWidth);
+        cardImageView.setFitHeight(cardHeight);
+        cardTable.getChildren().add(cardImageView);
+        });
+
     }
 
     public void addCardToTable(Karte neueKarte) {
@@ -95,6 +104,7 @@ public class BlackJack extends Application {
     public void launchApp() {
         launch();
     }
+
 
     public static void main(String[] args) {
         launch(args);
