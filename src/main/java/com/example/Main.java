@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.*;
+import javafx.application.Application;
+import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -18,7 +20,7 @@ import java.util.Comparator;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
 @SpringBootApplication
-public class Main {
+public class Main extends Application {
     static Context pi4j =  Pi4J.newAutoContext();
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotorIn1;
@@ -29,6 +31,7 @@ public class Main {
     static ObjectMapper mapper = new ObjectMapper();
     static Gamemode gamemode;
     static boolean turnHasEnded = false;
+    static BlackJack blackJackOberflaeche = new BlackJack();
 
 
 
@@ -174,6 +177,7 @@ public class Main {
     }
 
     private static void executeCameraScan(){
+
         BufferedImage bufferedImage=camera.captureImage();
 
         if (bufferedImage != null) {
@@ -270,13 +274,14 @@ public class Main {
 
     }
 
-
+//das ist ein test2
 
     private static void initializeGame() throws InterruptedException {
 
         executeCameraScan();
         switch (gamemode){
             case BLACKJACK -> {
+                Application.launch();
                 System.out.println("Karten werden für den Anfang ausgeteilt");
                 for (int i = 0; i < 2; i++) {
                     rotateStepperMotor(1000);
@@ -302,5 +307,10 @@ public class Main {
         }
 
         System.out.println("Karten wurden ausgeteilt");
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        blackJackOberflaeche.start(stage);
     }
 }
