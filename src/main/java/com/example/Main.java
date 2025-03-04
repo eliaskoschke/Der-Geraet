@@ -274,7 +274,7 @@ public class Main extends Application {
 
     }
 
-
+//das ist ein test
 
     private static void initializeGame() throws InterruptedException {
 
