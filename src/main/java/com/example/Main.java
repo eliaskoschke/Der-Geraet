@@ -156,6 +156,9 @@ public class Main {
                 for(String winner : gameService.getMapOfAllWinners().keySet()){
                     System.out.println(winner + " " + gameService.getMapOfAllWinners().get(winner));
                 }
+                if(gameService.getMapOfAllWinners() == null || gameService.getMapOfAllWinners().isEmpty()){
+                    System.out.println("Alle haben verloren");
+                }
             }
             case POKER -> {
 
