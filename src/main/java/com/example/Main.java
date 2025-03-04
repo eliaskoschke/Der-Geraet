@@ -20,7 +20,7 @@ import java.util.Comparator;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
 @SpringBootApplication
-public class Main extends Application {
+public class Main {
     static Context pi4j =  Pi4J.newAutoContext();
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotorIn1;
@@ -111,14 +111,24 @@ public class Main extends Application {
         gameService.setCurrentPlayer(new Player("0"));
         switch (gamemode){
             case BLACKJACK -> {
+                System.out.println("Computer Turn ist dran");
+                blackJackOberflaeche.removeFaceDownCard();
+                blackJackOberflaeche.addCardToTable(gameService.getDealer().getDealerHand().get(1));
+                System.out.println("Karte wurde hinzugefügt");
                 gameService.getDealer().countHand();
-                while(gameService.getDealer().getDealerHandWert() < 17){
-                    rotateStepperMotor(1000);
-                    System.out.println("Karte bekommen");
-                    giveDealerNextCard();
-                    gameService.getDealer().countHand();
-                    executeCameraScan();
-                    Thread.sleep(1000);
+                Thread.sleep(2000);
+                if(gameService.getListOfAllPlayers().isEmpty()){
+
+                } else {
+                    while (gameService.getDealer().getDealerHandWert() < 17) {
+                        rotateStepperMotor(1000);
+                        System.out.println("Karte bekommen");
+                        giveDealerNextCard();
+                        blackJackOberflaeche.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size()-1));
+                        gameService.getDealer().countHand();
+                        executeCameraScan();
+                        Thread.sleep(1000);
+                    }
                 }
                 int dealerHandWert = gameService.getDealer().getDealerHandWert();
                 for (Player player : gameService.getListOfAllPlayers()){
@@ -168,10 +178,11 @@ public class Main extends Application {
     }
 
     private static void giveDealerNextCard(){
+
         if(gameService.getDealer().getDealerHand() == null){
             gameService.getDealer().setDealerHand(new ArrayList<Karte>());
             gameService.getDealer().getDealerHand().add(gameService.getNextCardInDeck());
-        } else{
+        } else {
             gameService.getDealer().getDealerHand().add(gameService.getNextCardInDeck());
         }
     }
@@ -281,7 +292,7 @@ public class Main extends Application {
         executeCameraScan();
         switch (gamemode){
             case BLACKJACK -> {
-                Application.launch();
+                startGamePanel();
                 System.out.println("Karten werden für den Anfang ausgeteilt");
                 for (int i = 0; i < 2; i++) {
                     rotateStepperMotor(1000);
@@ -309,8 +320,9 @@ public class Main extends Application {
         System.out.println("Karten wurden ausgeteilt");
     }
 
-    @Override
-    public void start(Stage stage) throws Exception {
-        blackJackOberflaeche.start(stage);
+    private static void startGamePanel() {
+        new Thread (() -> {
+            blackJackOberflaeche.launchApp();
+        }).start();
     }
 }
