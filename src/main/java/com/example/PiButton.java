@@ -71,27 +71,6 @@ public class PiButton {
 
 
 
-
-    public void handleClick() {
-        long currentTime = System.currentTimeMillis();
-        if ((currentTime - lastPressTime) < DOUBLE_CLICK_TIME) {
-            isDoubleClick = true;
-            System.out.println("Doppelklick erkannt!");
-            doubleButtonClick();
-        } else {
-            isDoubleClick = false;
-            lastPressTime = currentTime;
-        }
-    }
-
-    public void checkSingleClick() {
-        if (!isDoubleClick && (System.currentTimeMillis() - lastPressTime) >= DOUBLE_CLICK_TIME && lastPressTime != 0) {
-            System.out.println("Einfacher Klick erkannt!");
-            singleButtonClick();
-            lastPressTime = 0; // Zurücksetzen, um zukünftige Klicks korrekt zu erkennen
-        }
-    }
-
     private void singleButtonClick() {
         if(!locked) {
             if (buttonRegistered) {

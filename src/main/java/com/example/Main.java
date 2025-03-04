@@ -20,7 +20,7 @@ import java.util.Comparator;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
 @SpringBootApplication
-public class Main extends Application {
+public class Main {
     static Context pi4j =  Pi4J.newAutoContext();
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotorIn1;
@@ -92,13 +92,17 @@ public class Main extends Application {
     }
 
     public static void executeNextTurn() throws InterruptedException {
+        Player deleteThisPlayer = null;
+        if(gameService.getCurrentPlayer().getKartenhandWert() > 21){
+            deleteThisPlayer = gameService.getCurrentPlayer();
+        }
         if(gameService.getCurrenPlayerIndex()+1 >= gameService.getListOfAllPlayers().size()){
+            if(deleteThisPlayer != null){
+                gameService.getListOfAllPlayers().remove(deleteThisPlayer);
+            }
             executeComputerTurn();
         } else{
-            Player deleteThisPlayer = null;
-            if(gameService.getCurrentPlayer().getKartenhandWert() > 21){
-                deleteThisPlayer = gameService.getCurrentPlayer();
-            }
+
             gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex()+1);
             gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(gameService.getCurrenPlayerIndex()));
             if(deleteThisPlayer != null){
@@ -111,14 +115,24 @@ public class Main extends Application {
         gameService.setCurrentPlayer(new Player("0"));
         switch (gamemode){
             case BLACKJACK -> {
+                System.out.println("Computer Turn ist dran");
+                blackJackOberflaeche.removeFaceDownCard();
+                blackJackOberflaeche.addCardToTable(gameService.getDealer().getDealerHand().get(1));
+                System.out.println("Karte wurde hinzugefügt");
                 gameService.getDealer().countHand();
-                while(gameService.getDealer().getDealerHandWert() < 17){
-                    rotateStepperMotor(1000);
-                    System.out.println("Karte bekommen");
-                    giveDealerNextCard();
-                    gameService.getDealer().countHand();
-                    executeCameraScan();
-                    Thread.sleep(1000);
+                Thread.sleep(10000);
+                if(gameService.getListOfAllPlayers().isEmpty()){
+
+                } else {
+                    while (gameService.getDealer().getDealerHandWert() < 17) {
+                        executeCameraScan();
+                        rotateStepperMotor(1000);
+                        System.out.println("Karte bekommen");
+                        giveDealerNextCard();
+                        blackJackOberflaeche.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size()-1));
+                        gameService.getDealer().countHand();
+                        Thread.sleep(10000);
+                    }
                 }
                 int dealerHandWert = gameService.getDealer().getDealerHandWert();
                 for (Player player : gameService.getListOfAllPlayers()){
@@ -139,6 +153,9 @@ public class Main extends Application {
                         }
                     }
                 }
+                for(String winner : gameService.getMapOfAllWinners().keySet()){
+                    System.out.println(winner + " " + gameService.getMapOfAllWinners().get(winner));
+                }
             }
             case POKER -> {
 
@@ -152,9 +169,9 @@ public class Main extends Application {
         switch (gamemode){
             case BLACKJACK -> {
                 rotateStepperMotor(1000);
+                executeCameraScan();
                 executeCardThrow();
                 giveCurrentPlayerNextCard();
-                executeCameraScan();
                 gameService.getCurrentPlayer().countHand();
                 System.out.println(gameService.getCurrentPlayer().getKartenhandWert());
                 if(gameService.getCurrentPlayer().getKartenhandWert() >= 21){
@@ -168,10 +185,11 @@ public class Main extends Application {
     }
 
     private static void giveDealerNextCard(){
+
         if(gameService.getDealer().getDealerHand() == null){
             gameService.getDealer().setDealerHand(new ArrayList<Karte>());
             gameService.getDealer().getDealerHand().add(gameService.getNextCardInDeck());
-        } else{
+        } else {
             gameService.getDealer().getDealerHand().add(gameService.getNextCardInDeck());
         }
     }
@@ -281,15 +299,20 @@ public class Main extends Application {
         executeCameraScan();
         switch (gamemode){
             case BLACKJACK -> {
-                Application.launch();
                 System.out.println("Karten werden für den Anfang ausgeteilt");
+                startGamePanel();
                 for (int i = 0; i < 2; i++) {
                     rotateStepperMotor(1000);
                     executeCardThrow();
                     giveDealerNextCard();
                     executeCameraScan();
+                    if(i == 0)
+                        blackJackOberflaeche.addCardToTable(gameService.getDealer().getDealerHand().get(0));
+                    else
+                        blackJackOberflaeche.addBeginningCards();
                     Thread.sleep(500);
                 }
+
                 for (Player player : gameService.getListOfAllPlayers()){
                     gameService.setCurrentPlayer(player);
                     for (int i = 0; i < 2; i++) {
@@ -300,6 +323,7 @@ public class Main extends Application {
                         Thread.sleep(500);
                     }
                 }
+                executeCardThrow();
             }
             case POKER -> {
 
@@ -309,8 +333,9 @@ public class Main extends Application {
         System.out.println("Karten wurden ausgeteilt");
     }
 
-    @Override
-    public void start(Stage stage) throws Exception {
-        blackJackOberflaeche.start(stage);
+    private static void startGamePanel() {
+        new Thread (() -> {
+            blackJackOberflaeche.launchApp();
+        }).start();
     }
 }

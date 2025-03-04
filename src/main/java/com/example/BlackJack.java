@@ -2,6 +2,7 @@ package com.example;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,13 +14,13 @@ import javafx.stage.Stage;
 
 public class BlackJack extends Application {
 
-    private HBox cardTable;
-    private ImageView faceDownCard;
-    private final int cardWidth = 150;
-    private final int cardHeight = 225;
-    private final int screenWidth = 1024;
-    private final int screenHeight = 600;
-    private Karte karte = new Karte();
+    private static HBox cardTable;
+    private static ImageView faceDownCard;
+    int mult = 2;
+    private final int cardWidth = 150 *mult;
+    private final int cardHeight = 225 *mult;
+    private final int screenWidth = 955 *mult;
+    private final int screenHeight = 582 *mult;
 
     public BlackJack() {
     }
@@ -27,7 +28,11 @@ public class BlackJack extends Application {
     @Override
     public void start(Stage primaryStage) {
         // Beispielkarte erstellen
-        karte.setBild(new Image("file:D:/DEV_Ausbildung_24/Der-Geraet-Maven/src/main/resources/static/img/cards/201.png"));
+        Platform.runLater(()->{
+            primaryStage.setHeight(screenHeight);
+            primaryStage.setWidth(screenWidth);
+//            primaryStage.setFullScreen(true);
+        });
         show(primaryStage);
     }
 
@@ -38,20 +43,10 @@ public class BlackJack extends Application {
         cardTable.setAlignment(Pos.CENTER); // Zentriert die Karten in der HBox
 
         // Hintergrundbild hinzufügen
-        cardTable.setStyle("-fx-background-image: url('file:D:/DEV_Ausbildung_24/Der-Geraet-Maven/src/main/resources/static/img/HintergrundTisch.png'); " +
+        cardTable.setStyle("-fx-background-image: url('file:/home/pi/Main-Branch/Der-Geraet/src/main/resources/static/img/HintergrundTisch.png'); " +
                 "-fx-background-size: cover;");
 
-        // Karte: ping - 2025-02-25 12:35:25.754335+00:00 links von der umgedrehten Karte hinzufügen
-        ImageView cardImageView = new ImageView(karte.getBild());
-        cardImageView.setFitWidth(cardWidth);
-        cardImageView.setFitHeight(cardHeight);
-        cardTable.getChildren().add(cardImageView);
-
-        // Umgedrehte Karte hinzufügen
-        faceDownCard = new ImageView(new Image("file:D:/DEV_Ausbildung_24/Der-Geraet-Maven/src/main/resources/static/img/cards/500.png"));
-        faceDownCard.setFitWidth(cardWidth);
-        faceDownCard.setFitHeight(cardHeight);
-        cardTable.getChildren().add(faceDownCard);
+        // Karte links von der umgedrehten Karte hinzufügen
 
         StackPane root = new StackPane();
         root.getChildren().add(cardTable);
@@ -62,24 +57,54 @@ public class BlackJack extends Application {
         primaryStage.show();
     }
 
-    public void addCardToTable(Karte karte) {
-        ImageView cardImageView = new ImageView(karte.getBild());
+    public void addBeginningCards(){
+        Platform.runLater(()-> {
+            faceDownCard = new ImageView(new Image("file:/home/pi/Main-Branch/Der-Geraet/src/main/resources/static/img/cards/500.png"));
+            faceDownCard.setFitWidth(cardWidth);
+            faceDownCard.setFitHeight(cardHeight);
+            cardTable.getChildren().add(faceDownCard);
+        });
+
+    }
+
+    public void addBeginningCards(Karte card){
+        Platform.runLater(()-> {
+        ImageView cardImageView = new ImageView(card.getBild());
         cardImageView.setFitWidth(cardWidth);
         cardImageView.setFitHeight(cardHeight);
         cardTable.getChildren().add(cardImageView);
+        });
+
+    }
+
+    public void addCardToTable(Karte neueKarte) {
+        Platform.runLater(()-> {
+            neueKarte.castKartenObjectToBildId();
+            ImageView cardImageView = new ImageView(neueKarte.getBild());
+            cardImageView.setFitWidth(cardWidth);
+            cardImageView.setFitHeight(cardHeight);
+            cardTable.getChildren().add(cardImageView);
+        });
     }
 
     public void removeFaceDownCard() {
-        if (faceDownCard != null) {
-            cardTable.getChildren().remove(faceDownCard);
-            faceDownCard = null;
-        }
+        Platform.runLater(()->{
+            if (faceDownCard != null) {
+                cardTable.getChildren().remove(faceDownCard);
+                faceDownCard = null;
+            }
+        });
     }
 
     public void remove() {
         Stage stage = (Stage) cardTable.getScene().getWindow();
         stage.close();
     }
+
+    public void launchApp() {
+        launch();
+    }
+
 
     public static void main(String[] args) {
         launch(args);

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javafx.scene.image.Image;
 
+import java.util.Objects;
+
 public class Karte {
 
     int wert;
@@ -18,7 +20,6 @@ public class Karte {
         this.wert = Integer.parseInt(wert);
         this.typ = typ;
         this.name = name;
-        bild = castKartenObjectToBildId();
     }
 
     public int getWert() {
@@ -53,9 +54,7 @@ public class Karte {
         this.bild = bild;
     }
 
-    public Image castKartenObjectToBildId(){
-        String idCSV ="";
-
+    public void castKartenObjectToBildId(){
         int idValue = 0;
         switch (typ){
             case "Karo":
@@ -88,8 +87,8 @@ public class Karte {
                 idValue += wert;
                 break;
         }
-        idCSV = "D:\\DEV_Ausbildung_24\\Der-Geraet-Maven\\src\\main\\resources\\static\\img\\cards\\"+String.valueOf(idValue) +".png";
-        Image image = new Image(idCSV);
-        return image;
+        System.out.println(idValue);
+        bild = new Image("file:/home/pi/Main-Branch/Der-Geraet/src/main/resources/static/img/cards/" + String.valueOf(idValue) + ".png");
+        System.out.println("Bild wurde hiinzugefügt");
     }
 }
