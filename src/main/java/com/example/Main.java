@@ -92,13 +92,17 @@ public class Main {
     }
 
     public static void executeNextTurn() throws InterruptedException {
+        Player deleteThisPlayer = null;
+        if(gameService.getCurrentPlayer().getKartenhandWert() > 21){
+            deleteThisPlayer = gameService.getCurrentPlayer();
+        }
         if(gameService.getCurrenPlayerIndex()+1 >= gameService.getListOfAllPlayers().size()){
+            if(deleteThisPlayer != null){
+                gameService.getListOfAllPlayers().remove(deleteThisPlayer);
+            }
             executeComputerTurn();
         } else{
-            Player deleteThisPlayer = null;
-            if(gameService.getCurrentPlayer().getKartenhandWert() > 21){
-                deleteThisPlayer = gameService.getCurrentPlayer();
-            }
+
             gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex()+1);
             gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(gameService.getCurrenPlayerIndex()));
             if(deleteThisPlayer != null){
@@ -116,18 +120,18 @@ public class Main {
                 blackJackOberflaeche.addCardToTable(gameService.getDealer().getDealerHand().get(1));
                 System.out.println("Karte wurde hinzugefügt");
                 gameService.getDealer().countHand();
-                Thread.sleep(2000);
+                Thread.sleep(10000);
                 if(gameService.getListOfAllPlayers().isEmpty()){
 
                 } else {
                     while (gameService.getDealer().getDealerHandWert() < 17) {
+                        executeCameraScan();
                         rotateStepperMotor(1000);
                         System.out.println("Karte bekommen");
                         giveDealerNextCard();
                         blackJackOberflaeche.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size()-1));
                         gameService.getDealer().countHand();
-                        executeCameraScan();
-                        Thread.sleep(1000);
+                        Thread.sleep(10000);
                     }
                 }
                 int dealerHandWert = gameService.getDealer().getDealerHandWert();
@@ -149,6 +153,9 @@ public class Main {
                         }
                     }
                 }
+                for(String winner : gameService.getMapOfAllWinners().keySet()){
+                    System.out.println(winner + " " + gameService.getMapOfAllWinners().get(winner));
+                }
             }
             case POKER -> {
 
@@ -162,9 +169,9 @@ public class Main {
         switch (gamemode){
             case BLACKJACK -> {
                 rotateStepperMotor(1000);
+                executeCameraScan();
                 executeCardThrow();
                 giveCurrentPlayerNextCard();
-                executeCameraScan();
                 gameService.getCurrentPlayer().countHand();
                 System.out.println(gameService.getCurrentPlayer().getKartenhandWert());
                 if(gameService.getCurrentPlayer().getKartenhandWert() >= 21){
@@ -292,15 +299,20 @@ public class Main {
         executeCameraScan();
         switch (gamemode){
             case BLACKJACK -> {
-                startGamePanel();
                 System.out.println("Karten werden für den Anfang ausgeteilt");
+                startGamePanel();
                 for (int i = 0; i < 2; i++) {
                     rotateStepperMotor(1000);
                     executeCardThrow();
                     giveDealerNextCard();
                     executeCameraScan();
+                    if(i == 0)
+                        blackJackOberflaeche.addCardToTable(gameService.getDealer().getDealerHand().get(0));
+                    else
+                        blackJackOberflaeche.addBeginningCards();
                     Thread.sleep(500);
                 }
+
                 for (Player player : gameService.getListOfAllPlayers()){
                     gameService.setCurrentPlayer(player);
                     for (int i = 0; i < 2; i++) {
@@ -311,6 +323,7 @@ public class Main {
                         Thread.sleep(500);
                     }
                 }
+                executeCardThrow();
             }
             case POKER -> {
 
