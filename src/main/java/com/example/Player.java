@@ -50,6 +50,10 @@ public class Player {
     }
 
     public void countHand() {
+        if(kartenhand == null || kartenhand.isEmpty()){
+            kartenhandWert = 0 ;
+            return;
+        }
         List<Karte> kartenHand = kartenhand;
         boolean sonderRegel = false;
         if (kartenHand.get(0).name.contains("Ass") || kartenHand.get(1).name.contains("Ass")) {

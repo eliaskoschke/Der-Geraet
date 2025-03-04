@@ -13,7 +13,7 @@ import org.apache.http.util.EntityUtils;
 
 public class PiButton {
     private static final String baseURL = "http://localhost:8080/api/logic";
-    private static final long DOUBLE_CLICK_TIME = 500; // Zeit in Millisekunden
+    private static final long DOUBLE_CLICK_TIME = 1000; // Zeit in Millisekunden
     private long lastPressTime = 0;
     private boolean isDoubleClick = false;
     private int pinNumber = 0;
@@ -21,7 +21,7 @@ public class PiButton {
     private final int playerNumber;
     private ObjectMapper mapper = new ObjectMapper();
     private boolean locked = true;
-    private static boolean isClicked = false;
+    private static boolean isWaitingForSecondClick = false;
 
     public PiButton(com. pi4j. context. Context pi4j, String playerNumber) throws InterruptedException {
         this.pinNumber = MappingForAdress.getButtonPinAdressForPlayerID(playerNumber);
@@ -41,13 +41,26 @@ public class PiButton {
                     singleButtonClick();
                 } else {
                     if (!locked) {
-                        handleClick();
-                        try {
-                            Thread.sleep(DOUBLE_CLICK_TIME+300);
-                        } catch (InterruptedException ex) {
-                            throw new RuntimeException(ex);
+                        long currentTime = System.currentTimeMillis();
+                        if(isWaitingForSecondClick && (currentTime - lastPressTime) < DOUBLE_CLICK_TIME){
+                            doubleButtonClick();
+                            System.out.println("DOPPELKLICK");
+                            isWaitingForSecondClick = false;
+                        } else{
+                            lastPressTime = currentTime;
+                            isWaitingForSecondClick = true;
+                            new java.util.Timer().schedule(new java.util.TimerTask(){
+                                @Override
+                                public void run(){
+                                    if(isWaitingForSecondClick) {
+                                        singleButtonClick();
+                                        System.out.println("Einzelklick");
+                                        isWaitingForSecondClick = false;
+                                    }
+                                }
+                            }, DOUBLE_CLICK_TIME);
+
                         }
-                        checkSingleClick();
                     }
                 }
 //                System.out.println("Button "+playerNumber +" wurde geklickt");
@@ -65,17 +78,14 @@ public class PiButton {
             isDoubleClick = true;
             System.out.println("Doppelklick erkannt!");
             doubleButtonClick();
-            isClicked = false;
         } else {
-            isClicked = true;
             isDoubleClick = false;
             lastPressTime = currentTime;
         }
     }
 
     public void checkSingleClick() {
-        if (!isDoubleClick && (System.currentTimeMillis() - lastPressTime) >= DOUBLE_CLICK_TIME && lastPressTime != 0 && isClicked) {
-            isClicked = false;
+        if (!isDoubleClick && (System.currentTimeMillis() - lastPressTime) >= DOUBLE_CLICK_TIME && lastPressTime != 0) {
             System.out.println("Einfacher Klick erkannt!");
             singleButtonClick();
             lastPressTime = 0; // Zurücksetzen, um zukünftige Klicks korrekt zu erkennen
