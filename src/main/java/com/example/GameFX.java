@@ -204,6 +204,8 @@ public class GameFX extends Application {
             }
         }
 
+
+        // Reset and initialize seat list
         seats.clear();
         for (int i = 0; i < 6; i++) {
             seats.add(false); // All seats start as empty
@@ -218,18 +220,12 @@ public class GameFX extends Application {
         Pane seatsPane = new Pane();
         seatsPane.setPrefSize(700, 280);
 
-        // Bind the size of the Pane to the size of the window
-        seatsPane.prefWidthProperty().bind(seatLayout.widthProperty());
-        seatsPane.prefHeightProperty().bind(seatLayout.heightProperty().subtract(50)); // Adjust for title
+        double centerX = 955;
+        double centerY = 80;
+        double radius = 175;
 
-        // Use bindings for dynamic positioning
-        double centerX = seatsPane.getPrefWidth() / 2;
-        double centerY = seatsPane.getPrefHeight() / 2 - 50; // Tisch weiter nach oben verschieben
-        double radius = Math.min(seatsPane.getPrefWidth(), seatsPane.getPrefHeight()) / 2.5; // Größerer Radius für mehr Abstand
-
-        for (int i = seats.size()-1; i >=0 ; i--) {
-            // Spiegel den Winkelbereich, um die Plätze unterhalb des Tisches zu positionieren
-            double angle = Math.PI * (1.0 + i / (double) (seats.size() - 1)) + Math.PI;
+        for (int i = 0; i < seats.size(); i++) {
+            double angle = Math.PI * (1 - i / (double) (seats.size() - 1));
 
             double x = centerX + radius * Math.cos(angle);
             double y = centerY + radius * Math.sin(angle);
@@ -237,10 +233,10 @@ public class GameFX extends Application {
             VBox seatContainer = new VBox(8);
             seatContainer.setAlignment(Pos.CENTER);
 
-            Circle seat = new Circle(46);
+            Circle seat = new Circle(35);
             seat.setFill(seats.get(i) ? Color.RED : Color.GREEN);
-
-            Text seatNumber = new Text("Platz " + (seats.size() - i));
+            circles.add(seat);
+            Text seatNumber = new Text("Platz " + (i + 1));
             seatNumber.setStyle("-fx-fill: white; -fx-font-size: 14px; -fx-font-weight: Bold;");
 
             int finalI = i;
@@ -251,27 +247,20 @@ public class GameFX extends Application {
 
             seatContainer.getChildren().addAll(seat, seatNumber);
 
-            // Bind the position of the seat containers
-            seatContainer.layoutXProperty().bind(seatsPane.widthProperty().multiply(x / seatsPane.getPrefWidth()).subtract(seat.getRadius()));
-            seatContainer.layoutYProperty().bind(seatsPane.heightProperty().multiply(y / seatsPane.getPrefHeight()).subtract(seat.getRadius()));
+            // **Perfectly center seat containers**
+            seatContainer.setLayoutX(x - seat.getRadius());
+            seatContainer.setLayoutY(y - seat.getRadius());
 
             seatsPane.getChildren().add(seatContainer);
         }
 
-        // Erstelle den Tischkreis
-        Circle table = new Circle();
+        // Adjusted table position & size
+        Circle table = new Circle(centerX, centerY + 25, 100);
         table.setFill(Color.rgb(70, 103, 210, 0.3));
         table.setStroke(Color.rgb(111, 137, 220, 0.5));
         table.setStrokeWidth(2);
-
-        // Binde den Radius des Kreises an die kleinere Dimension des Pane
-        table.radiusProperty().bind(seatsPane.widthProperty().multiply(0.1)); // 10% der Breite
-
-        // Binde die Position des Kreises an die Mitte des Pane
-        table.centerXProperty().bind(seatsPane.widthProperty().divide(2));
-        table.centerYProperty().bind(seatsPane.heightProperty().divide(2).subtract(50)); // Tisch weiter nach oben verschieben
-
         seatsPane.getChildren().add(0, table);
+
         // Arrange everything
         seatLayout.getChildren().addAll(title, seatsPane);
         seatLayout.setVisible(true);
