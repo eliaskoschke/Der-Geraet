@@ -1,11 +1,7 @@
 package com.example;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pi4j.Pi4J;
-import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.*;
-import javafx.application.Application;
-import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -21,7 +17,7 @@ import java.util.Comparator;
 
 @SpringBootApplication
 public class Main {
-    static Context pi4j =  Pi4J.newAutoContext();
+//    static Context pi4j =  Pi4J.newAutoContext();
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotorIn1;
     static DigitalOutput discardMotorIn2;
@@ -31,36 +27,45 @@ public class Main {
     static ObjectMapper mapper = new ObjectMapper();
     static Gamemode gamemode;
     static boolean turnHasEnded = false;
-    static BlackJack blackJackOberflaeche = new BlackJack();
+    static GameGraphics gameGraphics = new GameGraphics();
+    static boolean gameRestarted = false;
+    static boolean gameChoiceReseted = false;
 
 
 
     //--add-opens=Der.Geraet.Maven/com.example=ALL-UNNAMED
     public static void main(String[] args) throws InterruptedException {
-        controllerConfig();
+//        controllerConfig();
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
         //Initialize Methode für ersten kamera Scan etc.
 //        if(connectionInput.isHigh()){
 //            gameService.setConnected(true);
 //        }
-        registerPlayer();
-        initializeGame();
-        gameLogic();
+        gameService.setConnected(true);
+        startGamePanel();
+        while (!gameService.isGameHasEnded() || gameChoiceReseted) {
+            gameService.setGameHasEnded(false);
+            gameChoiceReseted = false;
+            registerPlayer();
+            while (!gameService.isGameHasEnded() || gameRestarted) {
+                restartTheCurrentgame();
+                gameService.setGameHasEnded(false);
+                gameRestarted = false;
+                initializeGame();
+                gameLogic();
+            }
+        }
     }
 
     public static void registerPlayer() throws InterruptedException {
         System.out.println("Spieler werden registriert");
-        while(true){
+        while(!gameService.isGameStarted()){
             Thread.sleep(30000);
             gameService.setGameStarted(true);
-            if(gameService.isGameStarted()){
-                gameService.setCurrentPlayer(new Player("0"));
-                gamemode = gameService.getGamemode();
-                //alle Taster low
-                break;
-            }
         }
+        gameService.setCurrentPlayer(new Player("0"));
+        gamemode = gameService.getGamemode();
     }
 
     private static void gameLogic() throws InterruptedException {
@@ -73,7 +78,7 @@ public class Main {
             });
         }
         gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
-        while(true){
+        while(!gameService.isGameHasEnded()){
             if(gameService.isButtonClickedOnce()){
                 hitEvent();
                 gameService.setButtonClickedOnce(false);
@@ -88,6 +93,16 @@ public class Main {
                 turnHasEnded = false;
             }
             Thread.sleep(100);
+        }
+        if(gameService.isConnected()) {
+            while (!gameGraphics.isRestartClicked() || !gameGraphics.isMenuClicked()) ;
+
+            gameRestarted = gameGraphics.isRestartClicked();
+            gameChoiceReseted = gameGraphics.isMenuClicked();
+            gameGraphics.setMenuClicked(false);
+            gameGraphics.setRestartClicked(false);
+        } else{
+            //Website soll irgendwas machen
         }
     }
 
@@ -116,8 +131,8 @@ public class Main {
         switch (gamemode){
             case BLACKJACK -> {
                 System.out.println("Computer Turn ist dran");
-                blackJackOberflaeche.removeFaceDownCard();
-                blackJackOberflaeche.addCardToTable(gameService.getDealer().getDealerHand().get(1));
+                gameGraphics.removeFaceDownCard();
+                gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(1));
                 System.out.println("Karte wurde hinzugefügt");
                 gameService.getDealer().countHand();
                 Thread.sleep(10000);
@@ -129,7 +144,7 @@ public class Main {
                         rotateStepperMotor(1000);
                         System.out.println("Karte bekommen");
                         giveDealerNextCard();
-                        blackJackOberflaeche.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size()-1));
+                        gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size()-1));
                         gameService.getDealer().countHand();
                         Thread.sleep(10000);
                     }
@@ -138,24 +153,30 @@ public class Main {
                 for (Player player : gameService.getListOfAllPlayers()){
                     if(dealerHandWert > 21){
                         //Alle gewinnen
-                        gameService.getMapOfAllWinners().put(player.getId(), "hat gewonnen");
+                        gameService.getMapOfAllWinners().put("Spieler " + player.getId(), "hat gewonnen");
                     } else if (dealerHandWert == 21) {
                         //schauen ob jemand mitziehen kann
                         if(player.getKartenhandWert() == 21){
-                            gameService.getMapOfAllWinners().put(player.getId(), "hat unentschieden gespielt");
+                            gameService.getMapOfAllWinners().put("Spieler " + player.getId(), "hat unentschieden gespielt");
                         }
                     } else{
                         //ganz normal vergleichen
                         if (player.getKartenhandWert() > dealerHandWert){
-                            gameService.getMapOfAllWinners().put(player.getId(), "hat gewonnen");
+                            gameService.getMapOfAllWinners().put("Spieler " + player.getId(), "hat gewonnen");
                         } else if (player.getKartenhandWert() == dealerHandWert) {
-                            gameService.getMapOfAllWinners().put(player.getId(), "hat unentschieden gespielt");
+                            gameService.getMapOfAllWinners().put("Spieler " + player.getId(), "hat unentschieden gespielt");
                         }
                     }
                 }
                 for(String winner : gameService.getMapOfAllWinners().keySet()){
                     System.out.println(winner + " " + gameService.getMapOfAllWinners().get(winner));
                 }
+                if(gameService.getMapOfAllWinners() == null || gameService.getMapOfAllWinners().isEmpty()){
+                    System.out.println("Alle haben verloren");
+                }
+                if(gameService.isConnected())
+                    gameGraphics.showGameResults(gameService.getMapOfAllWinners());
+                gameService.setGameHasEnded(true);
             }
             case POKER -> {
 
@@ -256,41 +277,41 @@ public class Main {
         stepperMotor.low();
     }
 
-    public static void controllerConfig(){
-        var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
-                .name("Stepper Motor")
-                .id("Stepper Motor ID")
-                .address(24) //passende adresse einfügen
-                .initial(DigitalState.LOW)
-                .onState(DigitalState.HIGH);
-        stepperMotor = pi4j.create(stepperMotorConfig);
-
-
-
-        discardMotorIn1 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
-                .id("IN1")
-                .name("Motor IN1")
-                .address(MappingForAdress.getMotorAdress("1"))
-                .shutdown(DigitalState.LOW)
-                .initial(DigitalState.LOW)
-                .provider("pigpio-digital-output"));
-
-        discardMotorIn2 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
-                .id("IN2")
-                .name("Motor IN2")
-                .address(MappingForAdress.getMotorAdress("2"))
-                .shutdown(DigitalState.LOW)
-                .initial(DigitalState.LOW)
-                .provider("pigpio-digital-output"));
-
-        connectionInput = pi4j.create(DigitalInput.newConfigBuilder(pi4j)
-                .name("Connection Input")
-                .id("Connection Input ID")
-                .address(MappingForAdress.getConnectionAdress())
-                .pull(PullResistance.PULL_DOWN)
-                .debounce(150L));
-
-    }
+//    public static void controllerConfig(){
+//        var stepperMotorConfig = DigitalOutput.newConfigBuilder(pi4j)
+//                .name("Stepper Motor")
+//                .id("Stepper Motor ID")
+//                .address(24) //passende adresse einfügen
+//                .initial(DigitalState.LOW)
+//                .onState(DigitalState.HIGH);
+//        stepperMotor = pi4j.create(stepperMotorConfig);
+//
+//
+//
+//        discardMotorIn1 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
+//                .id("IN1")
+//                .name("Motor IN1")
+//                .address(MappingForAdress.getMotorAdress("1"))
+//                .shutdown(DigitalState.LOW)
+//                .initial(DigitalState.LOW)
+//                .provider("pigpio-digital-output"));
+//
+//        discardMotorIn2 = pi4j.dout().create(DigitalOutput.newConfigBuilder(pi4j)
+//                .id("IN2")
+//                .name("Motor IN2")
+//                .address(MappingForAdress.getMotorAdress("2"))
+//                .shutdown(DigitalState.LOW)
+//                .initial(DigitalState.LOW)
+//                .provider("pigpio-digital-output"));
+//
+//        connectionInput = pi4j.create(DigitalInput.newConfigBuilder(pi4j)
+//                .name("Connection Input")
+//                .id("Connection Input ID")
+//                .address(MappingForAdress.getConnectionAdress())
+//                .pull(PullResistance.PULL_DOWN)
+//                .debounce(150L));
+//
+//    }
 
 //das ist ein test2
 
@@ -300,16 +321,15 @@ public class Main {
         switch (gamemode){
             case BLACKJACK -> {
                 System.out.println("Karten werden für den Anfang ausgeteilt");
-                startGamePanel();
                 for (int i = 0; i < 2; i++) {
                     rotateStepperMotor(1000);
                     executeCardThrow();
                     giveDealerNextCard();
                     executeCameraScan();
                     if(i == 0)
-                        blackJackOberflaeche.addCardToTable(gameService.getDealer().getDealerHand().get(0));
+                        gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(0));
                     else
-                        blackJackOberflaeche.addBeginningCards();
+                        gameGraphics.addBeginningCards();
                     Thread.sleep(500);
                 }
 
@@ -335,7 +355,25 @@ public class Main {
 
     private static void startGamePanel() {
         new Thread (() -> {
-            blackJackOberflaeche.launchApp();
+            gameGraphics.launchApp();
         }).start();
+    }
+
+    private static void restartTheCurrentgame(){
+        gameRestarted = false;
+        gameChoiceReseted = false;
+
+        turnHasEnded = false;
+        gameService.restartTheCurrentGame();
+        //zeige das Spiel an
+    }
+
+    private static void resetGameChoice(){
+        gameRestarted = false;
+        gameChoiceReseted = false;
+
+        turnHasEnded = false;
+        gameService.resetGameChoice();
+        //zeige das Menü an
     }
 }
