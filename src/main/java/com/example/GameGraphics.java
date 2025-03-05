@@ -177,8 +177,10 @@ public class GameGraphics extends Application {
     }
 
     public void remove() {
-        Stage stage = (Stage) cardTable.getScene().getWindow();
-        stage.close();
+        Platform.runLater(() -> {
+            Stage stage = (Stage) cardTable.getScene().getWindow();
+            stage.close();
+        });
     }
 
     public void launchApp() {

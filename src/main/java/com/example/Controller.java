@@ -151,7 +151,7 @@ public class Controller {
         }
         return new ResponseMessage("");
     }
-
+///ping/getPlayerTurn
     @GetMapping({"/game/ping/getPlayerTurn", "logic/ping/getPlayerTurn"})
     public ResponseMessage getPlayerTurn() throws JsonProcessingException {
         return new ResponseMessage(gameService.getCurrentPlayer().getId());

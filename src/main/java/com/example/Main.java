@@ -62,10 +62,10 @@ public class Main {
         System.out.println("Spieler werden registriert");
         while(!gameService.isGameStarted()){
             Thread.sleep(30000);
+            gameService.setCurrentPlayer(new Player("0"));
+            gamemode = gameService.getGamemode();
             gameService.setGameStarted(true);
         }
-        gameService.setCurrentPlayer(new Player("0"));
-        gamemode = gameService.getGamemode();
     }
 
     private static void gameLogic() throws InterruptedException {
@@ -79,6 +79,7 @@ public class Main {
         }
         gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
         while(!gameService.isGameHasEnded()){
+            //System.out.println("While schleife in Game logik " + gameService.getCurrentPlayer().getId());
             if(gameService.isButtonClickedOnce()){
                 hitEvent();
                 gameService.setButtonClickedOnce(false);
@@ -95,12 +96,17 @@ public class Main {
             Thread.sleep(100);
         }
         if(gameService.isConnected()) {
-            while (!gameGraphics.isRestartClicked() || !gameGraphics.isMenuClicked()) ;
+            while (!gameGraphics.isRestartClicked() && !gameGraphics.isMenuClicked()){
+                System.out.println("Gebe eine Button Anweisung an");
+            }
 
             gameRestarted = gameGraphics.isRestartClicked();
             gameChoiceReseted = gameGraphics.isMenuClicked();
             gameGraphics.setMenuClicked(false);
             gameGraphics.setRestartClicked(false);
+            //Das ist ein test
+            startGamePanel();
+            System.out.println("Wurde geschlossen");
         } else{
             //Website soll irgendwas machen
         }
@@ -198,6 +204,9 @@ public class Main {
                 if(gameService.getCurrentPlayer().getKartenhandWert() >= 21){
                     stayEvent();
                 }
+                if(gameService.getMapOfAllWinners() == null || gameService.getMapOfAllWinners().isEmpty()){
+                    System.out.println("Alle haben verloren");
+                }
             }
             case POKER -> {
                 turnHasEnded = true;
@@ -240,12 +249,12 @@ public class Main {
     }
 
     private static void executeCardThrow() throws InterruptedException {
-        discardMotorIn1.low();
-        discardMotorIn2.high();
+//        discardMotorIn1.low();
+//        discardMotorIn2.high();
         System.out.println("Motor wurde angesteuert");
         Thread.sleep(1000);
-        discardMotorIn1.low();
-        discardMotorIn2.low();
+//        discardMotorIn1.low();
+//        discardMotorIn2.low();
     }
 
     private static void giveCurrentPlayerNextCard() {
@@ -272,9 +281,9 @@ public class Main {
         }
     }
     public static void rotateStepperMotor(int angle) throws InterruptedException {
-        stepperMotor.high();
-        Thread.sleep(angle/10);
-        stepperMotor.low();
+        //stepperMotor.high();
+        //Thread.sleep(angle/10);
+        //stepperMotor.low();
     }
 
 //    public static void controllerConfig(){
@@ -349,7 +358,6 @@ public class Main {
 
             }
         }
-
         System.out.println("Karten wurden ausgeteilt");
     }
 

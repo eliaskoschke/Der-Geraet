@@ -31,7 +31,7 @@ public class PiButton {
                 .id("Button ID: " + String.valueOf(pinNumber))
                 .address(pinNumber)
                 .pull(PullResistance.PULL_DOWN)
-                .debounce(300L);
+                .debounce(3000L);
 
         var button = pi4j.create(buttonConfig);
 
