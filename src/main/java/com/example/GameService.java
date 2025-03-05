@@ -172,4 +172,53 @@ public class GameService {
     public void setMapOfAllWinners(HashMap<String, String> mapOfAllWinners) {
         this.mapOfAllWinners = mapOfAllWinners;
     }
+
+
+    public void restartTheCurrentGame(){
+        mapOfAllWinners = new HashMap<>();
+
+        numberOfCardFaceup = 1;
+
+        buttonClickedOnce = false;
+
+        buttonClickedTwice = false;
+
+        getMessage = "";
+
+        nextCardInDeck = null;
+
+        playerAtReset = 0;
+
+        playerGotReseted = 0;
+
+        currentPlayer = new Player();
+
+        currenPlayerIndex = 0;
+
+        dealer = new Computer();
+    }
+
+    public void resetGameChoice(){
+        mapOfAllWinners = new HashMap<>();
+
+        numberOfCardFaceup = 1;
+
+        buttonClickedOnce = false;
+
+        buttonClickedTwice = false;
+
+        getMessage = "";
+
+        nextCardInDeck = null;
+
+        playerAtReset = 0;
+
+        playerGotReseted = 0;
+
+        currentPlayer = new Player();
+
+        currenPlayerIndex = 0;
+
+        dealer = new Computer();
+    }
 }
