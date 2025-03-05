@@ -119,11 +119,11 @@ module drive_gear() {
             
             // Verstärkungszylinder
             translate([0,0,thickness])
-                cylinder(d=15, h=5, $fn=32);
+                cylinder(d=15, h=25, $fn=32);
         }
         
         // Abgeflachte Bohrung durch alles
-        flat_shaft_hole(shaft_diameter, thickness+5+1, flat_percent);
+        flat_shaft_hole(shaft_diameter, thickness+25+1, flat_percent);
     }
 }
 
