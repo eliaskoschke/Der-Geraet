@@ -29,7 +29,6 @@ public class Main {
     static boolean turnHasEnded = false;
     static GameGraphics gameGraphics = new GameGraphics();
     static boolean gameRestarted = false;
-    static boolean gameHasEnded = false;
     static boolean gameChoiceReseted = false;
 
 
@@ -43,14 +42,15 @@ public class Main {
 //        if(connectionInput.isHigh()){
 //            gameService.setConnected(true);
 //        }
+        gameService.setConnected(true);
         startGamePanel();
-        while (!gameHasEnded || gameChoiceReseted) {
-            gameHasEnded = false;
+        while (!gameService.isGameHasEnded() || gameChoiceReseted) {
+            gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
-            while (!gameHasEnded || gameRestarted) {
+            while (!gameService.isGameHasEnded() || gameRestarted) {
                 restartTheCurrentgame();
-                gameHasEnded = false;
+                gameService.setGameHasEnded(false);
                 gameRestarted = false;
                 initializeGame();
                 gameLogic();
@@ -78,7 +78,7 @@ public class Main {
             });
         }
         gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
-        while(!gameHasEnded){
+        while(!gameService.isGameHasEnded()){
             if(gameService.isButtonClickedOnce()){
                 hitEvent();
                 gameService.setButtonClickedOnce(false);
@@ -94,12 +94,16 @@ public class Main {
             }
             Thread.sleep(100);
         }
-        while(!gameGraphics.isRestartClicked() || !gameGraphics.isMenuClicked());
+        if(gameService.isConnected()) {
+            while (!gameGraphics.isRestartClicked() || !gameGraphics.isMenuClicked()) ;
 
-        gameRestarted = gameGraphics.isRestartClicked();
-        gameChoiceReseted = gameGraphics.isMenuClicked();
-        gameGraphics.setMenuClicked(false);
-        gameGraphics.setRestartClicked(false);
+            gameRestarted = gameGraphics.isRestartClicked();
+            gameChoiceReseted = gameGraphics.isMenuClicked();
+            gameGraphics.setMenuClicked(false);
+            gameGraphics.setRestartClicked(false);
+        } else{
+            //Website soll irgendwas machen
+        }
     }
 
     public static void executeNextTurn() throws InterruptedException {
@@ -170,8 +174,9 @@ public class Main {
                 if(gameService.getMapOfAllWinners() == null || gameService.getMapOfAllWinners().isEmpty()){
                     System.out.println("Alle haben verloren");
                 }
-                gameGraphics.showGameResults(gameService.getMapOfAllWinners());
-                gameHasEnded = true;
+                if(gameService.isConnected())
+                    gameGraphics.showGameResults(gameService.getMapOfAllWinners());
+                gameService.setGameHasEnded(true);
             }
             case POKER -> {
 

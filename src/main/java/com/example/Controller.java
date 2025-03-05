@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -79,6 +76,9 @@ public class Controller {
                 gameService.setGameReset(false);
             }
             return new ResponseMessage("true");
+        }
+        if(gameService.isGameHasEnded()){
+            return new ResponseMessage("Game beendet");
         }
         return new ResponseMessage(mapper.writeValueAsString("false"));
     }
@@ -155,6 +155,11 @@ public class Controller {
     @GetMapping({"/game/ping/getPlayerTurn", "logic/ping/getPlayerTurn"})
     public ResponseMessage getPlayerTurn() throws JsonProcessingException {
         return new ResponseMessage(gameService.getCurrentPlayer().getId());
+    }
+
+    @GetMapping("/game/getWinner")
+    public ResponseMessage getWinner() throws JsonProcessingException {
+        return new ResponseMessage(castWinnerMapIntoString(gameService.getMapOfAllWinners()));
     }
 
 
@@ -245,6 +250,18 @@ public class Controller {
         }
         idCSV = idCSV.substring(0, idCSV.length() - 1);
         return idCSV;
+    }
+
+    private String castWinnerMapIntoString(HashMap<String, String> map){
+        if(map == null || map.isEmpty()){
+            return "Kein Spieler hat gewonnen";
+        }
+        String returnString = "";
+        for(String key : map.keySet()){
+            returnString += key + " " + map.get(key) +",";
+        }
+        returnString = returnString.substring(0, returnString.length()-2);
+        return  returnString;
     }
 
 }

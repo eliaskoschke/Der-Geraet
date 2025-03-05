@@ -26,6 +26,8 @@ public class GameService {
 
     boolean gameReset = false;
 
+    private boolean gameHasEnded = false;
+
     Karte nextCardInDeck;
 
     int playerAtReset = 0;
@@ -205,6 +207,8 @@ public class GameService {
 
         buttonClickedOnce = false;
 
+        gameHasEnded = false;
+
         buttonClickedTwice = false;
 
         getMessage = "";
@@ -220,5 +224,13 @@ public class GameService {
         currenPlayerIndex = 0;
 
         dealer = new Computer();
+    }
+
+    public boolean isGameHasEnded() {
+        return gameHasEnded;
+    }
+
+    public void setGameHasEnded(boolean gameHasEnded) {
+        this.gameHasEnded = gameHasEnded;
     }
 }
