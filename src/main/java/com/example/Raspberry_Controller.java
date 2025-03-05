@@ -20,7 +20,8 @@ public class Raspberry_Controller {
     private static String baseURL = "http://localhost:8080/api/logic";
     private static ObjectMapper mapper = new ObjectMapper();
     static HashMap<String, DigitalOutput> playerButtonMap = new HashMap<>();
-    static boolean isInitializing = true;
+    static boolean isRegistering = true;
+    static boolean gameHasAlreadyStartedOnce = false;
     public static void main(String[] args) throws InterruptedException {
 
 //        int buttonNumber = 22;
@@ -64,22 +65,23 @@ public class Raspberry_Controller {
 //        });
         //PiButton button = new PiButton(pi4j, 15);
         addButtonOutputs("1", MappingForAdress.getLEDPinAdressForPlayerID("1"));
-//        addButtonOutputs("2", MappingForAdress.getLEDPinAdressForPlayerID("2"));
-//        addButtonOutputs("3", MappingForAdress.getLEDPinAdressForPlayerID("3"));
+        addButtonOutputs("2", MappingForAdress.getLEDPinAdressForPlayerID("2"));
+        addButtonOutputs("3", MappingForAdress.getLEDPinAdressForPlayerID("3"));
         addButtonOutputs("4", MappingForAdress.getLEDPinAdressForPlayerID("4"));
         addButtonOutputs("5", MappingForAdress.getLEDPinAdressForPlayerID("5"));
         addButtonOutputs("6", MappingForAdress.getLEDPinAdressForPlayerID("6"));
 
         ArrayList<PiButton> buttonList = new ArrayList<>();
         buttonList.add(new PiButton(pi4j, "1"));
-//        buttonList.add(new PiButton(pi4j, "2")); das ist ein test2
-//        buttonList.add(new PiButton(pi4j, "3"));
+        buttonList.add(new PiButton(pi4j, "2"));
+        buttonList.add(new PiButton(pi4j, "3"));
         buttonList.add(new PiButton(pi4j, "4"));
         buttonList.add(new PiButton(pi4j, "5"));
         buttonList.add(new PiButton(pi4j, "6"));
         Thread.sleep(5000);
         while(true){
-            if(!isInitializing) {
+            if(!isRegistering) {
+                gameHasAlreadyStartedOnce = true;
                 String currentPlayerId = getCurrentPLayerId();
                 for (PiButton piButton : buttonList) {
                     if (currentPlayerId.equals(String.valueOf(piButton.getPlayerNumber()))) {
@@ -92,12 +94,18 @@ public class Raspberry_Controller {
                     Thread.sleep(50);
                 }
             } else {
+                if(gameHasAlreadyStartedOnce){
+                    gameHasAlreadyStartedOnce = false;
+                    for(PiButton button : buttonList){
+                        button.resetButton();
+                    }
+                }
                 manageButtonsForRegistration(buttonList);
-                isInitializing = !gameHasStarted();
-                if(!isInitializing)
+                if(!isRegistering) {
                     deactivateAllNonRegisteredButtons(buttonList);
-                System.out.println("Aktueller Status zum Initialisieren: " + isInitializing);
+                }
             }
+            isRegistering = !gameHasStarted();
             Thread.sleep(100);
         }
 
@@ -138,10 +146,8 @@ public class Raspberry_Controller {
                 int statusCode = response.getStatusLine().getStatusCode();
                 if (statusCode == 200) {
                     String responseBody = EntityUtils.toString(response.getEntity());
-                    System.out.println("Nachricht bekommen: " + responseBody);
                     Message responseMessage = mapper.readValue(responseBody, Message.class);
                     playerID = responseMessage.getMessage();
-                    System.out.println("Current Player bekommen: " + playerID);
                     if(playerID == null){
                         playerID = "0";
                     }

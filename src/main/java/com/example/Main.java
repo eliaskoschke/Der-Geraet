@@ -18,7 +18,7 @@ import java.util.List;
 
 @SpringBootApplication
 public class Main {
-//    static Context pi4j =  Pi4J.newAutoContext();
+    //    static Context pi4j =  Pi4J.newAutoContext();
     static DigitalOutput stepperMotor;
     static DigitalOutput discardMotorIn1;
     static DigitalOutput discardMotorIn2;
@@ -35,7 +35,6 @@ public class Main {
     static ArrayList<Player> listOfAllPlayerAtTheBeginningOfTheGame;
 
 
-
     //--add-opens=Der.Geraet.Maven/com.example=ALL-UNNAMED
     public static void main(String[] args) throws InterruptedException {
 //        controllerConfig();
@@ -48,6 +47,9 @@ public class Main {
         gameService.setConnected(true);
         startGamePanel();
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
+            resetGameChoice();
+            System.out.println("Spiel wurde reseted");
+            gameService.setConnected(true);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
@@ -63,27 +65,37 @@ public class Main {
 
     public static void registerPlayer() throws InterruptedException {
         System.out.println("Spieler werden registriert");
-        while(!gameService.isGameStarted()){
+        while (!gameService.isGameStarted()) {
             List<String> playerIds = gameService.getListOfAllPlayers().stream()
                     .map(Player::getId)
                     .toList();
             gameFx.updateSeatColor(playerIds);
-            if(gameFx.isGameStarted()){
+            if (gameFx.isGameStarted()) {
                 gameService.setCurrentPlayer(new Player("0"));
                 listOfAllPlayerAtTheBeginningOfTheGame = new ArrayList<>();
-                for(Player player : gameService.getListOfAllPlayers()){
+                for (Player player : gameService.getListOfAllPlayers()) {
                     listOfAllPlayerAtTheBeginningOfTheGame.add(player);
                 }
                 gameService.setGamemode(gameFx.getCurrentGame());
                 gamemode = gameService.getGamemode();
                 gameService.setGameStarted(true);
+                gameFx.setGameStarted(false);
+
             }
             Thread.sleep(100);
         }
     }
 
     private static void gameLogic() throws InterruptedException {
-        if(gameService.getListOfAllPlayers().size()>=2) {
+        ArrayList<Player> listOfToRemovingPlayer = new ArrayList<>();
+        for(Player player : gameService.getListOfAllPlayers()){
+            player.countHand();
+            if(player.getKartenhandWert() == 21){
+                listOfToRemovingPlayer.add(player);
+            }
+        }
+        gameService.getListOfAllPlayers().remove(listOfToRemovingPlayer);
+        if (gameService.getListOfAllPlayers().size() >= 2) {
             Collections.sort(gameService.getListOfAllPlayers(), new Comparator<Player>() {
                 @Override
                 public int compare(Player p1, Player p2) {
@@ -92,13 +104,13 @@ public class Main {
             });
         }
         gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
-        while(!gameService.isGameHasEnded()){
+        while (!gameService.isGameHasEnded()) {
             //System.out.println("While schleife in Game logik " + gameService.getCurrentPlayer().getId());
-            if(gameService.isButtonClickedOnce()){
+            if (gameService.isButtonClickedOnce()) {
                 hitEvent();
                 gameService.setButtonClickedOnce(false);
             }
-            if(gameService.isButtonClickedTwice()){
+            if (gameService.isButtonClickedTwice()) {
                 //Taster des aktuellen Spielers Low
                 stayEvent();
                 gameService.setButtonClickedTwice(false);
@@ -109,9 +121,9 @@ public class Main {
             }
             Thread.sleep(100);
         }
-        if(gameService.isConnected()) {
-            while (!gameGraphics.isRestartClicked() && !gameGraphics.isMenuClicked()){
-                System.out.println("Gebe eine Button Anweisung an");
+        if (gameService.isConnected()) {
+            while (!gameGraphics.isRestartClicked() && !gameGraphics.isMenuClicked()) {
+                //System.out.println("Gebe eine Button Anweisung an");
             }
 
             gameRestarted = gameGraphics.isRestartClicked();
@@ -119,34 +131,38 @@ public class Main {
             gameGraphics.setMenuClicked(false);
             gameGraphics.setRestartClicked(false);
             //Das ist ein test
-        } else{
+        } else {
             //Website soll irgendwas machen
         }
+        gameService.setGameHasEnded(true);
     }
 
     public static void executeNextTurn() throws InterruptedException {
         Player deleteThisPlayer = null;
-        if(gameService.getCurrentPlayer().getKartenhandWert() > 21){
+        if (gameService.getCurrentPlayer().getKartenhandWert() > 21) {
             deleteThisPlayer = gameService.getCurrentPlayer();
+            gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex() - 1);
+            gameService.getListOfAllPlayers().remove(deleteThisPlayer);
         }
-        if(gameService.getCurrenPlayerIndex()+1 >= gameService.getListOfAllPlayers().size()){
-            if(deleteThisPlayer != null){
+        if (gameService.getCurrenPlayerIndex() + 1 >= gameService.getListOfAllPlayers().size()) {
+            if (deleteThisPlayer != null) {
                 gameService.getListOfAllPlayers().remove(deleteThisPlayer);
             }
             executeComputerTurn();
-        } else{
-
-            gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex()+1);
-            gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(gameService.getCurrenPlayerIndex()));
-            if(deleteThisPlayer != null){
-                gameService.getListOfAllPlayers().remove(deleteThisPlayer);
+        } else {
+            System.out.println("Aktueller Spieler index: "+ gameService.getCurrenPlayerIndex());
+            gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex() + 1);
+            System.out.println("Neuer Spieler index: "+ gameService.getCurrenPlayerIndex());
+            for(Player player :gameService.getListOfAllPlayers()){
+                System.out.println(player.getId());
             }
+            gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(gameService.getCurrenPlayerIndex()));
         }
     }
 
     public static void executeComputerTurn() throws InterruptedException {
         gameService.setCurrentPlayer(new Player("0"));
-        switch (gamemode){
+        switch (gamemode) {
             case BLACKJACK -> {
                 System.out.println("Computer Turn ist dran");
                 gameGraphics.removeFaceDownCard();
@@ -154,7 +170,7 @@ public class Main {
                 System.out.println("Karte wurde hinzugefügt");
                 gameService.getDealer().countHand();
                 Thread.sleep(10000);
-                if(gameService.getListOfAllPlayers().isEmpty()){
+                if (gameService.getListOfAllPlayers().isEmpty()) {
 
                 } else {
                     while (gameService.getDealer().getDealerHandWert() < 17) {
@@ -162,37 +178,39 @@ public class Main {
                         rotateStepperMotor(1000);
                         System.out.println("Karte bekommen");
                         giveDealerNextCard();
-                        gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size()-1));
+                        gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size() - 1));
                         gameService.getDealer().countHand();
                         Thread.sleep(10000);
                     }
                 }
                 int dealerHandWert = gameService.getDealer().getDealerHandWert();
-                for (Player player : gameService.getListOfAllPlayers()){
-                    if(dealerHandWert > 21){
+                for (Player player : gameService.getListOfAllPlayers()) {
+                    player.countHand();
+                    if (dealerHandWert > 21) {
                         //Alle gewinnen
                         gameService.getMapOfAllWinners().put("Spieler " + player.getId(), "hat gewonnen");
                     } else if (dealerHandWert == 21) {
                         //schauen ob jemand mitziehen kann
-                        if(player.getKartenhandWert() == 21){
+                        if (player.getKartenhandWert() == 21) {
                             gameService.getMapOfAllWinners().put("Spieler " + player.getId(), "hat unentschieden gespielt");
                         }
-                    } else{
+                    } else {
                         //ganz normal vergleichen
-                        if (player.getKartenhandWert() > dealerHandWert){
+                        if (player.getKartenhandWert() > dealerHandWert) {
                             gameService.getMapOfAllWinners().put("Spieler " + player.getId(), "hat gewonnen");
                         } else if (player.getKartenhandWert() == dealerHandWert) {
                             gameService.getMapOfAllWinners().put("Spieler " + player.getId(), "hat unentschieden gespielt");
                         }
                     }
                 }
-                for(String winner : gameService.getMapOfAllWinners().keySet()){
+                for (String winner : gameService.getMapOfAllWinners().keySet()) {
                     System.out.println(winner + " " + gameService.getMapOfAllWinners().get(winner));
                 }
-                if(gameService.getMapOfAllWinners() == null || gameService.getMapOfAllWinners().isEmpty()){
+                if (gameService.getMapOfAllWinners() == null || gameService.getMapOfAllWinners().isEmpty()) {
                     System.out.println("Alle haben verloren");
+                    gameService.getMapOfAllWinners().put("Alle", "haben verloren");
                 }
-                if(gameService.isConnected())
+                if (gameService.isConnected())
                     gameGraphics.showGameResults(gameService.getMapOfAllWinners());
                 gameService.setGameHasEnded(true);
             }
@@ -205,7 +223,7 @@ public class Main {
     }
 
     public static void hitEvent() throws InterruptedException {
-        switch (gamemode){
+        switch (gamemode) {
             case BLACKJACK -> {
                 rotateStepperMotor(1000);
                 executeCameraScan();
@@ -213,11 +231,8 @@ public class Main {
                 giveCurrentPlayerNextCard();
                 gameService.getCurrentPlayer().countHand();
                 System.out.println(gameService.getCurrentPlayer().getKartenhandWert());
-                if(gameService.getCurrentPlayer().getKartenhandWert() >= 21){
+                if (gameService.getCurrentPlayer().getKartenhandWert() >= 21) {
                     stayEvent();
-                }
-                if(gameService.getMapOfAllWinners() == null || gameService.getMapOfAllWinners().isEmpty()){
-                    System.out.println("Alle haben verloren");
                 }
             }
             case POKER -> {
@@ -226,9 +241,9 @@ public class Main {
         }
     }
 
-    private static void giveDealerNextCard(){
+    private static void giveDealerNextCard() {
 
-        if(gameService.getDealer().getDealerHand() == null){
+        if (gameService.getDealer().getDealerHand() == null) {
             gameService.getDealer().setDealerHand(new ArrayList<Karte>());
             gameService.getDealer().getDealerHand().add(gameService.getNextCardInDeck());
         } else {
@@ -236,27 +251,30 @@ public class Main {
         }
     }
 
-    private static void executeCameraScan(){
+    private static void executeCameraScan() {
+        for (int i = 0; i < 10; i++) {
 
-        BufferedImage bufferedImage=camera.captureImage();
+            BufferedImage bufferedImage = camera.captureImage();
 
-        if (bufferedImage != null) {
-            try {
-                // Dekodiere den QR-Code
-                String decodedText = camera.decodeQRCode(bufferedImage);
-                if (decodedText != null) {
-                    System.out.println("Decoded text: " + decodedText);
-                    Karte karte = mapper.readValue(decodedText, Karte.class);
-                    gameService.setNextCardInDeck(karte);
-                } else {
-                    System.out.println("QR-Code nicht gefunden");
+            if (bufferedImage != null) {
+                try {
+                    // Dekodiere den QR-Code
+                    String decodedText = camera.decodeQRCode(bufferedImage);
+                    if (decodedText != null) {
+                        System.out.println("Decoded text: " + decodedText);
+                        Karte karte = mapper.readValue(decodedText, Karte.class);
+                        gameService.setNextCardInDeck(karte);
+                        break;
+                    } else {
+                        System.out.println("QR-Code nicht gefunden");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Fehler beim Dekodieren des QR-Codes: " + e.getMessage());
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                System.out.println("Fehler beim Dekodieren des QR-Codes: " + e.getMessage());
-                e.printStackTrace();
+            } else {
+                System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
             }
-        } else {
-            System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
         }
     }
 
@@ -270,7 +288,7 @@ public class Main {
     }
 
     private static void giveCurrentPlayerNextCard() {
-        if(gameService.getCurrentPlayer().getKartenhand() == null){
+        if (gameService.getCurrentPlayer().getKartenhand() == null) {
 //                        gameService.getDealer().setDealerHand(new ArrayList<Karte>());
 //                        gameService.getDealer().getDealerHand().add(karte);
             gameService.getCurrentPlayer().setKartenhand(new ArrayList<Karte>());
@@ -283,7 +301,7 @@ public class Main {
 
     public static void stayEvent() throws InterruptedException {
         turnHasEnded = true;
-        switch(gamemode){
+        switch (gamemode) {
             case BLACKJACK -> {
 
             }
@@ -292,6 +310,7 @@ public class Main {
             }
         }
     }
+
     public static void rotateStepperMotor(int angle) throws InterruptedException {
         //stepperMotor.high();
         //Thread.sleep(angle/10);
@@ -339,7 +358,7 @@ public class Main {
     private static void initializeGame() throws InterruptedException {
 
         executeCameraScan();
-        switch (gamemode){
+        switch (gamemode) {
             case BLACKJACK -> {
                 System.out.println("Karten werden für den Anfang ausgeteilt");
                 for (int i = 0; i < 2; i++) {
@@ -347,14 +366,14 @@ public class Main {
                     executeCardThrow();
                     giveDealerNextCard();
                     executeCameraScan();
-                    if(i == 0)
+                    if (i == 0)
                         gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(0));
                     else
                         gameGraphics.addBeginningCards();
                     Thread.sleep(500);
                 }
 
-                for (Player player : gameService.getListOfAllPlayers()){
+                for (Player player : gameService.getListOfAllPlayers()) {
                     gameService.setCurrentPlayer(player);
                     for (int i = 0; i < 2; i++) {
                         rotateStepperMotor(1000);
@@ -374,17 +393,17 @@ public class Main {
     }
 
     private static void startGamePanel() {
-        new Thread (() -> {
+        new Thread(() -> {
             gameFx.launchApp();
         }).start();
     }
 
-    private static void restartTheCurrentgame(){
+    private static void restartTheCurrentgame() {
         gameRestarted = false;
         gameChoiceReseted = false;
         gameService.setListOfAllPlayers(listOfAllPlayerAtTheBeginningOfTheGame);
         gameService.getDealer().resetDealer();
-        for(Player player : gameService.getListOfAllPlayers()){
+        for (Player player : gameService.getListOfAllPlayers()) {
             player.resetPlayer();
         }
 
@@ -393,7 +412,7 @@ public class Main {
         //zeige das Spiel an
     }
 
-    private static void resetGameChoice(){
+    private static void resetGameChoice() {
         gameRestarted = false;
         gameChoiceReseted = false;
 

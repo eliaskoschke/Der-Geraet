@@ -68,7 +68,7 @@
         </dependency>
         <dependency>
             <groupId>com.pi4j</groupId>
-            <artifactId>pi4j-plugin-gpiod</artifactId>
+            <artifactId>pi4j-plugin-pigpio</artifactId>
             <version>2.7.0</version>
         </dependency>
 

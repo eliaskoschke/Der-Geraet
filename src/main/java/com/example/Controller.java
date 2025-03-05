@@ -129,6 +129,7 @@ public class Controller {
             gameService.setCurrenPlayerIndex(0);
         } else {
             gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex() + 1);
+            System.out.println("Ein Spieler wurde gekickt");
             //setze den taster der nächste Person auf high
         }
         Player playerWhoHasToBeKicked = gameService.getCurrentPlayer();
