@@ -96,6 +96,9 @@ public class Player {
             }
         }
         kartenhandWert = handWert;
-
+    }
+    public void resetPlayer(){
+        kartenhand = new ArrayList<>();
+        kartenhandWert = 0;
     }
 }

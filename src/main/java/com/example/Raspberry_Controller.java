@@ -77,7 +77,7 @@ public class Raspberry_Controller {
         buttonList.add(new PiButton(pi4j, "4"));
         buttonList.add(new PiButton(pi4j, "5"));
         buttonList.add(new PiButton(pi4j, "6"));
-        Thread.sleep(1000);
+        Thread.sleep(5000);
         while(true){
             if(!isInitializing) {
                 String currentPlayerId = getCurrentPLayerId();

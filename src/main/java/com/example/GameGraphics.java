@@ -29,21 +29,23 @@ public class GameGraphics extends Application {
     private final int cardHeight = 225 * mult;
     private final int screenWidth = 955 * mult;
     private final int screenHeight = 582 * mult;
+    private static Stage myStage;
 
     // Variablen, um den Status der Button-Klicks zu speichern
-    private boolean isRestartClicked = false;
-    private boolean isMenuClicked = false;
+    private static boolean isRestartClicked = false;
+    private static boolean isMenuClicked = false;
 
     public GameGraphics() {
     }
 
     @Override
     public void start(Stage primaryStage) {
+        myStage = primaryStage;
         Platform.runLater(() -> {
-            primaryStage.setHeight(screenHeight);
-            primaryStage.setWidth(screenWidth);
+            myStage.setHeight(screenHeight);
+            myStage.setWidth(screenWidth);
         });
-        show(primaryStage);
+        show(myStage);
     }
 
     public void show(Stage primaryStage) {
@@ -140,12 +142,14 @@ public class GameGraphics extends Application {
 
             restartButton.setOnAction(e -> {
                 isRestartClicked = true;
-                System.out.println("Spiel wird neu gestartet...");
+                GameGraphics gameGraphics = new GameGraphics();
+                gameGraphics.start(myStage);
             });
 
             menuButton.setOnAction(e -> {
                 isMenuClicked = true;
-                System.out.println("Zurück zum Menü...");
+                GameFX gameFX = new GameFX();
+                gameFX.start(myStage);
             });
 
             VBox vbox = new VBox(20, resultLabel, restartButton, menuButton);

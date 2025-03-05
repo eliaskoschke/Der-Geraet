@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -28,8 +29,10 @@ public class Main {
     static Gamemode gamemode;
     static boolean turnHasEnded = false;
     static GameGraphics gameGraphics = new GameGraphics();
+    static GameFX gameFx = new GameFX();
     static boolean gameRestarted = false;
     static boolean gameChoiceReseted = false;
+    static ArrayList<Player> listOfAllPlayerAtTheBeginningOfTheGame;
 
 
 
@@ -61,10 +64,21 @@ public class Main {
     public static void registerPlayer() throws InterruptedException {
         System.out.println("Spieler werden registriert");
         while(!gameService.isGameStarted()){
-            Thread.sleep(30000);
-            gameService.setCurrentPlayer(new Player("0"));
-            gamemode = gameService.getGamemode();
-            gameService.setGameStarted(true);
+            List<String> playerIds = gameService.getListOfAllPlayers().stream()
+                    .map(Player::getId)
+                    .toList();
+            gameFx.updateSeatColor(playerIds);
+            if(gameFx.isGameStarted()){
+                gameService.setCurrentPlayer(new Player("0"));
+                listOfAllPlayerAtTheBeginningOfTheGame = new ArrayList<>();
+                for(Player player : gameService.getListOfAllPlayers()){
+                    listOfAllPlayerAtTheBeginningOfTheGame.add(player);
+                }
+                gameService.setGamemode(gameFx.getCurrentGame());
+                gamemode = gameService.getGamemode();
+                gameService.setGameStarted(true);
+            }
+            Thread.sleep(100);
         }
     }
 
@@ -105,8 +119,6 @@ public class Main {
             gameGraphics.setMenuClicked(false);
             gameGraphics.setRestartClicked(false);
             //Das ist ein test
-            startGamePanel();
-            System.out.println("Wurde geschlossen");
         } else{
             //Website soll irgendwas machen
         }
@@ -363,13 +375,18 @@ public class Main {
 
     private static void startGamePanel() {
         new Thread (() -> {
-            gameGraphics.launchApp();
+            gameFx.launchApp();
         }).start();
     }
 
     private static void restartTheCurrentgame(){
         gameRestarted = false;
         gameChoiceReseted = false;
+        gameService.setListOfAllPlayers(listOfAllPlayerAtTheBeginningOfTheGame);
+        gameService.getDealer().resetDealer();
+        for(Player player : gameService.getListOfAllPlayers()){
+            player.resetPlayer();
+        }
 
         turnHasEnded = false;
         gameService.restartTheCurrentGame();
@@ -379,6 +396,7 @@ public class Main {
     private static void resetGameChoice(){
         gameRestarted = false;
         gameChoiceReseted = false;
+
 
         turnHasEnded = false;
         gameService.resetGameChoice();
