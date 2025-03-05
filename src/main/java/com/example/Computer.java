@@ -77,6 +77,11 @@ public class Computer {
         dealerHandWert = handWert;
     }
 
+    public void resetDealer(){
+        dealerHand = new ArrayList<>();
+        dealerHandWert = 0;
+    }
+
     public String getId() {
         return id;
     }
