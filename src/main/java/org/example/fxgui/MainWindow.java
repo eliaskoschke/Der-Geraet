@@ -10,6 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class MainWindow extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        PiController piController = new PiController();
+        // PiController piController = new PiController();
         // Hauptlayout
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
@@ -85,14 +86,14 @@ public class MainWindow extends Application {
             resetOtherButtons(luegeBtn, blackJackBtn, pokerBtn);
         });
 
+
         Scene scene = new Scene(root, 800, 600);
-        primaryStage.setTitle("Casino Spiele");
+        primaryStage.setTitle("Der Gerät");
         primaryStage.setScene(scene);
 
         // Fenster maximieren und Minimalgröße setzen
-        primaryStage.setMinWidth(800);
+        primaryStage.setMinWidth(1024);
         primaryStage.setMinHeight(600);
-
         primaryStage.show();
     }
 
@@ -127,38 +128,41 @@ public class MainWindow extends Application {
 
     private String getDefaultButtonStyle() {
         return String.format("""
-            -fx-background-color: %s;
-            -fx-text-fill: white;
-            -fx-font-size: 18px;
-            -fx-min-width: 180px;
-            -fx-min-height: 60px;
-            -fx-background-radius: 30;
-            -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
-        """, BUTTON_DEFAULT_COLOR);
+                    -fx-background-color: %s;
+                    -fx-text-fill: white;
+                    -fx-font-size: 18px;
+                    -fx-font-weight: Bold;
+                    -fx-min-width: 180px;
+                    -fx-min-height: 60px;
+                    -fx-background-radius: 30;
+                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
+                """, BUTTON_DEFAULT_COLOR);
     }
 
     private String getHoverButtonStyle() {
         return String.format("""
-            -fx-background-color: %s;
-            -fx-text-fill: white;
-            -fx-font-size: 18px;
-            -fx-min-width: 180px;
-            -fx-min-height: 60px;
-            -fx-background-radius: 30;
-            -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 8, 0, 0, 0);
-        """, BUTTON_HOVER_COLOR);
+                    -fx-background-color: %s;
+                    -fx-text-fill: white;
+                    -fx-font-size: 18px;
+                    -fx-font-weight: Bold;
+                    -fx-min-width: 180px;
+                    -fx-min-height: 60px;
+                    -fx-background-radius: 30;
+                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 8, 0, 0, 0);
+                """, BUTTON_HOVER_COLOR);
     }
 
     private String getActiveButtonStyle() {
         return String.format("""
-            -fx-background-color: %s;
-            -fx-text-fill: white;
-            -fx-font-size: 18px;
-            -fx-min-width: 180px;
-            -fx-min-height: 60px;
-            -fx-background-radius: 30;
-            -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
-        """, BUTTON_ACTIVE_COLOR);
+                    -fx-background-color: %s;
+                    -fx-text-fill: white;
+                    -fx-font-size: 18px;
+                    -fx-font-weight: Bold;
+                    -fx-min-width: 180px;
+                    -fx-min-height: 60px;
+                    -fx-background-radius: 30;
+                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
+                """, BUTTON_ACTIVE_COLOR);
     }
 
     private void toggleButtonStyle(Button button) {
@@ -172,10 +176,10 @@ public class MainWindow extends Application {
     private void showSeats(String game) {
         currentGame = game;
 
-        // Sitzplatzliste zurücksetzen und mit der neuen Anzahl initialisieren
+        // Reset and initialize seat list
         seats.clear();
         for (int i = 0; i < 6; i++) {
-            seats.add(false);  // Alle Plätze sind zu Beginn leer
+            seats.add(false); // All seats start as empty
         }
 
         seatLayout.getChildren().clear();
@@ -183,32 +187,28 @@ public class MainWindow extends Application {
         Text title = new Text(game + " - Sitzplätze");
         title.setStyle("-fx-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;");
 
-        // Container für die Sitze mit absolutem Positioning
+        // Seat container
         Pane seatsPane = new Pane();
-        seatsPane.setPrefSize(700, 350);  // Größerer Bereich für den Halbkreis
+        seatsPane.setPrefSize(700, 280);
 
-        // Halbkreis-Parameter
-        double centerX = 350;  // Mittelpunkt X
-        double centerY = 300;  // Mittelpunkt Y (näher am unteren Rand)
-        double radius = 250;   // Radius des Halbkreises
+        double centerX = 480;
+        double centerY = 80;
+        double radius = 175;
 
-        // Berechne die Positionen für jeden Sitz
         for (int i = 0; i < seats.size(); i++) {
-            // Berechne den Winkel für jeden Sitz (180 Grad verteilt)
-            double angle = Math.PI * (i / (double)(seats.size() - 1));
+            double angle = Math.PI * (1 - i / (double) (seats.size() - 1));
 
-            // Berechne die Position auf dem Halbkreis
             double x = centerX + radius * Math.cos(angle);
-            double y = centerY - radius * Math.sin(angle);  // Minus, weil Y-Achse nach unten geht
+            double y = centerY + radius * Math.sin(angle);
 
-            VBox seatContainer = new VBox(15);
+            VBox seatContainer = new VBox(8);
             seatContainer.setAlignment(Pos.CENTER);
 
-            Circle seat = new Circle(40);
+            Circle seat = new Circle(35);
             seat.setFill(seats.get(i) ? Color.RED : Color.GREEN);
 
             Text seatNumber = new Text("Platz " + (i + 1));
-            seatNumber.setStyle("-fx-fill: white; -fx-font-size: 16px;");
+            seatNumber.setStyle("-fx-fill: white; -fx-font-size: 14px; -fx-font-weight: Bold;");
 
             int finalI = i;
             seat.setOnMouseClicked(e -> {
@@ -218,24 +218,26 @@ public class MainWindow extends Application {
 
             seatContainer.getChildren().addAll(seat, seatNumber);
 
-            // Positioniere den Container
-            seatContainer.setLayoutX(x - 40);  // Zentriere den Container
-            seatContainer.setLayoutY(y - 40);
+            // **Perfectly center seat containers**
+            seatContainer.setLayoutX(x - seat.getRadius());
+            seatContainer.setLayoutY(y - seat.getRadius());
 
             seatsPane.getChildren().add(seatContainer);
         }
 
-        // Füge einen transparenten Tisch in der Mitte hinzu
-        Circle table = new Circle(centerX, centerY - 30, 100);
-        table.setFill(Color.rgb(70, 103, 210, 0.3));  // Halbtransparentes Blau
+        // Adjusted table position & size
+        Circle table = new Circle(centerX, centerY + 25, 100);
+        table.setFill(Color.rgb(70, 103, 210, 0.3));
         table.setStroke(Color.rgb(111, 137, 220, 0.5));
         table.setStrokeWidth(2);
-        seatsPane.getChildren().add(0, table);  // Füge den Tisch hinter den Sitzen ein
+        seatsPane.getChildren().add(0, table);
 
+        // Arrange everything
         seatLayout.getChildren().addAll(title, seatsPane);
         seatLayout.setVisible(true);
         startButton.setVisible(true);
     }
+
 
     public static void main(String[] args) {
         launch(args);
