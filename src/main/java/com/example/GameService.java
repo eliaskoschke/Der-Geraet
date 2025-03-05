@@ -8,39 +8,39 @@ import java.util.HashMap;
 @Service
 public class GameService {
 
-    private HashMap<String, String> mapOfAllWinners = new HashMap<>();
+    private static HashMap<String, String> mapOfAllWinners = new HashMap<>();
 
-    private Gamemode gamemode = Gamemode.BLACKJACK;
+    private static Gamemode gamemode = Gamemode.BLACKJACK;
 
-    private boolean connected = false;
+    private static boolean connected = false;
 
-    private int numberOfCardFaceup = 1;
+    private static int numberOfCardFaceup = 1;
 
-    private boolean buttonClickedOnce = false;
+    private static boolean buttonClickedOnce = false;
 
-    private boolean buttonClickedTwice = false;
+    private static boolean buttonClickedTwice = false;
 
-    private String getMessage = "";
+    private static String getMessage = "";
 
-    private boolean gameStarted = false;
+    private static boolean gameStarted = false;
 
-    boolean gameReset = false;
+    static boolean gameReset = false;
 
-    private boolean gameHasEnded = false;
+    private static boolean gameHasEnded = false;
 
-    Karte nextCardInDeck;
+    static Karte nextCardInDeck;
 
-    int playerAtReset = 0;
+    static int playerAtReset = 0;
 
-    int playerGotReseted = 0;
+    static int playerGotReseted = 0;
 
-    private Player currentPlayer = new Player();
+    private static Player currentPlayer = new Player();
 
-    private ArrayList<Player> listOfAllPlayers = new ArrayList<>();
+    private static ArrayList<Player> listOfAllPlayers = new ArrayList<>();
 
-    private int currenPlayerIndex = 0;
+    private static int currenPlayerIndex = 0;
 
-    Computer dealer = new Computer();
+    static Computer dealer = new Computer();
 
     public void buttonClicked() {
         this.buttonClickedOnce = true;
@@ -203,23 +203,33 @@ public class GameService {
     public void resetGameChoice(){
         mapOfAllWinners = new HashMap<>();
 
+        gamemode = Gamemode.BLACKJACK;
+
+        connected = false;
+
         numberOfCardFaceup = 1;
 
         buttonClickedOnce = false;
-
-        gameHasEnded = false;
 
         buttonClickedTwice = false;
 
         getMessage = "";
 
-        nextCardInDeck = null;
+        gameStarted = false;
+
+        gameReset = false;
+
+        gameHasEnded = false;
+
+        Karte nextCardInDeck = null;
 
         playerAtReset = 0;
 
         playerGotReseted = 0;
 
         currentPlayer = new Player();
+
+        listOfAllPlayers = new ArrayList<>();
 
         currenPlayerIndex = 0;
 
