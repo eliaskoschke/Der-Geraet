@@ -23,10 +23,17 @@ public class GameFX extends Application {
 
     static List<Boolean> seats = new ArrayList<>(6);
     static List<Circle> circles = new ArrayList<>(6);
-    private VBox seatLayout;
+    private static VBox seatLayout;
     private Button startButton;
     private static Gamemode currentGame;
     private static boolean gameStarted = false;
+
+    public GameFX(){
+        seats = new ArrayList<>(6);
+        circles = new ArrayList<>(6);
+        VBox seatLayout;
+        gameStarted = false;
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -213,7 +220,7 @@ public class GameFX extends Application {
         Pane seatsPane = new Pane();
         seatsPane.setPrefSize(700, 280);
 
-        double centerX = 480;
+        double centerX = 955;
         double centerY = 80;
         double radius = 175;
 
