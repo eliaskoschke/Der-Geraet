@@ -77,7 +77,7 @@ public class Raspberry_Controller {
         buttonList.add(new PiButton(pi4j, "4"));
         buttonList.add(new PiButton(pi4j, "5"));
         buttonList.add(new PiButton(pi4j, "6"));
-        Thread.sleep(1000);
+        Thread.sleep(5000);
         while(true){
             if(!isInitializing) {
                 String currentPlayerId = getCurrentPLayerId();
@@ -138,8 +138,13 @@ public class Raspberry_Controller {
                 int statusCode = response.getStatusLine().getStatusCode();
                 if (statusCode == 200) {
                     String responseBody = EntityUtils.toString(response.getEntity());
+                    System.out.println("Nachricht bekommen: " + responseBody);
                     Message responseMessage = mapper.readValue(responseBody, Message.class);
                     playerID = responseMessage.getMessage();
+                    System.out.println("Current Player bekommen: " + playerID);
+                    if(playerID == null){
+                        playerID = "0";
+                    }
                     return playerID;
                 } else {
                     System.err.println("Fehler: " + statusCode);
