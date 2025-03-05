@@ -15,7 +15,6 @@ public class PiButton {
     private static final String baseURL = "http://localhost:8080/api/logic";
     private static final long DOUBLE_CLICK_TIME = 1000; // Zeit in Millisekunden das ist ein test2
     private long lastPressTime = 0;
-    private boolean isDoubleClick = false;
     private int pinNumber = 0;
     private boolean buttonRegistered = false;
     private final int playerNumber;
@@ -31,7 +30,7 @@ public class PiButton {
                 .id("Button ID: " + String.valueOf(pinNumber))
                 .address(pinNumber)
                 .pull(PullResistance.PULL_DOWN)
-                .debounce(300L);
+                .debounce(3000L);
 
         var button = pi4j.create(buttonConfig);
 
@@ -186,5 +185,12 @@ public class PiButton {
 
     public void setButtonRegistered(boolean buttonRegistered) {
         this.buttonRegistered = buttonRegistered;
+    }
+
+    public void resetButton(){
+        lastPressTime = 0;
+        buttonRegistered = false;
+        locked = true;
+        isWaitingForSecondClick = false;
     }
 }
