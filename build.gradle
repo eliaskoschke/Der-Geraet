@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.pi4j'
+version = '0.0.1'
+
+description = """Pi4J :: MINIMAL EXAMPLE :: Sample minimal project"""
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+plugins.withType(JavaPlugin).configureEach {
+    java {
+        modularity.inferModulePath = true
+    }
+}
+
+// Copy the Java modules, run script and JAR in the distribution directory
+tasks.register("copyDistribution", Copy) {
+    from configurations.runtimeClasspath
+    from tasks.named('jar')
+    from layout.projectDirectory.file('assets/run.sh')
+    into layout.buildDirectory.dir('distribution')
+}
+tasks.named("build") {
+    dependsOn("copyDistribution")
+}
+
+// Dependencies for this application
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-api:2.0.16'
+    implementation 'org.slf4j:slf4j-simple:2.0.16'
+    implementation 'com.pi4j:pi4j-core:2.7.0'
+    implementation 'com.pi4j:pi4j-plugin-raspberrypi:2.7.0'
+    implementation 'com.pi4j:pi4j-plugin-gpiod:2.7.0'
+}
