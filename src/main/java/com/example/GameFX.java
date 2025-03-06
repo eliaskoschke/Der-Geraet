@@ -106,8 +106,8 @@ public class GameFX extends Application {
         primaryStage.setScene(scene);
 
         // Fenster maximieren und Minimalgröße setzen
-        primaryStage.setMinWidth(1920);
-        primaryStage.setMinHeight(1200);
+        primaryStage.setMinWidth(1024);
+        primaryStage.setMinHeight(600);
         primaryStage.show();
 
         Platform.runLater(() -> {
@@ -148,8 +148,8 @@ public class GameFX extends Application {
                     -fx-text-fill: white;
                     -fx-font-size: 30px; // Schriftgröße erhöht
                     -fx-font-weight: Bold;
-                    -fx-min-width: 310px; // Breite erhöht
-                    -fx-min-height: 135px; // Höhe erhöht
+                    -fx-min-width: 150px; // Breite erhöht
+                    -fx-min-height: 80px; // Höhe erhöht
                     -fx-background-radius: 30;
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
                 """, BUTTON_DEFAULT_COLOR);
@@ -161,8 +161,8 @@ public class GameFX extends Application {
                     -fx-text-fill: white;
                     -fx-font-size: 30px; // Schriftgröße erhöht
                     -fx-font-weight: Bold;
-                    -fx-min-width: 310px; // Breite erhöht
-                    -fx-min-height: 135px; // Höhe erhöht
+                    -fx-min-width: 150px; // Breite erhöht
+                    -fx-min-height: 80px; // Höhe erhöht
                     -fx-background-radius: 30;
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
                 """, BUTTON_HOVER_COLOR);
@@ -174,8 +174,8 @@ public class GameFX extends Application {
                     -fx-text-fill: black;
                     -fx-font-size: 30px; // Schriftgröße erhöht
                     -fx-font-weight: Bold;
-                    -fx-min-width: 310px; // Breite erhöht
-                    -fx-min-height: 135px; // Höhe erhöht
+                    -fx-min-width: 150px; // Breite erhöht
+                    -fx-min-height: 80px; // Höhe erhöht
                     -fx-background-radius: 30;
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
                 """, BUTTON_ACTIVE_COLOR);
@@ -206,16 +206,16 @@ public class GameFX extends Application {
         seatLayout.getChildren().clear();
 
         Text title = new Text(game + " - Sitzplätze");
-        title.setStyle("-fx-fill: white; -fx-font-size: 50px; -fx-font-weight: bold;");
-        title.setTranslateY(40); // Hebe den Titel an
+        title.setStyle("-fx-fill: white; -fx-font-size: 40px; -fx-font-weight: bold;");
+        title.setTranslateY(20); // Hebe den Titel an
 
         // Seat container
         Pane seatsPane = new Pane();
         seatsPane.setPrefSize(1000, 400);
 
-        double centerX = 940;
-        double centerY = 250; // Verschiebe die Kreise weiter nach unten
-        double radius = 300; // Radius erhöht, um die Kreise weiter zu entfernen
+        double centerX = 490;
+        double centerY = 80; // Verschiebe die Kreise weiter nach unten
+        double radius = 130; // Radius erhöht, um die Kreise weiter zu entfernen
 
         for (int i = 0; i < seats.size(); i++) {
             double angle = Math.PI * (1 - i / (double) (seats.size() - 1));
@@ -226,11 +226,11 @@ public class GameFX extends Application {
             VBox seatContainer = new VBox(8);
             seatContainer.setAlignment(Pos.CENTER);
 
-            Circle seat = new Circle(60); // Radius der Kreise
+            Circle seat = new Circle(25); // Radius der Kreise
             seat.setFill(seats.get(i) ? Color.RED : Color.GREEN);
             circles.add(seat);
             Text seatNumber = new Text("Platz " + (i + 1));
-            seatNumber.setStyle("-fx-fill: white; -fx-font-size: 35px; -fx-font-weight: Bold;");
+            seatNumber.setStyle("-fx-fill: white; -fx-font-size: 15px; -fx-font-weight: Bold;");
 
             int finalI = i;
             seat.setOnMouseClicked(e -> {
@@ -248,7 +248,7 @@ public class GameFX extends Application {
         }
 
         // Adjusted table position & size
-        Circle table = new Circle(centerX, centerY + 25, 200); // Größerer Tisch
+        Circle table = new Circle(centerX, centerY + 25, 80); // Größerer Tisch
         table.setFill(Color.rgb(70, 103, 210, 0.3));
         table.setStroke(Color.rgb(111, 137, 220, 0.5));
         table.setStrokeWidth(2);

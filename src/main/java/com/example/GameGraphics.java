@@ -17,18 +17,20 @@ import javafx.scene.text.Font;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class GameGraphics extends Application {
 
     private static HBox cardTable;
     private static ImageView faceDownCard;
-    int mult = 2;
+    int mult = 1;
     private final int cardWidth = 150 * mult;
     private final int cardHeight = 225 * mult;
-    private final int screenWidth = 1920;
-    private final int screenHeight = 1200 ;
+    private final int screenWidth = 1024;
+    private final int screenHeight = 600 ;
     private static Stage myStage;
 
     // Variablen, um den Status der Button-Klicks zu speichern
@@ -55,7 +57,7 @@ public class GameGraphics extends Application {
         cardTable.setPadding(new Insets(20));
         cardTable.setAlignment(Pos.CENTER);
 
-        cardTable.setStyle("-fx-background-image: url('file:/home/pi/Main-Branch/Der-Geraet/src/main/resources/static/img/Hintergrund__Tisch.png'); " +
+        cardTable.setStyle("-fx-background-image: url('" + getClass().getResource("/static/img/HintergrundTisch.png") + "');" +
                 "-fx-background-size: cover;");
 
         StackPane root = new StackPane();
@@ -80,7 +82,7 @@ public class GameGraphics extends Application {
 
     public void addBeginningCards() {
         Platform.runLater(() -> {
-            faceDownCard = new ImageView(new Image("file:/home/pi/Main-Branch/Der-Geraet/src/main/resources/static/img/cards" + "/500.png"));
+            faceDownCard = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/static/img/cards/500.png"))));
             faceDownCard.setFitWidth(cardWidth);
             faceDownCard.setFitHeight(cardHeight);
             cardTable.getChildren().add(faceDownCard);
@@ -115,10 +117,10 @@ public class GameGraphics extends Application {
         });
     }
 
-    public void showGameResults(HashMap<String, String> results) {
+    public void showGameResults(Map<String, String> results) {
         Platform.runLater(() -> {
             StackPane resultPane = new StackPane();
-            resultPane.setStyle("-fx-background-color: black;");
+            resultPane.setStyle("-fx-background-color: rgb(36, 43, 66);");
 
             StringBuilder resultText = new StringBuilder();
             for (Map.Entry<String, String> entry : results.entrySet()) {
@@ -133,13 +135,24 @@ public class GameGraphics extends Application {
             Button restartButton = new Button("Spiel Neustarten");
             Button menuButton = new Button("Zurück zum Menü");
 
-            restartButton.setPrefWidth(600);
-            restartButton.setPrefHeight(180);
-            menuButton.setPrefWidth(600);
-            menuButton.setPrefHeight(180);
+            restartButton.setPrefWidth(300);
+            restartButton.setPrefHeight(80);
+            menuButton.setPrefWidth(300);
+            menuButton.setPrefHeight(80);
 
-            restartButton.setStyle("-fx-font-size: 40px;");
-            menuButton.setStyle("-fx-font-size: 40px;");
+            final String STYLE = """
+                    -fx-background-color: rgb(70, 103, 210);
+                    -fx-text-fill: white;
+                    -fx-font-size: 30px; // Schriftgröße erhöht
+                    -fx-font-weight: Bold;
+                    -fx-min-width: 150px; // Breite erhöht
+                    -fx-min-height: 80px; // Höhe erhöht
+                    -fx-background-radius: 30;
+                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
+                """;
+
+            restartButton.setStyle(STYLE);
+            menuButton.setStyle(STYLE);
 
             restartButton.setOnAction(e -> {
                 isRestartClicked = true;
