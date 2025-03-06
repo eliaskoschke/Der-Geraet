@@ -106,13 +106,14 @@ public class GameFX extends Application {
         primaryStage.setScene(scene);
 
         // Fenster maximieren und Minimalgröße setzen
-        primaryStage.setMinWidth(1024);
-        primaryStage.setMinHeight(600);
+        primaryStage.setMinWidth(1920);
+        primaryStage.setMinHeight(1200);
         primaryStage.show();
 
         Platform.runLater(() -> {
-            primaryStage.setWidth(1910);
-            primaryStage.setHeight(1164);
+//            primaryStage.setWidth(1920);
+//            primaryStage.setHeight(1185);
+            primaryStage.setFullScreen(true);
         });
     }
 
@@ -147,8 +148,8 @@ public class GameFX extends Application {
                     -fx-text-fill: white;
                     -fx-font-size: 30px; // Schriftgröße erhöht
                     -fx-font-weight: Bold;
-                    -fx-min-width: 300px; // Breite erhöht
-                    -fx-min-height: 100px; // Höhe erhöht
+                    -fx-min-width: 310px; // Breite erhöht
+                    -fx-min-height: 135px; // Höhe erhöht
                     -fx-background-radius: 30;
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
                 """, BUTTON_DEFAULT_COLOR);
@@ -160,8 +161,8 @@ public class GameFX extends Application {
                     -fx-text-fill: white;
                     -fx-font-size: 30px; // Schriftgröße erhöht
                     -fx-font-weight: Bold;
-                    -fx-min-width: 300px; // Breite erhöht
-                    -fx-min-height: 100px; // Höhe erhöht
+                    -fx-min-width: 310px; // Breite erhöht
+                    -fx-min-height: 135px; // Höhe erhöht
                     -fx-background-radius: 30;
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
                 """, BUTTON_HOVER_COLOR);
@@ -173,8 +174,8 @@ public class GameFX extends Application {
                     -fx-text-fill: black;
                     -fx-font-size: 30px; // Schriftgröße erhöht
                     -fx-font-weight: Bold;
-                    -fx-min-width: 300px; // Breite erhöht
-                    -fx-min-height: 100px; // Höhe erhöht
+                    -fx-min-width: 310px; // Breite erhöht
+                    -fx-min-height: 135px; // Höhe erhöht
                     -fx-background-radius: 30;
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
                 """, BUTTON_ACTIVE_COLOR);
@@ -205,7 +206,7 @@ public class GameFX extends Application {
         seatLayout.getChildren().clear();
 
         Text title = new Text(game + " - Sitzplätze");
-        title.setStyle("-fx-fill: white; -fx-font-size: 30px; -fx-font-weight: bold;");
+        title.setStyle("-fx-fill: white; -fx-font-size: 50px; -fx-font-weight: bold;");
         title.setTranslateY(40); // Hebe den Titel an
 
         // Seat container
@@ -229,7 +230,7 @@ public class GameFX extends Application {
             seat.setFill(seats.get(i) ? Color.RED : Color.GREEN);
             circles.add(seat);
             Text seatNumber = new Text("Platz " + (i + 1));
-            seatNumber.setStyle("-fx-fill: white; -fx-font-size: 20px; -fx-font-weight: Bold;");
+            seatNumber.setStyle("-fx-fill: white; -fx-font-size: 35px; -fx-font-weight: Bold;");
 
             int finalI = i;
             seat.setOnMouseClicked(e -> {

@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 import static com.pi4j.Pi4J.newAutoContext;
 
-public class Raspberry_Controller {
+public class   Raspberry_Controller {
     static Context pi4j = newAutoContext();
     private static String baseURL = "http://localhost:8080/api/logic";
     private static ObjectMapper mapper = new ObjectMapper();

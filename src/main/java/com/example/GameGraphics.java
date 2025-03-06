@@ -27,8 +27,8 @@ public class GameGraphics extends Application {
     int mult = 2;
     private final int cardWidth = 150 * mult;
     private final int cardHeight = 225 * mult;
-    private final int screenWidth = 955 * mult;
-    private final int screenHeight = 582 * mult;
+    private final int screenWidth = 1920;
+    private final int screenHeight = 1200 ;
     private static Stage myStage;
 
     // Variablen, um den Status der Button-Klicks zu speichern
@@ -42,8 +42,9 @@ public class GameGraphics extends Application {
     public void start(Stage primaryStage) {
         myStage = primaryStage;
         Platform.runLater(() -> {
-            myStage.setHeight(screenHeight);
-            myStage.setWidth(screenWidth);
+//            myStage.setHeight(screenHeight);
+//            myStage.setWidth(screenWidth);
+            primaryStage.setFullScreen(true);
         });
         show(myStage);
     }
@@ -54,7 +55,7 @@ public class GameGraphics extends Application {
         cardTable.setPadding(new Insets(20));
         cardTable.setAlignment(Pos.CENTER);
 
-        cardTable.setStyle("-fx-background-image: url('file:/home/pi/Main-Branch/Der-Geraet/src/main/resources/static/img/HintergrundTisch.png'); " +
+        cardTable.setStyle("-fx-background-image: url('file:/home/pi/Main-Branch/Der-Geraet/src/main/resources/static/img/Hintergrund__Tisch.png'); " +
                 "-fx-background-size: cover;");
 
         StackPane root = new StackPane();
@@ -132,13 +133,13 @@ public class GameGraphics extends Application {
             Button restartButton = new Button("Spiel Neustarten");
             Button menuButton = new Button("Zurück zum Menü");
 
-            restartButton.setPrefWidth(300);
-            restartButton.setPrefHeight(60);
-            menuButton.setPrefWidth(300);
-            menuButton.setPrefHeight(60);
+            restartButton.setPrefWidth(600);
+            restartButton.setPrefHeight(180);
+            menuButton.setPrefWidth(600);
+            menuButton.setPrefHeight(180);
 
-            restartButton.setStyle("-fx-font-size: 20px;");
-            menuButton.setStyle("-fx-font-size: 20px;");
+            restartButton.setStyle("-fx-font-size: 40px;");
+            menuButton.setStyle("-fx-font-size: 40px;");
 
             restartButton.setOnAction(e -> {
                 isRestartClicked = true;

@@ -44,12 +44,13 @@ public class Main {
 //        if(connectionInput.isHigh()){
 //            gameService.setConnected(true);
 //        }
-        gameService.setConnected(false);
-        startGamePanel();
+        gameService.setConnected(true);
+        if(gameService.isConnected())
+            startGamePanel();
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
             System.out.println("Spiel wurde reseted");
-            gameService.setConnected(false);
+            gameService.setConnected(true);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
