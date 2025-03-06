@@ -1,4 +1,5 @@
-package org.example.fxgui;
+package com.example;
+
 
 import javafx.application.Application;
 import javafx.application.Platform;

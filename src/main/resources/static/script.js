@@ -46,11 +46,41 @@ function inGame() {
             if (data.message == 'Game has started') {
                 gameStarted = true;
                 console.log('Spiel wurde gestartet');
+            } else if(data.message == "Game beendet"){
+                console.log("Siegertabelle")
+                fetch('api/game/getWinner', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type' : 'application/json'
+                    }
+                })
+                .then(response => {
+                    if(!response.ok) {
+                        throw new Error('Netzwerkantwort war nicht ok')
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.message) {
+                        if(data.message == 'false') {
+
+                        } else {
+                            element = document.getElementById('winnerTable');
+                            element.classList.remove('hidden');
+                            element.innerHTML = "";
+                            const d = data.message.split(',');
+                            for(const inhalt of d) {
+                                element.appendChild('<h2>'+inhalt+'</h2>');
+                            }
+                        }
+                    }
+                })
+
             } else if(data.message == "Game was reseted"){
                 gameStarted = false;
                 console.log("Resetted")
                 leave();
-            } 
+            }
         } else {
             console.error('Keine Nachricht in der Antwort gefunden!');
         }
@@ -62,20 +92,19 @@ function inGame() {
 
 
 function Game() {
-    if (gameStarted != true) {
-        inGame();
-    } else if ((user != null) && (gameStarted = true)) {
-        if (!document.getElementById('start').classList.contains('hidden')){document.getElementById('start').classList.add('hidden');}
-        if (document.getElementById('playerGame').classList.contains('hidden')){document.getElementById('playerGame').classList.remove('hidden');}
+
+    inGame();
+
+    if (!document.getElementById('start').classList.contains('hidden')){document.getElementById('start').classList.add('hidden');}
+    if (document.getElementById('playerGame').classList.contains('hidden')){document.getElementById('playerGame').classList.remove('hidden');}
 
 
-        if(userPick == user) {
-            document.getElementById('pickBtn1').disabled = false;
-            document.getElementById('pickBtn2').disabled = false;
-        } else {
-            document.getElementById('pickBtn1').disabled = true;
-            document.getElementById('pickBtn2').disabled = true;
-        }
+    if(userPick == user) {
+        document.getElementById('pickBtn1').disabled = false;
+        document.getElementById('pickBtn2').disabled = false;
+    } else {
+        document.getElementById('pickBtn1').disabled = true;
+        document.getElementById('pickBtn2').disabled = true;
     }
 }
 setInterval(Game, 100);
@@ -187,7 +216,7 @@ setInterval(pingLobbyAsUser, 1000);
 
 
 function get() {
-    fetch('/api/user/getCard', {
+    fetch('/api/user/hit', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -214,7 +243,7 @@ function get() {
 
 
 function hold() {
-    fetch('/api/user/holdCard', {
+    fetch('/api/user/stay', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

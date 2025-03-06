@@ -19,7 +19,7 @@ public class GameFX extends Application {
     private static final String BACKGROUND_COLOR = "rgb(36, 43, 66)";
     private static final String BUTTON_DEFAULT_COLOR = "rgb(70, 103, 210)";
     private static final String BUTTON_HOVER_COLOR = "rgb(111, 137, 220)";
-    private static final String BUTTON_ACTIVE_COLOR = "rgb(45, 77, 185)";
+    private static final String BUTTON_ACTIVE_COLOR = "rgb(255, 255, 255)";
 
     static List<Boolean> seats = new ArrayList<>(6);
     static List<Circle> circles = new ArrayList<>(6);
@@ -28,7 +28,7 @@ public class GameFX extends Application {
     private static Gamemode currentGame;
     private static boolean gameStarted = false;
 
-    public GameFX(){
+    public GameFX() {
         seats = new ArrayList<>(6);
         circles = new ArrayList<>(6);
         VBox seatLayout;
@@ -37,7 +37,6 @@ public class GameFX extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // PiController piController = new PiController();
         // Hauptlayout
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
@@ -62,7 +61,7 @@ public class GameFX extends Application {
 
         // Sitzplatz Layout im Zentrum
         seatLayout = new VBox(20);
-        seatLayout.setAlignment(Pos.CENTER);
+        seatLayout.setAlignment(Pos.TOP_CENTER); // Zentriere den Inhalt
         seatLayout.setVisible(false);
         root.setCenter(seatLayout);
 
@@ -76,9 +75,6 @@ public class GameFX extends Application {
         bottomBox.setPadding(new Insets(20, 0, 0, 0));
         bottomBox.getChildren().add(startButton);
         root.setBottom(bottomBox);
-
-        // Event-Handler für den Start-Button
-        //startButton.setOnAction(e -> openGameScene(primaryStage));
 
         // Button Event Handler
         blackJackBtn.setOnAction(e -> {
@@ -139,8 +135,6 @@ public class GameFX extends Application {
         }
     }
 
-
-
     private Button createStyledButton(String text) {
         Button button = new Button(text);
         button.setStyle(getDefaultButtonStyle());
@@ -151,10 +145,10 @@ public class GameFX extends Application {
         return String.format("""
                     -fx-background-color: %s;
                     -fx-text-fill: white;
-                    -fx-font-size: 18px;
+                    -fx-font-size: 30px; // Schriftgröße erhöht
                     -fx-font-weight: Bold;
-                    -fx-min-width: 180px;
-                    -fx-min-height: 60px;
+                    -fx-min-width: 300px; // Breite erhöht
+                    -fx-min-height: 100px; // Höhe erhöht
                     -fx-background-radius: 30;
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
                 """, BUTTON_DEFAULT_COLOR);
@@ -164,23 +158,23 @@ public class GameFX extends Application {
         return String.format("""
                     -fx-background-color: %s;
                     -fx-text-fill: white;
-                    -fx-font-size: 18px;
+                    -fx-font-size: 30px; // Schriftgröße erhöht
                     -fx-font-weight: Bold;
-                    -fx-min-width: 180px;
-                    -fx-min-height: 60px;
+                    -fx-min-width: 300px; // Breite erhöht
+                    -fx-min-height: 100px; // Höhe erhöht
                     -fx-background-radius: 30;
-                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 8, 0, 0, 0);
+                    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
                 """, BUTTON_HOVER_COLOR);
     }
 
     private String getActiveButtonStyle() {
         return String.format("""
                     -fx-background-color: %s;
-                    -fx-text-fill: white;
-                    -fx-font-size: 18px;
+                    -fx-text-fill: black;
+                    -fx-font-size: 30px; // Schriftgröße erhöht
                     -fx-font-weight: Bold;
-                    -fx-min-width: 180px;
-                    -fx-min-height: 60px;
+                    -fx-min-width: 300px; // Breite erhöht
+                    -fx-min-height: 100px; // Höhe erhöht
                     -fx-background-radius: 30;
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
                 """, BUTTON_ACTIVE_COLOR);
@@ -189,21 +183,20 @@ public class GameFX extends Application {
     private void toggleButtonStyle(Button button) {
         if (!button.getStyle().contains(BUTTON_ACTIVE_COLOR)) {
             button.setStyle(getActiveButtonStyle());
-        } else {
-            button.setStyle(getDefaultButtonStyle());
         }
     }
 
     private void showSeats(String game) {
-        switch (game){
-            case "Black Jack" ->{
+        switch (game) {
+            case "Black Jack" -> {
                 currentGame = Gamemode.BLACKJACK;
             }
-            case "Poker" ->{
+            case "Poker" -> {
                 currentGame = Gamemode.POKER;
             }
         }
 
+        // Reset and initialize seat list
         seats.clear();
         for (int i = 0; i < 6; i++) {
             seats.add(false); // All seats start as empty
@@ -212,24 +205,19 @@ public class GameFX extends Application {
         seatLayout.getChildren().clear();
 
         Text title = new Text(game + " - Sitzplätze");
-        title.setStyle("-fx-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;");
+        title.setStyle("-fx-fill: white; -fx-font-size: 30px; -fx-font-weight: bold;");
+        title.setTranslateY(40); // Hebe den Titel an
 
         // Seat container
         Pane seatsPane = new Pane();
-        seatsPane.setPrefSize(700, 280);
+        seatsPane.setPrefSize(1000, 400);
 
-        // Bind the size of the Pane to the size of the window
-        seatsPane.prefWidthProperty().bind(seatLayout.widthProperty());
-        seatsPane.prefHeightProperty().bind(seatLayout.heightProperty().subtract(50)); // Adjust for title
+        double centerX = 940;
+        double centerY = 250; // Verschiebe die Kreise weiter nach unten
+        double radius = 300; // Radius erhöht, um die Kreise weiter zu entfernen
 
-        // Use bindings for dynamic positioning
-        double centerX = seatsPane.getPrefWidth() / 2;
-        double centerY = seatsPane.getPrefHeight() / 2 - 50; // Tisch weiter nach oben verschieben
-        double radius = Math.min(seatsPane.getPrefWidth(), seatsPane.getPrefHeight()) / 2.5; // Größerer Radius für mehr Abstand
-
-        for (int i = seats.size()-1; i >=0 ; i--) {
-            // Spiegel den Winkelbereich, um die Plätze unterhalb des Tisches zu positionieren
-            double angle = Math.PI * (1.0 + i / (double) (seats.size() - 1)) + Math.PI;
+        for (int i = 0; i < seats.size(); i++) {
+            double angle = Math.PI * (1 - i / (double) (seats.size() - 1));
 
             double x = centerX + radius * Math.cos(angle);
             double y = centerY + radius * Math.sin(angle);
@@ -237,11 +225,11 @@ public class GameFX extends Application {
             VBox seatContainer = new VBox(8);
             seatContainer.setAlignment(Pos.CENTER);
 
-            Circle seat = new Circle(46);
+            Circle seat = new Circle(60); // Radius der Kreise
             seat.setFill(seats.get(i) ? Color.RED : Color.GREEN);
-
-            Text seatNumber = new Text("Platz " + (seats.size() - i));
-            seatNumber.setStyle("-fx-fill: white; -fx-font-size: 14px; -fx-font-weight: Bold;");
+            circles.add(seat);
+            Text seatNumber = new Text("Platz " + (i + 1));
+            seatNumber.setStyle("-fx-fill: white; -fx-font-size: 20px; -fx-font-weight: Bold;");
 
             int finalI = i;
             seat.setOnMouseClicked(e -> {
@@ -251,27 +239,20 @@ public class GameFX extends Application {
 
             seatContainer.getChildren().addAll(seat, seatNumber);
 
-            // Bind the position of the seat containers
-            seatContainer.layoutXProperty().bind(seatsPane.widthProperty().multiply(x / seatsPane.getPrefWidth()).subtract(seat.getRadius()));
-            seatContainer.layoutYProperty().bind(seatsPane.heightProperty().multiply(y / seatsPane.getPrefHeight()).subtract(seat.getRadius()));
+            // **Perfectly center seat containers**
+            seatContainer.setLayoutX(x - seat.getRadius());
+            seatContainer.setLayoutY(y - seat.getRadius() + 20); // Text unter den Kreisen
 
             seatsPane.getChildren().add(seatContainer);
         }
 
-        // Erstelle den Tischkreis
-        Circle table = new Circle();
+        // Adjusted table position & size
+        Circle table = new Circle(centerX, centerY + 25, 200); // Größerer Tisch
         table.setFill(Color.rgb(70, 103, 210, 0.3));
         table.setStroke(Color.rgb(111, 137, 220, 0.5));
         table.setStrokeWidth(2);
-
-        // Binde den Radius des Kreises an die kleinere Dimension des Pane
-        table.radiusProperty().bind(seatsPane.widthProperty().multiply(0.1)); // 10% der Breite
-
-        // Binde die Position des Kreises an die Mitte des Pane
-        table.centerXProperty().bind(seatsPane.widthProperty().divide(2));
-        table.centerYProperty().bind(seatsPane.heightProperty().divide(2).subtract(50)); // Tisch weiter nach oben verschieben
-
         seatsPane.getChildren().add(0, table);
+
         // Arrange everything
         seatLayout.getChildren().addAll(title, seatsPane);
         seatLayout.setVisible(true);
@@ -280,7 +261,7 @@ public class GameFX extends Application {
 
     public static void updateSeatColor(List<String> id) {
         for (int i = 0; i < id.size(); i++) {
-            int seat = Integer.parseInt(id.get(i)) -1;
+            int seat = Integer.parseInt(id.get(i)) - 1;
             circles.get(seat).setFill(Color.RED);
         }
     }
@@ -301,7 +282,6 @@ public class GameFX extends Application {
         primaryStage.setScene(gameScene);
         GameGraphics gameGraphics = new GameGraphics();
         gameGraphics.start(primaryStage);
-
     }
 
     public static void main(String[] args) {

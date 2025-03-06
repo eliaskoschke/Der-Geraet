@@ -65,10 +65,11 @@ public class Controller {
 
     @GetMapping({"/user/ping", "logic/ping"})
     public ResponseMessage userPing() throws JsonProcessingException {
-        if (gameService.isGameStarted()) {
+        if(gameService.isGameHasEnded()){
+            return new ResponseMessage("Game beendet");
+        } else if (gameService.isGameStarted()) {
             return new ResponseMessage("Game has started");
-        }
-        if (gameService.isGameReset()) {
+        } else if (gameService.isGameReset()) {
             gameService.setPlayerGotReseted(gameService.getPlayerGotReseted() + 1);
             if (gameService.getPlayerGotReseted() >= gameService.getPlayerAtReset()) {
                 gameService.setPlayerAtReset(0);
@@ -77,9 +78,7 @@ public class Controller {
             }
             return new ResponseMessage("true");
         }
-        if(gameService.isGameHasEnded()){
-            return new ResponseMessage("Game beendet");
-        }
+
         return new ResponseMessage(mapper.writeValueAsString("false"));
     }
 
@@ -174,7 +173,7 @@ public class Controller {
         return new ResponseMessage("true");
     }
 
-    @PostMapping({"/logic/buttonIsClickedTwice", "/user/hit"})
+    @PostMapping({"/logic/buttonIsClickedTwice", "/user/stay"})
     public ResponseMessage buttonIsClickedTwice(@RequestBody Message message) {
 
         System.out.println("Hallo");

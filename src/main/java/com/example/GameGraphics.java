@@ -164,11 +164,11 @@ public class GameGraphics extends Application {
         });
     }
 
-    public boolean isRestartClicked() {
+    public static boolean isRestartClicked() {
         return isRestartClicked;
     }
 
-    public boolean isMenuClicked() {
+    public static boolean isMenuClicked() {
         return isMenuClicked;
     }
 
