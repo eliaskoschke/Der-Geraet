@@ -5,15 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
 public class Controller {
-    private final GameService gameService;
+    private GameService gameService;
     private ObjectMapper mapper = new ObjectMapper();
     int counter = 0;
 
@@ -21,14 +18,6 @@ public class Controller {
     @Autowired
     public Controller(GameService gameService) {
         this.gameService = gameService;
-
-        gameService.setDealerHand( List.of(
-                new Karte("5", "Kreuz", "Kreuz 5"),
-                new Karte("10", "Karo", "Karo 10"),
-                new Karte("2", "Pik", "Pik 2"),
-                new Karte("10", "Herz", "Herz 10"),
-                new Karte("11", "Pik", "Pik Ass")
-        ));
     }
 
     @GetMapping("/onload")
@@ -74,13 +63,13 @@ public class Controller {
         return null;
     }
 
-    @GetMapping("/user/ping")
+    @GetMapping({"/user/ping", "logic/ping"})
     public ResponseMessage userPing() throws JsonProcessingException {
         if (gameService.isGameStarted()) {
             return new ResponseMessage("Game has started");
         }
         if (gameService.isGameReset()) {
-            gameService.setPlayerGotReseted(gameService.getPlayerGotReseted()+1);
+            gameService.setPlayerGotReseted(gameService.getPlayerGotReseted() + 1);
             if (gameService.getPlayerGotReseted() >= gameService.getPlayerAtReset()) {
                 gameService.setPlayerAtReset(0);
                 gameService.setPlayerGotReseted(0);
@@ -88,12 +77,9 @@ public class Controller {
             }
             return new ResponseMessage("true");
         }
-        return new ResponseMessage(mapper.writeValueAsString("false"));
-    }
-
-    @GetMapping("/user/stay")
-    public ResponseMessage stay() throws JsonProcessingException {
-
+        if(gameService.isGameHasEnded()){
+            return new ResponseMessage("Game beendet");
+        }
         return new ResponseMessage(mapper.writeValueAsString("false"));
     }
 
@@ -113,15 +99,15 @@ public class Controller {
     @PostMapping("/admin/startGame")
     public ResponseMessage startGame(@RequestBody Message message) {
         gameService.setGameStarted(true);
-        if (message.getMessage().toLowerCase().equals("blackjack")){
+        if (message.getMessage().toLowerCase().equals("blackjack")) {
             gameService.setGamemode(Gamemode.BLACKJACK);
-        } else{
+        } else {
             gameService.setGamemode(Gamemode.POKER);
         }
         Collections.sort(gameService.getListOfAllPlayers(), new Comparator<Player>() {
             @Override
             public int compare(Player p1, Player p2) {
-                return Integer.compare(Integer.parseInt(p1.getId()),Integer.parseInt(p2.getId()));
+                return Integer.compare(Integer.parseInt(p1.getId()), Integer.parseInt(p2.getId()));
             }
         });
         gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
@@ -143,6 +129,7 @@ public class Controller {
             gameService.setCurrenPlayerIndex(0);
         } else {
             gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex() + 1);
+            System.out.println("Ein Spieler wurde gekickt");
             //setze den taster der nächste Person auf high
         }
         Player playerWhoHasToBeKicked = gameService.getCurrentPlayer();
@@ -154,49 +141,56 @@ public class Controller {
     @GetMapping("/game/ping/getDealerHand")
     public ResponseMessage getDealerHand() throws JsonProcessingException {
         counter++;
-        if(gameService.getDealerHand() != null) {
-            if(counter >= 10){
+        if (gameService.getDealer().getDealerHand() != null) {
+            if (counter >= 10) {
                 counter = 0;
-                gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() +1);
+                gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() + 1);
             }
 //            gameService.setNumberOfCardFaceup(gameService.getDealerHand().size() -1);
-            String idCSV = castKartenObjectToBildId(gameService.getDealerHand());
+            String idCSV = castKartenObjectToBildId(gameService.getDealer().getDealerHand());
             return new ResponseMessage(idCSV);
         }
         return new ResponseMessage("");
     }
-
-    @GetMapping("/game/ping/getPlayerTurn")
+///ping/getPlayerTurn
+    @GetMapping({"/game/ping/getPlayerTurn", "logic/ping/getPlayerTurn"})
     public ResponseMessage getPlayerTurn() throws JsonProcessingException {
         return new ResponseMessage(gameService.getCurrentPlayer().getId());
     }
 
+    @GetMapping("/game/getWinner")
+    public ResponseMessage getWinner() throws JsonProcessingException {
+        return new ResponseMessage(castWinnerMapIntoString(gameService.getMapOfAllWinners()));
+    }
 
 
     @PostMapping({"/logic/buttonIsClickedOnce", "/user/hit"})
     public ResponseMessage buttonIsClickedOnce(@RequestBody Message message) {
         System.out.println("Hallo");
-        String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ")+1);
+        String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ") + 1);
         System.out.println("Es wurde ein Button geklickt: " + buttonId);
         gameService.setButtonClickedOnce(true);
+
         return new ResponseMessage("true");
     }
 
     @PostMapping({"/logic/buttonIsClickedTwice", "/user/hit"})
     public ResponseMessage buttonIsClickedTwice(@RequestBody Message message) {
+
         System.out.println("Hallo");
-        String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ")+1);
+        String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ") + 1);
         System.out.println("Es wurde ein Button geklickt: " + buttonId);
         gameService.setButtonClickedTwice(true);
+
         return new ResponseMessage("true");
     }
 
     @PostMapping("/logic/cardGotScanned")
     public ResponseMessage cardGotScanned(@RequestBody Message message) throws JsonProcessingException {
-        try{
+        try {
             Karte karte = mapper.readValue(message.getMessage(), Karte.class);
             return new ResponseMessage("true");
-        } catch (Exception e){
+        } catch (Exception e) {
 
         }
         return new ResponseMessage("false");
@@ -214,11 +208,11 @@ public class Controller {
         return new ResponseMessage("not acknowledged");
     }
 
-    public String castKartenObjectToBildId(List<Karte>dealerHand){
-        String idCSV ="";
-        for(int i = 0; i < dealerHand.size(); i++){
+    public String castKartenObjectToBildId(List<Karte> dealerHand) {
+        String idCSV = "";
+        for (int i = 0; i < dealerHand.size(); i++) {
             int idValue = 0;
-            if(i< gameService.getNumberOfCardFaceup()) {
+            if (i < gameService.getNumberOfCardFaceup()) {
                 switch (dealerHand.get(i).typ) {
                     case "Karo":
                         idValue += 100;
@@ -253,38 +247,22 @@ public class Controller {
             } else {
                 idValue = 500;
             }
-            idCSV += String.valueOf(idValue) +",";
+            idCSV += String.valueOf(idValue) + ",";
         }
-        idCSV = idCSV.substring(0, idCSV.length()-1);
-        return  idCSV;
+        idCSV = idCSV.substring(0, idCSV.length() - 1);
+        return idCSV;
     }
 
-
-    public static class Message {
-        private String message;
-
-        public String getMessage() {
-            return message;
+    private String castWinnerMapIntoString(HashMap<String, String> map){
+        if(map == null || map.isEmpty()){
+            return "Kein Spieler hat gewonnen";
         }
-
-        public void setMessage(String message) {
-            this.message = message;
+        String returnString = "";
+        for(String key : map.keySet()){
+            returnString += key + " " + map.get(key) +",";
         }
+        returnString = returnString.substring(0, returnString.length()-2);
+        return  returnString;
     }
 
-    public static class ResponseMessage {
-        private String message;
-
-        public ResponseMessage(String message) {
-            this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-    }
 }

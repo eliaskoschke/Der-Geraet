@@ -1,28 +1,15 @@
 package com.example;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
-import org.bytedeco.javacv.*;
 import org.bytedeco.javacv.Frame;
 
 
 import org.bytedeco.javacv.OpenCVFrameGrabber;
-import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 
-
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 public class Camera {
 

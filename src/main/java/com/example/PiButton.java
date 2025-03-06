@@ -1,5 +1,6 @@
 package com.example;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi4j.io.gpio.digital.DigitalInput;
 import com.pi4j.io.gpio.digital.DigitalState;
 import com.pi4j.io.gpio.digital.PullResistance;
@@ -12,73 +13,71 @@ import org.apache.http.util.EntityUtils;
 
 public class PiButton {
     private static final String baseURL = "http://localhost:8080/api/logic";
-    private static final long DOUBLE_CLICK_TIME = 300; // Zeit in Millisekunden
+    private static final long DOUBLE_CLICK_TIME = 1000; // Zeit in Millisekunden das ist ein test2
     private long lastPressTime = 0;
-    private boolean isDoubleClick = false;
     private int pinNumber = 0;
     private boolean buttonRegistered = false;
     private final int playerNumber;
+    private ObjectMapper mapper = new ObjectMapper();
+    private boolean locked = true;
+    private static boolean isWaitingForSecondClick = false;
 
-    public PiButton(com. pi4j. context. Context pi4j, int pinNumber) throws InterruptedException {
-        this.pinNumber = pinNumber;
-        this.playerNumber = convertPinNumberToPlayerNumber();
+    public PiButton(com. pi4j. context. Context pi4j, String playerNumber) throws InterruptedException {
+        this.pinNumber = MappingForAdress.getButtonPinAdressForPlayerID(playerNumber);
+        this.playerNumber = Integer.parseInt(playerNumber);
         var buttonConfig = DigitalInput.newConfigBuilder(pi4j)
                 .name("Button Name: " + String.valueOf(pinNumber))
                 .id("Button ID: " + String.valueOf(pinNumber))
                 .address(pinNumber)
                 .pull(PullResistance.PULL_DOWN)
-                .debounce(150L);
+                .debounce(3000L);
 
         var button = pi4j.create(buttonConfig);
 
         button.addListener(e -> {
             if (e.state() == DigitalState.HIGH) {
-                handleClick();
+                if(!buttonRegistered){
+                    singleButtonClick();
+                } else {
+                    if (!locked) {
+                        long currentTime = System.currentTimeMillis();
+                        if(isWaitingForSecondClick && (currentTime - lastPressTime) < DOUBLE_CLICK_TIME){
+                            doubleButtonClick();
+                            System.out.println("DOPPELKLICK");
+                            isWaitingForSecondClick = false;
+                        } else{
+                            lastPressTime = currentTime;
+                            isWaitingForSecondClick = true;
+                            new java.util.Timer().schedule(new java.util.TimerTask(){
+                                @Override
+                                public void run(){
+                                    if(isWaitingForSecondClick) {
+                                        singleButtonClick();
+                                        System.out.println("Einzelklick");
+                                        isWaitingForSecondClick = false;
+                                    }
+                                }
+                            }, DOUBLE_CLICK_TIME);
+
+                        }
+                    }
+                }
+//                System.out.println("Button "+playerNumber +" wurde geklickt");
             }
         });
     }
 
-    public int convertPinNumberToPlayerNumber(){
-        return switch (pinNumber) {
-            case 2 -> 1;
-            case 3 -> 2;
-            case 4 -> 3;
-            case 14 -> 4;
-            case 17 -> 5;
-            case 27 -> 6;
-            default -> 0;
-        };
-    }
 
 
-
-    public void handleClick() {
-        long currentTime = System.currentTimeMillis();
-
-        if ((currentTime - lastPressTime) < DOUBLE_CLICK_TIME) {
-            isDoubleClick = true;
-            System.out.println("Doppelklick erkannt!");
-            doubleButtonClick();
-        } else {
-            isDoubleClick = false;
-            lastPressTime = currentTime;
-        }
-    }
-
-    public void checkSingleClick() {
-        if (!isDoubleClick && (System.currentTimeMillis() - lastPressTime) >= DOUBLE_CLICK_TIME && lastPressTime != 0) {
-            System.out.println("Einfacher Klick erkannt!");
-            singleButtonClick();
-            lastPressTime = 0; // Zurücksetzen, um zukünftige Klicks korrekt zu erkennen
-        }
-    }
 
     private void singleButtonClick() {
-        System.out.println("Knopf gedrückt");
-        if(buttonRegistered) {
-            sendMessageButtonClickedOnce();
-        } else{
-            resgiterPlayerAtTable();
+        if(!locked) {
+            if (buttonRegistered) {
+                sendMessageButtonClickedOnce();
+            } else {
+                System.out.println("Ich bin im Einzel klick und regestriere gleich");
+                resgiterPlayerAtTable();
+            }
         }
     }
 
@@ -94,13 +93,11 @@ public class PiButton {
             // Sende die POST-Anfrage und erhalte die Antwort
             try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
                 // Überprüfe den Status der Antwort und verarbeite sie
-                int statusCode = response.getStatusLine().getStatusCode();
-                if (statusCode == 200) {
-                    String responseBody = EntityUtils.toString(response.getEntity());
-                    System.out.println("Antwort erhalten: " + responseBody);
-                    buttonRegistered = false;
+                Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
+                if (responseMessage.getMessage().equals("acknowledged")) {
+                    buttonRegistered = true;
                 } else {
-                    System.err.println("Fehler: " + statusCode);
+                    System.out.println("Fehler: ");
                 }
             }
         } catch (Exception exception) {
@@ -134,11 +131,13 @@ public class PiButton {
     }
 
     private void doubleButtonClick() {
-        System.out.println("Knopf gedrückt");
-        if(buttonRegistered) {
-            sendMessageButtonClickedTwice();
-        } else{
-            resgiterPlayerAtTable();
+        if(!locked) {
+            if (buttonRegistered) {
+                sendMessageButtonClickedTwice();
+            } else {
+                System.out.println("Ich bin im Doppelbutton klick und regestriere gleich");
+                resgiterPlayerAtTable();
+            }
         }
     }
 
@@ -165,5 +164,33 @@ public class PiButton {
         } catch (Exception exception){
             exception.getStackTrace();
         }
+    }
+
+
+    public int getPlayerNumber() {
+        return playerNumber;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    public boolean isButtonRegistered() {
+        return buttonRegistered;
+    }
+
+    public void setButtonRegistered(boolean buttonRegistered) {
+        this.buttonRegistered = buttonRegistered;
+    }
+
+    public void resetButton(){
+        lastPressTime = 0;
+        buttonRegistered = false;
+        locked = true;
+        isWaitingForSecondClick = false;
     }
 }

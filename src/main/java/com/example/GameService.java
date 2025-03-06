@@ -3,42 +3,44 @@ package com.example;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 @Service
 public class GameService {
 
-    private Gamemode gamemode = Gamemode.BLACKJACK;
+    private static HashMap<String, String> mapOfAllWinners = new HashMap<>();
 
-    private boolean connected = false;
+    private static Gamemode gamemode = Gamemode.BLACKJACK;
 
-    private int numberOfCardFaceup = 1;
+    private static boolean connected = false;
 
-    private boolean buttonClickedOnce = false;
+    private static int numberOfCardFaceup = 1;
 
-    private boolean buttonClickedTwice = false;
+    private static boolean buttonClickedOnce = false;
 
-    private String getMessage = "";
+    private static boolean buttonClickedTwice = false;
 
-    private boolean gameStarted = false;
+    private static String getMessage = "";
 
-    boolean gameReset = false;
+    private static boolean gameStarted = false;
 
-    Karte nextCardInDeck;
+    static boolean gameReset = false;
 
-    int playerAtReset = 0;
+    private static boolean gameHasEnded = false;
 
-    int playerGotReseted = 0;
+    static Karte nextCardInDeck;
 
-    List<Karte> dealerHand ;
+    static int playerAtReset = 0;
 
-    ArrayList<String> dealerHandBildId = new ArrayList<>();
+    static int playerGotReseted = 0;
 
-    private Player currentPlayer = new Player();
+    private static Player currentPlayer = new Player();
 
-    private ArrayList<Player> listOfAllPlayers = new ArrayList<>();
+    private static ArrayList<Player> listOfAllPlayers = new ArrayList<>();
 
-    private int currenPlayerIndex = 0;
+    private static int currenPlayerIndex = 0;
+
+    static Computer dealer = new Computer();
 
     public void buttonClicked() {
         this.buttonClickedOnce = true;
@@ -93,14 +95,6 @@ public class GameService {
         this.playerGotReseted = playerGotReseted;
     }
 
-    public List<Karte> getDealerHand() {
-        return dealerHand;
-    }
-
-    public void setDealerHand(List<Karte> dealerHand) {
-        this.dealerHand = dealerHand;
-    }
-
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
@@ -115,14 +109,6 @@ public class GameService {
 
     public void setListOfAllPlayers(ArrayList<Player> listOfAllPlayers) {
         this.listOfAllPlayers = listOfAllPlayers;
-    }
-
-    public ArrayList<String> getDealerHandBildId() {
-        return dealerHandBildId;
-    }
-
-    public void setDealerHandBildId(ArrayList<String> dealerHandBildId) {
-        this.dealerHandBildId = dealerHandBildId;
     }
 
     public boolean isButtonClickedTwice() {
@@ -171,5 +157,90 @@ public class GameService {
 
     public void setConnected(boolean connected) {
         this.connected = connected;
+    }
+
+    public Computer getDealer() {
+        return dealer;
+    }
+
+    public void setDealer(Computer dealer) {
+        this.dealer = dealer;
+    }
+
+    public HashMap<String, String> getMapOfAllWinners() {
+        return mapOfAllWinners;
+    }
+
+    public void setMapOfAllWinners(HashMap<String, String> mapOfAllWinners) {
+        this.mapOfAllWinners = mapOfAllWinners;
+    }
+
+
+    public void restartTheCurrentGame(){
+        mapOfAllWinners = new HashMap<>();
+
+        numberOfCardFaceup = 1;
+
+        buttonClickedOnce = false;
+
+        buttonClickedTwice = false;
+
+        getMessage = "";
+
+        nextCardInDeck = null;
+
+        playerAtReset = 0;
+
+        playerGotReseted = 0;
+
+        currentPlayer = new Player();
+
+        currenPlayerIndex = 0;
+
+        dealer = new Computer();
+    }
+
+    public void resetGameChoice(){
+        mapOfAllWinners = new HashMap<>();
+
+        gamemode = Gamemode.BLACKJACK;
+
+        connected = false;
+
+        numberOfCardFaceup = 1;
+
+        buttonClickedOnce = false;
+
+        buttonClickedTwice = false;
+
+        getMessage = "";
+
+        gameStarted = false;
+
+        gameReset = false;
+
+        gameHasEnded = false;
+
+        Karte nextCardInDeck = null;
+
+        playerAtReset = 0;
+
+        playerGotReseted = 0;
+
+        currentPlayer = new Player();
+
+        listOfAllPlayers = new ArrayList<>();
+
+        currenPlayerIndex = 0;
+
+        dealer = new Computer();
+    }
+
+    public boolean isGameHasEnded() {
+        return gameHasEnded;
+    }
+
+    public void setGameHasEnded(boolean gameHasEnded) {
+        this.gameHasEnded = gameHasEnded;
     }
 }
