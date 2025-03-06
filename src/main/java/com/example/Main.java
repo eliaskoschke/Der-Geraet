@@ -44,12 +44,12 @@ public class Main {
 //        if(connectionInput.isHigh()){
 //            gameService.setConnected(true);
 //        }
-        gameService.setConnected(true);
+        gameService.setConnected(false);
         startGamePanel();
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
             System.out.println("Spiel wurde reseted");
-            gameService.setConnected(true);
+            gameService.setConnected(false);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
@@ -66,24 +66,34 @@ public class Main {
     public static void registerPlayer() throws InterruptedException {
         System.out.println("Spieler werden registriert");
         while (!gameService.isGameStarted()) {
-            List<String> playerIds = gameService.getListOfAllPlayers().stream()
-                    .map(Player::getId)
-                    .toList();
-            gameFx.updateSeatColor(playerIds);
-            if (gameFx.isGameStarted()) {
+            if(gameService.isConnected()) {
+                List<String> playerIds = gameService.getListOfAllPlayers().stream()
+                        .map(Player::getId)
+                        .toList();
+                gameFx.updateSeatColor(playerIds);
+                if (gameFx.isGameStarted()) {
+                    gameService.setCurrentPlayer(new Player("0"));
+                    listOfAllPlayerAtTheBeginningOfTheGame = new ArrayList<>();
+                    for (Player player : gameService.getListOfAllPlayers()) {
+                        listOfAllPlayerAtTheBeginningOfTheGame.add(player);
+                    }
+                    gameService.setGamemode(gameFx.getCurrentGame());
+                    gamemode = gameService.getGamemode();
+                    gameService.setGameStarted(true);
+                    gameFx.setGameStarted(false);
+
+                }
+            }
+            Thread.sleep(100);
+        }
+            if(!gameService.isConnected()){
                 gameService.setCurrentPlayer(new Player("0"));
                 listOfAllPlayerAtTheBeginningOfTheGame = new ArrayList<>();
                 for (Player player : gameService.getListOfAllPlayers()) {
                     listOfAllPlayerAtTheBeginningOfTheGame.add(player);
                 }
-                gameService.setGamemode(gameFx.getCurrentGame());
                 gamemode = gameService.getGamemode();
-                gameService.setGameStarted(true);
-                gameFx.setGameStarted(false);
-
             }
-            Thread.sleep(100);
-        }
     }
 
     private static void gameLogic() throws InterruptedException {
@@ -123,7 +133,7 @@ public class Main {
         }
         if (gameService.isConnected()) {
             while (!gameGraphics.isRestartClicked() && !gameGraphics.isMenuClicked()) {
-                //System.out.println("Gebe eine Button Anweisung an");
+                System.out.println("Gebe eine Button Anweisung an");
             }
 
             gameRestarted = gameGraphics.isRestartClicked();
@@ -135,6 +145,8 @@ public class Main {
             //Website soll irgendwas machen
         }
         gameService.setGameHasEnded(true);
+        System.out.println("Restart: "+ gameRestarted);
+        System.out.println("Reset: "+ gameChoiceReseted);
     }
 
     public static void executeNextTurn() throws InterruptedException {
@@ -150,12 +162,7 @@ public class Main {
             }
             executeComputerTurn();
         } else {
-            System.out.println("Aktueller Spieler index: "+ gameService.getCurrenPlayerIndex());
             gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex() + 1);
-            System.out.println("Neuer Spieler index: "+ gameService.getCurrenPlayerIndex());
-            for(Player player :gameService.getListOfAllPlayers()){
-                System.out.println(player.getId());
-            }
             gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(gameService.getCurrenPlayerIndex()));
         }
     }
@@ -165,8 +172,10 @@ public class Main {
         switch (gamemode) {
             case BLACKJACK -> {
                 System.out.println("Computer Turn ist dran");
-                gameGraphics.removeFaceDownCard();
-                gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(1));
+                if(gameService.isConnected()) {
+                    gameGraphics.removeFaceDownCard();
+                    gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(1));
+                }
                 System.out.println("Karte wurde hinzugefügt");
                 gameService.getDealer().countHand();
                 Thread.sleep(10000);
@@ -176,9 +185,10 @@ public class Main {
                     while (gameService.getDealer().getDealerHandWert() < 17) {
                         executeCameraScan();
                         rotateStepperMotor(1000);
-                        System.out.println("Karte bekommen");
                         giveDealerNextCard();
-                        gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size() - 1));
+                        if(gameService.isConnected()) {
+                            gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size() - 1));
+                        }
                         gameService.getDealer().countHand();
                         Thread.sleep(10000);
                     }
