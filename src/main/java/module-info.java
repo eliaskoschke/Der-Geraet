@@ -15,6 +15,7 @@ module Der.Geraet.Maven {
     requires spring.beans;
     requires spring.web;
     requires org.bytedeco.opencv;
+    requires com.fazecast.jSerialComm;
 
     opens com.example to javafx.graphics, spring.beans, spring.context;
     exports com.example;
