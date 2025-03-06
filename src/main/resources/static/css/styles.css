@@ -115,12 +115,17 @@ h5 {
 
 @media (max-width: 1024px) {
     #dealerHand {
-        grid-template-columns: repeat(4, minmax(80px, 1fr)); /* Bei kleineren Bildschirmen 4 Spalten */
+        grid-template-columns: repeat(4, minmax(80px, 1fr)); 
     }
 }
 
 @media (max-width: 768px) {
     #dealerHand {
-        grid-template-columns: repeat(3, minmax(80px, 1fr)); /* Bei kleineren Bildschirmen 3 Spalten */
+        grid-template-columns: repeat(3, minmax(80px, 1fr)); 
     }
+}
+
+.winnerTable {
+    background-color: hsl(225, 30%, 50%);
+    border-radius: 20px;
 }

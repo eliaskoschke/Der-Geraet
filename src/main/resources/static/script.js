@@ -46,6 +46,35 @@ function inGame() {
             if (data.message == 'Game has started') {
                 gameStarted = true;
                 console.log('Spiel wurde gestartet');
+            } else if(data.message == "Game beendet"){
+                console.log("Siegertabelle")
+                fetch('api/game/getWinner', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type' : 'application/json'
+                    }
+                })
+                .then(response => {
+                    if(!response.ok) {
+                        throw new Error('Netzwerkantwort war nicht ok')
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.message) {
+                        if(data.message == 'false') {
+
+                        } else {
+                            element = document.getElementById('winnerTable');
+                            element.innerHTML = "";
+                            const d = data.message.split(',');
+                            for(const inhalt of d) {
+                                element.appendChild('<h2>'+inhalt+'</h2>');
+                            }
+                        }
+                    }
+                })
+                
             } else if(data.message == "Game was reseted"){
                 gameStarted = false;
                 console.log("Resetted")
@@ -238,3 +267,5 @@ function hold() {
     error => console.error('Fehler:', error)
     );
 }
+
+
