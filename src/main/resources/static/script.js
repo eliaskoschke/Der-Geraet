@@ -65,12 +65,16 @@ function inGame() {
                         if(data.message == 'false') {
 
                         } else {
-                            element = document.getElementById('winnerTable');
-                            element.classList.remove('hidden');
-                            element.innerHTML = "";
+                            playerGame = document.getElementById('playerGame');
+                            playerGame.classList.add('hidden');
+                            table = document.getElementById('winnerTable');
+                            table.classList.remove('hidden');
+                            table.innerHTML = "";
                             const d = data.message.split(',');
                             for(const inhalt of d) {
-                                element.appendChild('<h2>'+inhalt+'</h2>');
+                                const h2inhalt = document.createElement("h2");
+                                h2inhalt.textContent = inhalt;
+                                table.appendChild(h2inhalt);
                             }
                         }
                     }
