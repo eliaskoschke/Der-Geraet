@@ -34,8 +34,6 @@ public class Main {
     static boolean gameChoiceReseted = false;
     static ArrayList<Player> listOfAllPlayerAtTheBeginningOfTheGame;
 
-
-    //--add-opens=Der.Geraet.Maven/com.example=ALL-UNNAMED
     public static void main(String[] args) throws InterruptedException {
 //        controllerConfig();
         ApplicationContext context = SpringApplication.run(Main.class, args);
@@ -44,13 +42,13 @@ public class Main {
 //        if(connectionInput.isHigh()){
 //            gameService.setConnected(true);
 //        }
-        gameService.setConnected(true);
+        gameService.setConnected(false);
         if(gameService.isConnected())
             startGamePanel();
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
             System.out.println("Spiel wurde reseted");
-            gameService.setConnected(true);
+            gameService.setConnected(false);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
@@ -116,13 +114,11 @@ public class Main {
         }
         gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
         while (!gameService.isGameHasEnded()) {
-            //System.out.println("While schleife in Game logik " + gameService.getCurrentPlayer().getId());
             if (gameService.isButtonClickedOnce()) {
                 hitEvent();
                 gameService.setButtonClickedOnce(false);
             }
             if (gameService.isButtonClickedTwice()) {
-                //Taster des aktuellen Spielers Low
                 stayEvent();
                 gameService.setButtonClickedTwice(false);
             }
@@ -141,7 +137,6 @@ public class Main {
             gameChoiceReseted = gameGraphics.isMenuClicked();
             gameGraphics.setMenuClicked(false);
             gameGraphics.setRestartClicked(false);
-            //Das ist ein test
         } else {
             //Website soll irgendwas machen
         }
@@ -377,10 +372,12 @@ public class Main {
                     executeCardThrow();
                     giveDealerNextCard();
                     executeCameraScan();
-                    if (i == 0)
-                        gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(0));
-                    else
-                        gameGraphics.addBeginningCards();
+                    if(gameService.isConnected()) {
+                        if (i == 0)
+                            gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(0));
+                        else
+                            gameGraphics.addBeginningCards();
+                    }
                     Thread.sleep(500);
                 }
 
