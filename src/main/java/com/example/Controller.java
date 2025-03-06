@@ -9,6 +9,9 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api")
+
+//Todo: AnfangsEndpunkte überarbeiten
+//      Kommentare für Hauptpunkte einfügen (Eingangsdaten, Ausgangsdaten, Was macht es konkret nicht zu detailiert)
 public class Controller {
     private GameService gameService;
     private ObjectMapper mapper = new ObjectMapper();
@@ -63,6 +66,7 @@ public class Controller {
         return null;
     }
 
+    //Todo: /Logic
     @GetMapping({"/user/ping", "logic/ping"})
     public ResponseMessage userPing() throws JsonProcessingException {
         if(gameService.isGameHasEnded()){
@@ -82,14 +86,18 @@ public class Controller {
         return new ResponseMessage(mapper.writeValueAsString("false"));
     }
 
+    //Todo: Name "ping" umändern
     @GetMapping("/admin/ping")
     public ResponseMessage adminPing() throws JsonProcessingException {
         return new ResponseMessage(String.valueOf(gameService.getListOfAllPlayers().size()));
     }
 
+    //Todo: Name des Endpunktes und der Methode ändern
+    //      Passwort sollte ins Property
+    //      Was wenn der admin sich nicht daran hält?
     @PostMapping("/admin/sendPassword")
     public ResponseMessage sendPassword(@RequestBody Message postPassword) {
-        if (postPassword.getMessage().equals("1111")) {
+        if (postPassword.getMessage().equals("1111")) { // Ja ist schon richtig Kacke ABER ist auch nur Projekt für Ausbildungsmessen!!!!
             return new ResponseMessage("true");
         }
         return new ResponseMessage("false");
@@ -98,6 +106,7 @@ public class Controller {
     @PostMapping("/admin/startGame")
     public ResponseMessage startGame(@RequestBody Message message) {
         gameService.setGameStarted(true);
+        //TODO: Gamemode.valueOf(message.getMessage().toUpperCase());
         if (message.getMessage().toLowerCase().equals("blackjack")) {
             gameService.setGamemode(Gamemode.BLACKJACK);
         } else {
@@ -137,6 +146,7 @@ public class Controller {
         return new ResponseMessage("Spieler wurde gekickt");
     }
 
+    //Todo: Warum CSV? Warum nicht anders?
     @GetMapping("/game/ping/getDealerHand")
     public ResponseMessage getDealerHand() throws JsonProcessingException {
         counter++;

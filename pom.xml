@@ -189,7 +189,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>com.example.BlackJack</mainClass>
+                    <mainClass>com.example.GameGraphics</mainClass>
                 </configuration>
 
             </plugin>

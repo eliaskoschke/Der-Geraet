@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 @Service
 public class GameService {
+    //Todo: static weg. WARUM?????
 
     private static HashMap<String, String> mapOfAllWinners = new HashMap<>();
 

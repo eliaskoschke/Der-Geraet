@@ -18,11 +18,10 @@ import java.util.List;
 
 @SpringBootApplication
 public class Main {
-    //    static Context pi4j =  Pi4J.newAutoContext();
-    static DigitalOutput stepperMotor;
-    static DigitalOutput discardMotorIn1;
-    static DigitalOutput discardMotorIn2;
-    static DigitalInput connectionInput;
+    //Todo: Alles in Packages unterteilen
+    //      Api dokumentieren (Welche Endpunkte gibt es? Warum? Nach welchem System?)
+
+    // static Context pi4j =  Pi4J.newAutoContext();
     static GameService gameService;
     static Camera camera = new Camera();
     static ObjectMapper mapper = new ObjectMapper();
@@ -417,7 +416,6 @@ public class Main {
 
         turnHasEnded = false;
         gameService.restartTheCurrentGame();
-        //zeige das Spiel an
     }
 
     private static void resetGameChoice() {
@@ -427,6 +425,5 @@ public class Main {
 
         turnHasEnded = false;
         gameService.resetGameChoice();
-        //zeige das Menü an
     }
 }

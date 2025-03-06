@@ -153,7 +153,7 @@ public class GameFX extends Application {
                     -fx-background-radius: 30;
                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 0);
                 """, BUTTON_DEFAULT_COLOR);
-    }
+    }//TEST
 
     private String getHoverButtonStyle() {
         return String.format("""

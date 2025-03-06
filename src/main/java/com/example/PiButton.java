@@ -12,6 +12,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 public class PiButton {
+    //Todo: URL in eine Config machen
     private static final String baseURL = "http://localhost:8080/api/logic";
     private static final long DOUBLE_CLICK_TIME = 1000; // Zeit in Millisekunden das ist ein test2
     private long lastPressTime = 0;
@@ -37,6 +38,7 @@ public class PiButton {
         button.addListener(e -> {
             if (e.state() == DigitalState.HIGH) {
                 if(!buttonRegistered){
+                    //Todo: mach direkt eine registerMethode auf
                     singleButtonClick();
                 } else {
                     if (!locked) {
@@ -75,14 +77,14 @@ public class PiButton {
             if (buttonRegistered) {
                 sendMessageButtonClickedOnce();
             } else {
-                System.out.println("Ich bin im Einzel klick und regestriere gleich");
-                resgiterPlayerAtTable();
+                registerPlayerAtTable();
             }
         }
     }
 
-    private void resgiterPlayerAtTable() {
+    private void registerPlayerAtTable() {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            //Todo: Warum hast du das so gemacht? Mach doch einfach ein Message Objekt du Idiot
             String message = "{\"message\":\"" + playerNumber + "\"}";
 
             HttpPost postRequest = new HttpPost(baseURL + "/registerPlayerAtTable");
@@ -136,7 +138,7 @@ public class PiButton {
                 sendMessageButtonClickedTwice();
             } else {
                 System.out.println("Ich bin im Doppelbutton klick und regestriere gleich");
-                resgiterPlayerAtTable();
+                registerPlayerAtTable();
             }
         }
     }

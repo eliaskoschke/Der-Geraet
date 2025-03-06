@@ -22,48 +22,11 @@ public class   Raspberry_Controller {
     static HashMap<String, DigitalOutput> playerButtonMap = new HashMap<>();
     static boolean isRegistering = true;
     static boolean gameHasAlreadyStartedOnce = false;
+    //TODO: Umbennenen in Tisch Client
     public static void main(String[] args) throws InterruptedException {
 
-//        int buttonNumber = 22;
-//
-//        var buttonConfig = DigitalInput.newConfigBuilder(pi4j)
-//                .name("Button")
-//                .id("Button " + String.valueOf(buttonNumber))
-//                .address(buttonNumber)
-//                .pull(PullResistance.PULL_DOWN)
-//                .debounce(1000L);
-//
-//        var button = pi4j.create(buttonConfig);
-//
-//        button.addListener(e -> {
-//           if (e.state() == DigitalState.HIGH) {
-//               System.out.println("Knopf gedrückt");
-//                int thisButtonNumber = buttonNumber;
-//               try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-//                   String message = "{\"message\":\"Button clicked: "+ thisButtonNumber+"\"}";
-//
-//                   HttpPost postRequest = new HttpPost(baseURL + "/buttonIsClicked");
-//                   postRequest.setHeader("Content-Type", "application/json");
-//
-//                   postRequest.setEntity(new StringEntity(message));
-//
-//                   // Sende die POST-Anfrage und erhalte die Antwort
-//                   try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
-//                       // Überprüfe den Status der Antwort und verarbeite sie
-//                       int statusCode = response.getStatusLine().getStatusCode();
-//                       if (statusCode == 200) {
-//                           String responseBody = EntityUtils.toString(response.getEntity());
-//                           System.out.println("Antwort erhalten: " + responseBody);
-//                       } else {
-//                           System.err.println("Fehler: " + statusCode);
-//                       }
-//                   }
-//               } catch (Exception exception){
-//                   exception.getStackTrace();
-//               }
-//           }
-//        });
         //PiButton button = new PiButton(pi4j, 15);
+        //Todo: for schleife einbauen
         addButtonOutputs("1", MappingForAdress.getLEDPinAdressForPlayerID("1"));
         addButtonOutputs("2", MappingForAdress.getLEDPinAdressForPlayerID("2"));
         addButtonOutputs("3", MappingForAdress.getLEDPinAdressForPlayerID("3"));
@@ -71,6 +34,7 @@ public class   Raspberry_Controller {
         addButtonOutputs("5", MappingForAdress.getLEDPinAdressForPlayerID("5"));
         addButtonOutputs("6", MappingForAdress.getLEDPinAdressForPlayerID("6"));
 
+        //Todo: PiButton umbennenen in ButtonHandler
         ArrayList<PiButton> buttonList = new ArrayList<>();
         buttonList.add(new PiButton(pi4j, "1"));
         buttonList.add(new PiButton(pi4j, "2"));
@@ -87,7 +51,6 @@ public class   Raspberry_Controller {
                     if (currentPlayerId.equals(String.valueOf(piButton.getPlayerNumber()))) {
                         if(playerButtonMap.get(currentPlayerId).isLow())
                             activateButton(piButton);
-                        //piButton.checkSingleClick();
                     } else if (playerButtonMap.get(String.valueOf(piButton.getPlayerNumber())).isHigh()) {
                         deactivateButton(piButton);
                     }
@@ -182,6 +145,7 @@ public class   Raspberry_Controller {
 
     private static void deactivateButton(PiButton piButton){
         piButton.setLocked(true);
+        //Todo: teste ob locked notwendig ist
         playerButtonMap.get(String.valueOf(piButton.getPlayerNumber())).low();
     }
 

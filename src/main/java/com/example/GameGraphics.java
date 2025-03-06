@@ -172,7 +172,7 @@ public class GameGraphics extends Application {
     public static boolean isMenuClicked() {
         return isMenuClicked;
     }
-
+//TEST
     public void setRestartClicked(boolean restartClicked) {
         isRestartClicked = restartClicked;
     }
