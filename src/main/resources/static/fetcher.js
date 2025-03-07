@@ -1,4 +1,5 @@
 function get(endpoint) {
+    console.log(endpoint + "Wurde abgefragt.")
     fetch('/api/' + endpoint, {
         method: 'GET',
         headers: {
@@ -27,6 +28,7 @@ function get(endpoint) {
     
 
 function post(endpoint, messageString) {
+    console.log(endpoint + "Wurde abgefragt.")
     fetch('/api/' + endpoint, {
         method: 'POST',
         headers: {
