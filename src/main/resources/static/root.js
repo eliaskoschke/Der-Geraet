@@ -2,29 +2,8 @@ function leave() {
     window.location.href = 'index.html';
     if(window.location.pathname === "/play.html") {
         console.log(user + " left the game.");
-        fetch('/api/user/playerLeftTheTable', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ message: user })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Netzwerkantwort war nicht ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data && data.message) {
-
-                    } else {
-                        alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
-                    }
-                })
-                .catch(
-                error => console.error('Fehler:', error)
-                );
+        
+        post('user/playerLeftTheTable', user);
         user = null;
         ingame = false;
     }
@@ -34,34 +13,15 @@ var userPick;
 
 
 function pingPlayerTurn() {
-
-    fetch('api/game/ping/getPlayerTurn', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Netzwerkantwort war nicht ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data && data.message) {
-            console.log(data.message);
-            var current = document.getElementById('currentPlayer');
-            userPick = data.message;
-            if (data.message != user) {
-                current.textContent = "Spieler " + data.message + " ist an der Reihe!";
-            } else {
-                current.textContent = "Du bist an der Reihe!";
-            }
-        } else {
-            console.error('Keine Nachricht in der Antwort gefunden.');
-        }
-    })
-    .catch(error => console.error('Fehler:', error));
+    console.log(data.message);
+    var current = document.getElementById('currentPlayer');
+    userPick = get('game/ping/getPlayerTurn');;
+    if (userPick != user) {
+        current.textContent = "Spieler " + userPick + " ist an der Reihe!";
+    } else {
+        current.textContent = "Du bist an der Reihe!";
+    }
+    
 }
 
 setInterval(pingPlayerTurn, 1000);
@@ -71,27 +31,7 @@ var olddealerhand = "";
 var displayedCards = 0;
 
 function pingDealerHand() {
-    fetch('/api/game/ping/getDealerHand', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Netzwerkantwort war nicht ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data && data.message) {
-            dealerHand = data.message;
-        } else {
-            console.error('Keine Nachricht in der Antwort gefunden.');
-        }
-    })
-    .catch(error => console.error('Fehler:', error));
-
+    dealerHand = get('game/ping/getDealerHand');
     
     if (dealerHand == olddealerhand) {
         console.log('Keine Neuen karten vorhanden');
@@ -99,6 +39,7 @@ function pingDealerHand() {
         updateDealerHand();
     }
     
+
 }
 setInterval(pingDealerHand, 1000);
 
@@ -130,3 +71,25 @@ function updateDealerHand() {
     } 
     
 }
+
+function setFavicon() {
+    const faviconLink = document.createElement("link");
+    faviconLink.rel = "icon";
+
+    var card = Math.round((Math.random() * 4) + 1);
+    var newRandom = Math.round((Math.random() * 13) + 1);
+
+    if (newRandom < 10) {
+        newRandom = "0" + newRandom;
+    }
+
+    card = card + "" + newRandom;
+    faviconLink.href = "img/cards/" + card + ".png"; 
+
+    const head = document.querySelector("head");
+    head.appendChild(faviconLink);
+}
+
+
+window.onload = setFavicon();
+

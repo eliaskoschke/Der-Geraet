@@ -1,19 +1,5 @@
-@font-face {
-    font-family: "Roboto Mono";
-    src: url('../fonts/RobotoMono.ttf') format('truetype');
-    font-weight: 100 700;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: "Roboto Mono";
-    src: url('../fonts/RobotoMono-Italic.ttf') format('truetype');
-    font-weight: 100 700;
-    font-style: italic;
-}
-
 * {
-    font-family: "Roboto Mono", monospace;
+    font-family: "Roboto Mono", serif;
 }
 
 body {
@@ -75,7 +61,7 @@ h5 {
     color: hsl(0, 0%, 85%);
 }
 
-.hidden, .hidden.start {
+.hidden {
     display: none !important;
 }
 

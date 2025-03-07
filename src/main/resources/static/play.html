@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Der Gerät</title>
@@ -24,7 +27,7 @@
             <button id="11" onclick="joinTable(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(300deg) translate(160px) rotate(-300deg);"><b>Platz</b>11</button>
             <button id="12" onclick="joinTable(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(330deg) translate(160px) rotate(-330deg);"><b>Platz</b>12</button>
         </div>
-        <div id="start" class="hidden">
+        <div class="start hidden" id="start">
             <h1>Warte bis Host das <br> <span id="highlight">Spiel </span>Startet <br> <span id="dots">...</span></h1>
         </div>
         <div class="playerGame hidden" id="playerGame">
@@ -32,8 +35,8 @@
             <h2 id="titleDealerHand">Dealer:</h2>
             <div id="dealerHand"></div>
             <div class="pickBtns">
-                <button onclick="get()" class="main-button" id="pickBtn1">Ziehen</button>
-                <button onclick="hold()" class="main-button" id="pickBtn2">Bleiben</button>
+                <button onclick="getCard()" class="main-button" id="pickBtn1">Ziehen</button>
+                <button onclick="holdCard()" class="main-button" id="pickBtn2">Bleiben</button>
             </div>
         </div id="winnerTable" class="winnerTable hidden">
 
@@ -45,6 +48,6 @@
 
     <script src="script.js"></script>
     <script src="root.js"></script>
-    <script src="fetch.js"></script>
+    <script src="fetcher.js"></script>
 </body>
 </html>
