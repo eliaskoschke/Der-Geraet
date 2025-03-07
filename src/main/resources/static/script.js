@@ -22,21 +22,20 @@ window.onload = function() {
 };
 
 function Game() {
-    
     inGame();
 
-    if(gameStarted == true)
-        if (!document.getElementById('start').classList.contains('hidden')){document.getElementById('start').classList.add('hidden');}
-        if (document.getElementById('playerGame').classList.contains('hidden')){document.getElementById('playerGame').classList.remove('hidden');}
+    if (gameStarted === true) {
+        document.getElementById('start').classList.add('hidden');
+        document.getElementById('playerGame').classList.remove('hidden');
+    }
 
-
-        if(userPick == user) {
-            document.getElementById('pickBtn1').disabled = false;
-            document.getElementById('pickBtn2').disabled = false;
-        } else {
-            document.getElementById('pickBtn1').disabled = true;
-            document.getElementById('pickBtn2').disabled = true;
-        }
+    if(userPick == user) {
+        document.getElementById('pickBtn1').disabled = false;
+        document.getElementById('pickBtn2').disabled = false;
+    } else {
+        document.getElementById('pickBtn1').disabled = true;
+        document.getElementById('pickBtn2').disabled = true;
+    }
 }
 setInterval(Game, 100);
 
