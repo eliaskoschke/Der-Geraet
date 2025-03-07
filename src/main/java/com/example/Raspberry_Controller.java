@@ -16,15 +16,19 @@ import java.util.HashMap;
 import static com.pi4j.Pi4J.newAutoContext;
 
 public class   Raspberry_Controller {
-    static Context pi4j = newAutoContext();
+    public static Context pi4j;
     private static String baseURL = "http://localhost:8080/api/logic";
     private static ObjectMapper mapper = new ObjectMapper();
     static HashMap<String, DigitalOutput> playerButtonMap = new HashMap<>();
     static boolean isRegistering = true;
     static boolean gameHasAlreadyStartedOnce = false;
     //TODO: Umbennenen in Tisch Client
-    public static void main(String[] args) throws InterruptedException {
 
+    public Raspberry_Controller(Context pi4j){
+        this.pi4j = pi4j;
+    }
+
+    public void execute() throws InterruptedException {
         //PiButton button = new PiButton(pi4j, 15);
         //Todo: for schleife einbauen
         addButtonOutputs("1", MappingForAdress.getLEDPinAdressForPlayerID("1"));
@@ -126,6 +130,7 @@ public class   Raspberry_Controller {
     }
 
     private static void addButtonOutputs(String playerID, int adresse) {
+        System.out.println(adresse);
         var buttonOutput = pi4j.create(DigitalOutput.newConfigBuilder(pi4j)
                 .name("Freigabe für Player "+ playerID)
                 .id("Freigabe "+String.valueOf(adresse))

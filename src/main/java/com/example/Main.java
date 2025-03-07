@@ -1,7 +1,10 @@
 package com.example;
 
+import com.example.tcm2209.StepperController;
+import com.example.tcm2209.TMCDeviceIsBusyException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pi4j.io.gpio.digital.*;
+import com.pi4j.Pi4J;
+import com.pi4j.context.Context;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -21,7 +24,7 @@ public class Main {
     //Todo: Alles in Packages unterteilen
     //      Api dokumentieren (Welche Endpunkte gibt es? Warum? Nach welchem System?)
 
-    // static Context pi4j =  Pi4J.newAutoContext();
+    public static Context pi4j =   Pi4J.newAutoContext();;
     static GameService gameService;
     static Camera camera = new Camera();
     static ObjectMapper mapper = new ObjectMapper();
@@ -32,8 +35,10 @@ public class Main {
     static boolean gameRestarted = false;
     static boolean gameChoiceReseted = false;
     static ArrayList<Player> listOfAllPlayerAtTheBeginningOfTheGame;
+    static StepperController stepperController;
+    static boolean someOneStartedWithBlackJack = false;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, TMCDeviceIsBusyException {
 //        controllerConfig();
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
@@ -41,13 +46,22 @@ public class Main {
 //        if(connectionInput.isHigh()){
 //            gameService.setConnected(true);
 //        }
-        gameService.setConnected(false);
+        stepperController = new StepperController(pi4j);
+//        stepperController.orientieren();
+        stepperController.turn(-90);
+//        System.out.println("sollte an sein");
+        Thread.sleep(20000);
+        Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
+
+        startController(raspberryController);
+        stepperController = new StepperController(pi4j);
+        gameService.setConnected(true);
         if(gameService.isConnected())
             startGamePanel();
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
             System.out.println("Spiel wurde reseted");
-            gameService.setConnected(false);
+            gameService.setConnected(true);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
@@ -100,18 +114,29 @@ public class Main {
             player.countHand();
             if(player.getKartenhandWert() == 21){
                 listOfToRemovingPlayer.add(player);
+                System.out.println("Spieler wurde hinzugefügt");
             }
         }
-        gameService.getListOfAllPlayers().remove(listOfToRemovingPlayer);
-        if (gameService.getListOfAllPlayers().size() >= 2) {
-            Collections.sort(gameService.getListOfAllPlayers(), new Comparator<Player>() {
-                @Override
-                public int compare(Player p1, Player p2) {
-                    return Integer.compare(Integer.parseInt(p1.getId()), Integer.parseInt(p2.getId()));
-                }
-            });
+        if(!listOfToRemovingPlayer.isEmpty()) {
+            for(Player player : listOfToRemovingPlayer){
+                gameService.getListOfAllPlayers().remove(player);
+                System.out.println("Spieler wurde entfernt");
+                someOneStartedWithBlackJack = true;
+            }
         }
-        gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
+        if(gameService.getListOfAllPlayers() != null && !gameService.getListOfAllPlayers().isEmpty()) {
+            if (gameService.getListOfAllPlayers().size() >= 2) {
+                Collections.sort(gameService.getListOfAllPlayers(), new Comparator<Player>() {
+                    @Override
+                    public int compare(Player p1, Player p2) {
+                        return Integer.compare(Integer.parseInt(p1.getId()), Integer.parseInt(p2.getId()));
+                    }
+                });
+            }
+            gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
+        } else{
+            executeComputerTurn();
+        }
         while (!gameService.isGameHasEnded()) {
             if (gameService.isButtonClickedOnce()) {
                 hitEvent();
@@ -129,7 +154,7 @@ public class Main {
         }
         if (gameService.isConnected()) {
             while (!gameGraphics.isRestartClicked() && !gameGraphics.isMenuClicked()) {
-                System.out.println("Gebe eine Button Anweisung an");
+                //System.out.println("Gebe eine Button Anweisung an");
             }
 
             gameRestarted = gameGraphics.isRestartClicked();
@@ -174,7 +199,7 @@ public class Main {
                 System.out.println("Karte wurde hinzugefügt");
                 gameService.getDealer().countHand();
                 Thread.sleep(10000);
-                if (gameService.getListOfAllPlayers().isEmpty()) {
+                if (gameService.getListOfAllPlayers().isEmpty() && !someOneStartedWithBlackJack) {
 
                 } else {
                     while (gameService.getDealer().getDealerHandWert() < 17) {
@@ -189,6 +214,14 @@ public class Main {
                     }
                 }
                 int dealerHandWert = gameService.getDealer().getDealerHandWert();
+                if(someOneStartedWithBlackJack){
+                    for(Player player : listOfAllPlayerAtTheBeginningOfTheGame){
+                        if(player.getKartenhandWert() == 21 && !gameService.getListOfAllPlayers().contains(player)){
+                            gameService.getListOfAllPlayers().add(player);
+                            System.out.println("Ein Spieler wurde wieder hinzugefügt");
+                        }
+                    }
+                }
                 for (Player player : gameService.getListOfAllPlayers()) {
                     player.countHand();
                     if (dealerHandWert > 21) {
@@ -368,6 +401,7 @@ public class Main {
                 System.out.println("Karten werden für den Anfang ausgeteilt");
                 for (int i = 0; i < 2; i++) {
                     rotateStepperMotor(1000);
+                    executeCameraScan();
                     executeCardThrow();
                     giveDealerNextCard();
                     executeCameraScan();
@@ -377,7 +411,8 @@ public class Main {
                         else
                             gameGraphics.addBeginningCards();
                     }
-                    Thread.sleep(500);
+                    System.out.println("Jetzt Karte entnehmen");
+                    Thread.sleep(5000);
                 }
 
                 for (Player player : gameService.getListOfAllPlayers()) {
@@ -385,9 +420,11 @@ public class Main {
                     for (int i = 0; i < 2; i++) {
                         rotateStepperMotor(1000);
                         executeCardThrow();
+                        executeCameraScan();
                         giveCurrentPlayerNextCard();
                         executeCameraScan();
-                        Thread.sleep(500);
+                        System.out.println("Jetzt Karte entnehmen");
+                        Thread.sleep(5000);
                     }
                 }
                 executeCardThrow();
@@ -405,8 +442,19 @@ public class Main {
         }).start();
     }
 
+    private static void startController(Raspberry_Controller controller) {
+        new Thread(() -> {
+            try {
+                controller.execute();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+    }
+
     private static void restartTheCurrentgame() {
         gameRestarted = false;
+        someOneStartedWithBlackJack = false;
         gameChoiceReseted = false;
         gameService.setListOfAllPlayers(listOfAllPlayerAtTheBeginningOfTheGame);
         gameService.getDealer().resetDealer();
@@ -421,6 +469,7 @@ public class Main {
     private static void resetGameChoice() {
         gameRestarted = false;
         gameChoiceReseted = false;
+        someOneStartedWithBlackJack = false;
 
 
         turnHasEnded = false;

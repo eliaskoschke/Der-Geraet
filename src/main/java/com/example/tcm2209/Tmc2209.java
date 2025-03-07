@@ -1,4 +1,4 @@
-package com.pi4j.example.tmc2209;
+package com.example.tcm2209;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.pi4j.context.Context;
@@ -40,7 +40,7 @@ public class Tmc2209 {
         }
         setSpreadCycle(false);
         readDriverStatus();
-        setCurrent(20, 10, 0.5f);
+        setCurrent(25, 10, 0.5f);
 
         PwmConfig pwmConfig = Pwm.newConfigBuilder(p4jContext)
                 .id("tmx-step")

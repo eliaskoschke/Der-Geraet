@@ -1,4 +1,4 @@
-package com.pi4j.example.tmc2209;
+package com.example.tcm2209;
 
 public enum Register {
     GCONF         ((byte) 0x00),

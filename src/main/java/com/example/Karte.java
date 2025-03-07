@@ -87,8 +87,8 @@ public class Karte {
                 idValue += wert;
                 break;
         }
-        System.out.println(idValue);
+        //System.out.println(idValue);
         bild = new Image("file:/home/pi/Main-Branch/Der-Geraet/src/main/resources/static/img/cards/" + String.valueOf(idValue) + ".png");
-        System.out.println("Bild wurde hiinzugefügt");
+        //System.out.println("Bild wurde hiinzugefügt");
     }
 }
