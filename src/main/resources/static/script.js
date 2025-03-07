@@ -1,15 +1,6 @@
 var user = null;
 var ingame = false;
 var gameStarted = false;
-function sitzplatzClicked(index) {
-    var sitzplaetze = document.getElementById('btns-sitzplaetze');
-    sitzplaetze.classList.add('hidden');
-    user = index;
-    console.log("User Logged in with id: " + user);
-    ingame = true;
-    var start = document.getElementById('start');
-    start.classList.remove('hidden');
-}
 
 window.onload = function() {
     isUserLoggedIn();
@@ -96,12 +87,16 @@ function inGame() {
 
 
 function Game() {
-
     inGame();
 
-    if (!document.getElementById('start').classList.contains('hidden')){document.getElementById('start').classList.add('hidden');}
-    if (document.getElementById('playerGame').classList.contains('hidden')){document.getElementById('playerGame').classList.remove('hidden');}
-
+    if (gameStarted) {
+        if (!document.getElementById('start').classList.contains('hidden')) {
+            document.getElementById('start').classList.add('hidden');
+        }
+        if (document.getElementById('playerGame').classList.contains('hidden')) {
+            document.getElementById('playerGame').classList.remove('hidden');
+        }
+    }
 
     if(userPick == user) {
         document.getElementById('pickBtn1').disabled = false;
@@ -114,13 +109,17 @@ function Game() {
 setInterval(Game, 100);
 
 function joinTable(id) {
-    sitzplatzClicked(id)
+    user = id;
+    console.log("User Logged in with id: " + user);
+    ingame = true;
+    
     const button = document.getElementById(id);
     if (button) {
         button.disabled = true;
     } else {
         console.warn(`Button mit ID ${id} nicht gefunden.`);
     }
+
     fetch('/api/user/playerJoinedTheTable', {
         method: 'POST',
         headers: {
@@ -138,6 +137,12 @@ function joinTable(id) {
         if (data && data.message) {
             if(data.message == "not acknowledged"){
                 window.location.reload();
+            }
+            else {
+                // Start-Bereich anzeigen
+                document.getElementById('start').classList.remove('hidden');
+                // Sitzplätze ausblenden
+                document.getElementById('btns-sitzplaetze').classList.add('hidden');
             }
         } else {
             alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');

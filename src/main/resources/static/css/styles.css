@@ -75,7 +75,7 @@ h5 {
     color: hsl(0, 0%, 85%);
 }
 
-.hidden {
+.hidden, .hidden.start {
     display: none !important;
 }
 
