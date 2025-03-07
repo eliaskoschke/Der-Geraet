@@ -1,6 +1,7 @@
 var user = null;
 var ingame = false;
 var gameStarted = false;
+
 function sitzplatzClicked(index) {
     var sitzplaetze = document.getElementById('btns-sitzplaetze');
     sitzplaetze.classList.add('hidden');
@@ -10,6 +11,22 @@ function sitzplatzClicked(index) {
     var start = document.getElementById('start');
     start.classList.remove('hidden');
 }
+
+function joinTable(id) {
+    const button = document.getElementById(id);
+    if (button) {
+        button.disabled = true;
+    } else {
+        console.warn(`Button mit ID ${id} nicht gefunden.`);
+    }
+
+    if(post('user/playerJoinedTheTable', id) == "not acknowledged"){
+        window.location.reload();
+    } else {
+        sitzplatzClicked(id)
+    }
+}
+
 
 window.onload = function() {
     var dots = document.getElementById('dots');
@@ -80,23 +97,6 @@ function inGame() {
         } 
 }
 
-
-
-
-function joinTable(id) {
-    sitzplatzClicked(id)
-    const button = document.getElementById(id);
-    if (button) {
-        button.disabled = true;
-    } else {
-        console.warn(`Button mit ID ${id} nicht gefunden.`);
-    }
-
-    if(post('user/playerJoinedTheTable', id) == "not acknowledged"){
-        window.location.reload();
-    }
-}
-
 function loadTables() {
     handleServerResponse(get('onload'));
 }
@@ -125,8 +125,10 @@ function pingLobbyAsUser() {
     }
 }
 
-window.onload = loadTables; 
-setInterval(pingLobbyAsUser, 1000);
+window.onload = function() {
+    loadTables(); 
+    setInterval(pingLobbyAsUser, 1000);
+}
 
 
 

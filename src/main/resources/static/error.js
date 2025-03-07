@@ -1,20 +1,32 @@
 window.onload = function() {
+    console.log("Error loaded");
+    error();
+}
+
+function error() {
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
-    var h1 = document.getElementById('errorBox');
+
+    var errorMessage = "Unerklärlicher Fehler :/";
 
     switch (error) {
         case 'gameAlreadyStarted': 
-            h1.textContent = "Error: Das Spiel wurde bereits gestartet.";
+            errorMessage = "Das Spiel wurde bereits gestartet.";
             break;
         case 'wrongPassword':
-            h1.textContent = "Falsches Passwort!";
+            errorMessage = "Falsches Passwort!";
             break;
         case 'gamestarterror':
-            h1.textContent = "Fehler beim Starten des Spiels!";
+            errorMessage = "Fehler beim Starten des Spiels!";
+            break;
+        case null:
+        case undefined:
         default:
-            h1.textContent = "Unerklärlicher Fehler :/"
+            errorMessage = "Unerklärlicher Fehler :/";
+            break;
     }
+
+    document.getElementById('errorBox').textContent = errorMessage;
 }
 
 function back() {
