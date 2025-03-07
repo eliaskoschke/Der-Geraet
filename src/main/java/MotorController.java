@@ -1,5 +1,3 @@
-package com.example;
-
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalOutput;
 import com.pi4j.io.pwm.Pwm;
@@ -34,16 +32,11 @@ public class MotorController {
     }
 
     public void werfeKatreAus(){
-        dreheVorwaerts(50,1000);
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        dreheRueckwerts(25,500);
+        dreheVorwaerts(100,100);
+        dreheRueckwerts(75,300);
     }
 
-    private void dreheVorwaerts(int speed, int dauer){
+    private void dreheRueckwerts(int speed, int dauer){
         try{
             direction1.high();
             direction2.low();
@@ -58,7 +51,7 @@ public class MotorController {
         
     }
 
-    private void dreheRueckwerts(int speed, int dauer){
+    private void dreheVorwaerts(int speed, int dauer){
         try{
             direction1.low();
             direction2.high();
