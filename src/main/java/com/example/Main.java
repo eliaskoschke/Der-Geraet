@@ -55,11 +55,13 @@ public class Main {
         //Thread.sleep(20000);
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
 
-        startController(raspberryController);
+
         //stepperController = new StepperController(pi4j);
-        gameService.setConnected(true);
-        if(gameService.isConnected())
+        gameService.setConnected(false);
+        if(gameService.isConnected()) {
+            startController(raspberryController);
             startGamePanel();
+        }
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             if(!stepperIsHome)
                 stepperController.orientieren();
@@ -67,7 +69,7 @@ public class Main {
                 stepperIsHome = false;
             resetGameChoice();
             System.out.println("Spiel wurde reseted");
-            gameService.setConnected(true);
+            gameService.setConnected(false);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
