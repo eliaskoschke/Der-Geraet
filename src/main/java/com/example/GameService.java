@@ -41,7 +41,27 @@ public class GameService {
 
     private static int currenPlayerIndex = 0;
 
+    private boolean gameRestarted = false;
+
+    private boolean gameChoiceReseted = false;
+
     static Computer dealer = new Computer();
+
+    public boolean isGameChoiceReseted() {
+        return gameChoiceReseted;
+    }
+
+    public void setGameChoiceReseted(boolean gameChoiceReseted) {
+        this.gameChoiceReseted = gameChoiceReseted;
+    }
+
+    public boolean isGameRestarted() {
+        return gameRestarted;
+    }
+
+    public void setGameRestarted(boolean gameRestarted) {
+        this.gameRestarted = gameRestarted;
+    }
 
     public void buttonClicked() {
         this.buttonClickedOnce = true;

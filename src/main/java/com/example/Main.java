@@ -38,6 +38,7 @@ public class Main {
     static StepperController stepperController;
     static boolean someOneStartedWithBlackJack = false;
     static boolean stepperIsHome = true;
+    static ArrayList<Player> blackJackList = new ArrayList<>();
 
 
     //--add-opens=Der.Geraet.Maven/com.example=ALL-UNNAMED --add-reads Der.Geraet.Maven=ALL-UNNAMED
@@ -54,26 +55,24 @@ public class Main {
 //        System.out.println("sollte an sein");
         //Thread.sleep(20000);
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
-
-
-        //stepperController = new StepperController(pi4j);
-        gameService.setConnected(false);
+        startController(raspberryController);
+//        stepperController = new StepperController(pi4j);
+        gameService.setConnected(true);
         if(gameService.isConnected()) {
-            startController(raspberryController);
             startGamePanel();
         }
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
-            if(!stepperIsHome)
-                stepperController.orientieren();
-            else
-                stepperIsHome = false;
             resetGameChoice();
             System.out.println("Spiel wurde reseted");
-            gameService.setConnected(false);
+            gameService.setConnected(true);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
             while (!gameService.isGameHasEnded() || gameRestarted) {
+                if(!stepperIsHome)
+                    stepperController.orientieren();
+                else
+                    stepperIsHome = false;
                 stepperController.orientieren();
                 restartTheCurrentgame();
                 gameService.setGameHasEnded(false);
@@ -129,6 +128,7 @@ public class Main {
         if(!listOfToRemovingPlayer.isEmpty()) {
             for(Player player : listOfToRemovingPlayer){
                 gameService.getListOfAllPlayers().remove(player);
+                blackJackList.add(player);
                 System.out.println("Spieler wurde entfernt");
                 someOneStartedWithBlackJack = true;
             }
@@ -171,7 +171,14 @@ public class Main {
             gameGraphics.setMenuClicked(false);
             gameGraphics.setRestartClicked(false);
         } else {
-            //Website soll irgendwas machen
+            while(!gameService.isGameRestarted() && !gameService.isGameChoiceReseted()){
+
+            }
+
+            gameRestarted = gameService.isGameRestarted();
+            gameChoiceReseted = gameService.isGameChoiceReseted();
+            gameService.setGameChoiceReseted(false);
+            gameService.setGameRestarted(false);
         }
         gameService.setGameHasEnded(true);
         System.out.println("Restart: "+ gameRestarted);
@@ -224,11 +231,9 @@ public class Main {
                 }
                 int dealerHandWert = gameService.getDealer().getDealerHandWert();
                 if(someOneStartedWithBlackJack){
-                    for(Player player : listOfAllPlayerAtTheBeginningOfTheGame){
-                        if(player.getKartenhandWert() == 21 && !gameService.getListOfAllPlayers().contains(player)){
-                            gameService.getListOfAllPlayers().add(player);
-                            System.out.println("Ein Spieler wurde wieder hinzugefügt");
-                        }
+                    for(Player player : blackJackList){
+                        gameService.getListOfAllPlayers().add(player);
+                        System.out.println("Ein Spieler wurde wieder hinzugefügt");
                     }
                 }
                 for (Player player : gameService.getListOfAllPlayers()) {
@@ -427,7 +432,7 @@ public class Main {
                             gameGraphics.addBeginningCards();
                     }
                     System.out.println("Jetzt Karte entnehmen");
-                    Thread.sleep(2000);
+                    Thread.sleep(3000);
                 }
 
                 for (Player player : gameService.getListOfAllPlayers()) {
@@ -439,7 +444,7 @@ public class Main {
                         giveCurrentPlayerNextCard();
                         executeCameraScan();
                         System.out.println("Jetzt Karte entnehmen");
-                        Thread.sleep(2000);
+                        Thread.sleep(3000);
                     }
                 }
                 executeCardThrow();
@@ -471,6 +476,7 @@ public class Main {
         gameRestarted = false;
         someOneStartedWithBlackJack = false;
         gameChoiceReseted = false;
+        blackJackList = new ArrayList<>();
         gameService.setListOfAllPlayers(listOfAllPlayerAtTheBeginningOfTheGame);
         gameService.getDealer().resetDealer();
         for (Player player : gameService.getListOfAllPlayers()) {
@@ -484,6 +490,7 @@ public class Main {
     private static void resetGameChoice() {
         gameRestarted = false;
         gameChoiceReseted = false;
+        blackJackList = new ArrayList<>();
         someOneStartedWithBlackJack = false;
 
 
