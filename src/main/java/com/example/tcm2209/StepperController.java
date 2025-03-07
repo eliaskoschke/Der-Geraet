@@ -9,9 +9,9 @@ public class StepperController {
     private static final int PIN_INDEX = 23;
     private static final int PIN_STEP = 18;
     private static final int PIN_DIR = 24;
-    private static final int SPEED = 1000;
+    private static final int SPEED = 1800;
     private static final int HOMESPEED = 1000;
-    private static final int TRESHOLD = 40;
+    private static final int TRESHOLD = 45;
     Tmc2209 steppermotor;
 
     Context pi4j;

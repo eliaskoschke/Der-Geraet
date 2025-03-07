@@ -37,7 +37,10 @@ public class Main {
     static ArrayList<Player> listOfAllPlayerAtTheBeginningOfTheGame;
     static StepperController stepperController;
     static boolean someOneStartedWithBlackJack = false;
+    static boolean stepperIsHome = true;
 
+
+    //--add-opens=Der.Geraet.Maven/com.example=ALL-UNNAMED --add-reads Der.Geraet.Maven=ALL-UNNAMED
     public static void main(String[] args) throws InterruptedException, TMCDeviceIsBusyException {
 //        controllerConfig();
         ApplicationContext context = SpringApplication.run(Main.class, args);
@@ -47,18 +50,21 @@ public class Main {
 //            gameService.setConnected(true);
 //        }
         stepperController = new StepperController(pi4j);
-//        stepperController.orientieren();
-        stepperController.turn(-90);
+        stepperController.orientieren();
 //        System.out.println("sollte an sein");
-        Thread.sleep(20000);
+        //Thread.sleep(20000);
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
 
         startController(raspberryController);
-        stepperController = new StepperController(pi4j);
+        //stepperController = new StepperController(pi4j);
         gameService.setConnected(true);
         if(gameService.isConnected())
             startGamePanel();
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
+            if(!stepperIsHome)
+                stepperController.orientieren();
+            else
+                stepperIsHome = false;
             resetGameChoice();
             System.out.println("Spiel wurde reseted");
             gameService.setConnected(true);
@@ -66,6 +72,7 @@ public class Main {
             gameChoiceReseted = false;
             registerPlayer();
             while (!gameService.isGameHasEnded() || gameRestarted) {
+                stepperController.orientieren();
                 restartTheCurrentgame();
                 gameService.setGameHasEnded(false);
                 gameRestarted = false;
@@ -204,7 +211,7 @@ public class Main {
                 } else {
                     while (gameService.getDealer().getDealerHandWert() < 17) {
                         executeCameraScan();
-                        rotateStepperMotor(1000);
+                        rotateStepperMotor(3);
                         giveDealerNextCard();
                         if(gameService.isConnected()) {
                             gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size() - 1));
@@ -263,7 +270,7 @@ public class Main {
     public static void hitEvent() throws InterruptedException {
         switch (gamemode) {
             case BLACKJACK -> {
-                rotateStepperMotor(1000);
+                rotateStepperMotor(Integer.parseInt(gameService.getCurrentPlayer().getId()));
                 executeCameraScan();
                 executeCardThrow();
                 giveCurrentPlayerNextCard();
@@ -349,7 +356,13 @@ public class Main {
         }
     }
 
-    public static void rotateStepperMotor(int angle) throws InterruptedException {
+    public static void rotateStepperMotor(int playerID) {
+        int angle = (-30 * playerID);
+        try{
+            stepperController.turn(angle);
+        } catch(Exception e){
+            e.printStackTrace();
+        }
         //stepperMotor.high();
         //Thread.sleep(angle/10);
         //stepperMotor.low();
@@ -400,7 +413,7 @@ public class Main {
             case BLACKJACK -> {
                 System.out.println("Karten werden für den Anfang ausgeteilt");
                 for (int i = 0; i < 2; i++) {
-                    rotateStepperMotor(1000);
+                    rotateStepperMotor(3);
                     executeCameraScan();
                     executeCardThrow();
                     giveDealerNextCard();
@@ -412,19 +425,19 @@ public class Main {
                             gameGraphics.addBeginningCards();
                     }
                     System.out.println("Jetzt Karte entnehmen");
-                    Thread.sleep(5000);
+                    Thread.sleep(2000);
                 }
 
                 for (Player player : gameService.getListOfAllPlayers()) {
                     gameService.setCurrentPlayer(player);
                     for (int i = 0; i < 2; i++) {
-                        rotateStepperMotor(1000);
+                        rotateStepperMotor(Integer.parseInt(gameService.getCurrentPlayer().getId()));
                         executeCardThrow();
                         executeCameraScan();
                         giveCurrentPlayerNextCard();
                         executeCameraScan();
                         System.out.println("Jetzt Karte entnehmen");
-                        Thread.sleep(5000);
+                        Thread.sleep(2000);
                     }
                 }
                 executeCardThrow();

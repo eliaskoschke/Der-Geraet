@@ -8,6 +8,7 @@ import com.pi4j.io.pwm.PwmConfig;
 import com.pi4j.io.pwm.PwmType;
 
 import java.util.Arrays;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -26,6 +27,7 @@ public class Tmc2209 {
     private final Pwm stepPin;
     private final DigitalOutput dirPin;
     private final AtomicInteger currSpeed = new AtomicInteger();
+    private final Semaphore isMovingSemaphore = new Semaphore(0);
 
     public Tmc2209(Context p4jContext, int indexPin, int dirPin, int stepPin) throws InterruptedException, TMCCommunicationException {
         port = SerialPort.getCommPorts()[0];
@@ -40,7 +42,7 @@ public class Tmc2209 {
         }
         setSpreadCycle(false);
         readDriverStatus();
-        setCurrent(25, 10, 0.5f);
+        setCurrent(30, 10, 0.5f);
 
         PwmConfig pwmConfig = Pwm.newConfigBuilder(p4jContext)
                 .id("tmx-step")
@@ -69,6 +71,7 @@ public class Tmc2209 {
                 if (position.get() == targetPosition.get()) {
                     this.stepPin.off();
                     this.currSpeed.set(0);
+                    this.isMovingSemaphore.release();
                 }
             }
         });
@@ -97,11 +100,13 @@ public class Tmc2209 {
             direction.set(Direction.FORWARD);
             dirPin.on();
             stepPin.on(50, speed);
+            isMovingSemaphore.acquireUninterruptibly();
         } else if (position.get() > targetPosition) {
             currSpeed.set(-speed);
             direction.set(Direction.BACKWARD);
             dirPin.off();
             stepPin.on(50, speed);
+            isMovingSemaphore.acquireUninterruptibly();
         } else {
             currSpeed.set(0);
         }
