@@ -12,6 +12,8 @@ window.onload = function() {
             break;
         case 'gamestarterror':
             h1.textContent = "Fehler beim Starten des Spiels!";
+        default:
+            h1.textContent = "Unerklärlicher Fehler :/"
     }
 }
 
