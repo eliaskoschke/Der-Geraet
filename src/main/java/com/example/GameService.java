@@ -1,5 +1,6 @@
 package com.example;
 
+import javafx.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -8,6 +9,10 @@ import java.util.HashMap;
 @Service
 public class GameService {
     //Todo: static weg. WARUM?????
+
+    private Pair<Boolean, Integer> adminPanelRotateStepper = new Pair<>(false, 0);
+
+    private boolean adminPanelCardThrowActivated = false;
 
     private static HashMap<String, String> mapOfAllWinners = new HashMap<>();
 
@@ -198,6 +203,10 @@ public class GameService {
 
 
     public void restartTheCurrentGame(){
+        adminPanelRotateStepper = new Pair<>(false, 0);
+
+        adminPanelCardThrowActivated = false;
+
         mapOfAllWinners = new HashMap<>();
 
         numberOfCardFaceup = 1;
@@ -222,6 +231,10 @@ public class GameService {
     }
 
     public void resetGameChoice(){
+        adminPanelRotateStepper = new Pair<>(false, 0);
+
+        adminPanelCardThrowActivated = false;
+
         mapOfAllWinners = new HashMap<>();
 
         gamemode = Gamemode.BLACKJACK;
@@ -263,5 +276,21 @@ public class GameService {
 
     public void setGameHasEnded(boolean gameHasEnded) {
         this.gameHasEnded = gameHasEnded;
+    }
+
+    public Pair<Boolean, Integer> getAdminPanelRotateStepper() {
+        return adminPanelRotateStepper;
+    }
+
+    public void setAdminPanelRotateStepper(Pair<Boolean, Integer> adminPanelRotateStepper) {
+        this.adminPanelRotateStepper = adminPanelRotateStepper;
+    }
+
+    public boolean isAdminPanelCardThrowActivated() {
+        return adminPanelCardThrowActivated;
+    }
+
+    public void setAdminPanelCardThrowActivated(boolean adminPanelCardThrowActivated) {
+        this.adminPanelCardThrowActivated = adminPanelCardThrowActivated;
     }
 }

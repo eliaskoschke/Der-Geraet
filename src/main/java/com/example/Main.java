@@ -5,6 +5,7 @@ import com.example.tcm2209.TMCDeviceIsBusyException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
+import javafx.util.Pair;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -46,19 +47,13 @@ public class Main {
 //        controllerConfig();
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
-        //Initialize Methode für ersten kamera Scan etc.
-//        if(connectionInput.isHigh()){
-//            gameService.setConnected(true);
-//        }
+
         stepperController = new StepperController(pi4j);
         stepperController.orientieren();
-//        System.out.println("sollte an sein");
-        //Thread.sleep(20000);
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
-        startController(raspberryController);
-//        stepperController = new StepperController(pi4j);
         gameService.setConnected(true);
         if(gameService.isConnected()) {
+            startController(raspberryController);
             startGamePanel();
         }
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
@@ -73,7 +68,6 @@ public class Main {
                     stepperController.orientieren();
                 else
                     stepperIsHome = false;
-                stepperController.orientieren();
                 restartTheCurrentgame();
                 gameService.setGameHasEnded(false);
                 gameRestarted = false;
@@ -86,6 +80,14 @@ public class Main {
     public static void registerPlayer() throws InterruptedException {
         System.out.println("Spieler werden registriert");
         while (!gameService.isGameStarted()) {
+            if(gameService.getAdminPanelRotateStepper().getKey()){
+                rotateStepperMotor(gameService.getAdminPanelRotateStepper().getValue());
+                gameService.setAdminPanelRotateStepper(new Pair<>(false, 0));
+            }
+            if(gameService.isAdminPanelCardThrowActivated()){
+                executeCardThrow();
+                gameService.setAdminPanelCardThrowActivated(false);
+            }
             if(gameService.isConnected()) {
                 List<String> playerIds = gameService.getListOfAllPlayers().stream()
                         .map(Player::getId)

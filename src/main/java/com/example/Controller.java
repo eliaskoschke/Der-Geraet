@@ -2,6 +2,7 @@ package com.example;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -144,6 +145,18 @@ public class Controller {
         gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(gameService.getCurrenPlayerIndex()));
         gameService.getListOfAllPlayers().remove(playerWhoHasToBeKicked);
         return new ResponseMessage("Spieler wurde gekickt");
+    }
+
+    @PostMapping("/admin/adminPanel/rotateStepper")
+    public ResponseMessage rotateStepper(@RequestBody Message message) {
+        gameService.setAdminPanelRotateStepper(new Pair<>(true, Integer.parseInt(message.getMessage())));
+        return new ResponseMessage("thanks");
+    }
+
+    @PostMapping("/admin/adminPanel/activateCardMotor")
+    public ResponseMessage activateCardMotor(@RequestBody Message message) {
+        gameService.setAdminPanelCardThrowActivated(true);
+        return new ResponseMessage("thanks");
     }
 
     //Todo: Warum CSV? Warum nicht anders?
