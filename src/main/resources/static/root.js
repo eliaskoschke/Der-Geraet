@@ -46,11 +46,19 @@ function pingPlayerTurn() {
         userPick = data.message;
         if (userPick != user) {
             current.textContent = "Spieler " + userPick + " ist an der Reihe!";
+
+                document.getElementById('pickBtn1').disabled = true;
+                document.getElementById('pickBtn2').disabled = true;
+
         } else {
             current.textContent = "Du bist an der Reihe!";
+
+                document.getElementById('pickBtn1').disabled = false;
+                document.getElementById('pickBtn2').disabled = false;
+
         }
     })
-    .catch(error => console.error('Fehler beim Abrufen des aktuellen Spielers:', error));
+    .catch(error => console.error('Fehler beim Abrufen des aktuellen Spielers:'));
 }
 
 var dealerHand = "";

@@ -22,9 +22,9 @@ function joinTable(id) {
 
     post('user/playerJoinedTheTable', id)
         .then(belegtFrageueichen => {
-            if(belegtFrageueichen == "not acknowledged") {
+            if(belegtFrageueichen === false) {
                 window.location.reload();
-            } else if(belegtFrageueichen == "acknowledged") {
+            } else if(belegtFrageueichen === true) {
                 sitzplatzClicked(id);
             }
         })
@@ -48,13 +48,14 @@ function Game() {
         document.getElementById('start').classList.add('hidden');
         document.getElementById('playerGame').classList.remove('hidden');
     }
-
-    if(userPick == user) {
-        document.getElementById('pickBtn1').disabled = false;
-        document.getElementById('pickBtn2').disabled = false;
+    console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+    if(2 === user) {
+//        document.getElementById('pickBtn1').disabled = false;
+//        document.getElementById('pickBtn2').disabled = false;
     } else {
-        document.getElementById('pickBtn1').disabled = true;
-        document.getElementById('pickBtn2').disabled = true;
+    console.log("haaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: " + userPick)
+//        document.getElementById('pickBtn1').disabled = true;
+//        document.getElementById('pickBtn2').disabled = true;
     }
 }
 

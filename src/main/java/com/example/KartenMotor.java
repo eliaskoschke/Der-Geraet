@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-public class KartenMotor {
+public class KartenMotor implements IKartenMotor{
     private Context pi4j;
     private DigitalOutput direction1;
     private DigitalOutput direction2;

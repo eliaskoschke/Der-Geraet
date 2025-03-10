@@ -40,7 +40,7 @@ public class Main {
     static boolean someOneStartedWithBlackJack = false;
     static boolean stepperIsHome = true;
     static ArrayList<Player> blackJackList = new ArrayList<>();
-    static KartenMotor cardMotor;
+    static IKartenMotor cardMotor;
 
 
     //--add-opens=Der.Geraet.Maven/com.example=ALL-UNNAMED --add-reads Der.Geraet.Maven=ALL-UNNAMED
@@ -53,6 +53,7 @@ public class Main {
 //        stepperController.orientieren();
 //        Thread.sleep(3000);
         //cardMotor = new KartenMotor(pi4j);
+        cardMotor = new KartenMotorFake();
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
         gameService.setConnected(false);
         if(gameService.isConnected()) {
@@ -320,30 +321,33 @@ public class Main {
     }
 
     private static void executeCameraScan() {
-        for (int i = 0; i < 10; i++) {
+        Karte karte = new Karte("5", "Herz", "Herz 5");
+        gameService.setNextCardInDeck(karte);
 
-            BufferedImage bufferedImage = camera.captureImage();
-
-            if (bufferedImage != null) {
-                try {
-                    // Dekodiere den QR-Code
-                    String decodedText = camera.decodeQRCode(bufferedImage);
-                    if (decodedText != null) {
-                        System.out.println("Decoded text: " + decodedText);
-                        Karte karte = mapper.readValue(decodedText, Karte.class);
-                        gameService.setNextCardInDeck(karte);
-                        break;
-                    } else {
-                        System.out.println("QR-Code nicht gefunden");
-                    }
-                } catch (Exception e) {
-                    System.out.println("Fehler beim Dekodieren des QR-Codes: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            } else {
-                System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
-            }
-        }
+//        for (int i = 0; i < 10; i++) {
+//            BufferedImage bufferedImage = camera.captureImage();
+//
+//            if (bufferedImage != null) {
+//                try {
+//                    // Dekodiere den QR-Code
+//                    String decodedText = camera.decodeQRCode(bufferedImage);
+//                    if (decodedText != null) {
+//                        System.out.println("Decoded text: " + decodedText);
+//                        //Karte karte = mapper.readValue(decodedText, Karte.class);
+//                        karte = new Karte("5", "Herz", "Herz 5");
+//                        gameService.setNextCardInDeck(karte);
+//                        break;
+//                    } else {
+//                        System.out.println("QR-Code nicht gefunden");
+//                    }
+//                } catch (Exception e) {
+//                    System.out.println("Fehler beim Dekodieren des QR-Codes: " + e.getMessage());
+//                    e.printStackTrace();
+//                }
+//            } else {
+//                System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
+//            }
+//        }
     }
 
     private static void executeCardThrow() throws InterruptedException {
