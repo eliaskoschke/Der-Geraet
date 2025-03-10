@@ -27,6 +27,7 @@ public class GameFX extends Application {
     private Button startButton;
     private static Gamemode currentGame;
     private static boolean gameStarted = false;
+    private static List<String> playerList = new ArrayList<>();
 
     public GameFX() {
         seats = new ArrayList<>(6);
@@ -119,7 +120,7 @@ public class GameFX extends Application {
 
         startButton.setOnAction(e -> {
             gameStarted = true;
-            GameGraphics gameGraphics = new GameGraphics();
+            GameGraphics gameGraphics = new GameGraphics(false);
             gameGraphics.start(primaryStage);
         });
 
@@ -258,6 +259,10 @@ public class GameFX extends Application {
             seat.setOnMouseClicked(e -> {
                 seats.set(finalI, !seats.get(finalI));
                 seat.setFill(seats.get(finalI) ? Color.RED : Color.GREEN);
+                if(playerList.contains(String.valueOf(finalI+1))){
+                    seat.setFill(Color.RED);
+                } else
+                    seat.setFill(Color.GREEN);
             });
 
             seatContainer.getChildren().addAll(seat, seatNumber);
@@ -283,10 +288,16 @@ public class GameFX extends Application {
     }
 
     public static void updateSeatColor(List<String> id) {
-        for (int i = 0; i < id.size(); i++) {
-            int seat = Integer.parseInt(id.get(i)) - 1;
-            circles.get(seat).setFill(Color.RED);
+        for (int i = 0; i < circles.size(); i++) {
+            if(i<id.size()) {
+                int seat = Integer.parseInt(id.get(i)) - 1;
+                circles.get(seat).setFill(Color.RED);
+            } else{
+                if(!id.contains(String.valueOf(i+1)))
+                    circles.get(i).setFill(Color.GREEN);
+            }
         }
+        playerList =  id;
     }
 
     public void launchApp() {
@@ -303,7 +314,7 @@ public class GameFX extends Application {
 
         // Setze die neue Szene auf der primären Bühne
         primaryStage.setScene(gameScene);
-        GameGraphics gameGraphics = new GameGraphics();
+        GameGraphics gameGraphics = new GameGraphics(false);
         gameGraphics.start(primaryStage);
     }
 

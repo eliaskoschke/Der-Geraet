@@ -63,8 +63,10 @@ public class   Raspberry_Controller {
             } else {
                 if(gameHasAlreadyStartedOnce){
                     gameHasAlreadyStartedOnce = false;
+                    deactivateAllNonRegisteredButtons(buttonList);
                     for(PiButton button : buttonList){
                         button.resetButton();
+                        System.out.println("ALLE BUTTONS WURDE RESETED");
                     }
                 }
                 manageButtonsForRegistration(buttonList);
@@ -149,7 +151,6 @@ public class   Raspberry_Controller {
     }
 
     private static void deactivateButton(PiButton piButton){
-        piButton.setLocked(true);
         //Todo: teste ob locked notwendig ist
         playerButtonMap.get(String.valueOf(piButton.getPlayerNumber())).low();
     }
@@ -173,6 +174,7 @@ public class   Raspberry_Controller {
                     Message responseMessage = mapper.readValue(responseBody, Message.class);
                     if(responseMessage.getMessage().equals("true")){
                         gameHasAlreadyStartedOnce = true;
+                        System.out.println("Buttons wurde reseted");
                     }
                     if(responseMessage.getMessage().equals("Game has started")){
                         return true;

@@ -31,7 +31,7 @@ public class Main {
     static ObjectMapper mapper = new ObjectMapper();
     static Gamemode gamemode;
     static boolean turnHasEnded = false;
-    static GameGraphics gameGraphics = new GameGraphics();
+    static GameGraphics gameGraphics = new GameGraphics(false);
     static GameFX gameFx = new GameFX();
     static boolean gameRestarted = false;
     static boolean gameChoiceReseted = false;
@@ -50,6 +50,7 @@ public class Main {
 
         stepperController = new StepperController(pi4j);
         stepperController.orientieren();
+//        Thread.sleep(3000);
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
         gameService.setConnected(true);
         if(gameService.isConnected()) {
@@ -77,14 +78,19 @@ public class Main {
         }
     }
 
-    public static void registerPlayer() throws InterruptedException {
+    public static void registerPlayer() throws InterruptedException, TMCDeviceIsBusyException {
         System.out.println("Spieler werden registriert");
         while (!gameService.isGameStarted()) {
             if(gameService.getAdminPanelRotateStepper().getKey()){
-                rotateStepperMotor(gameService.getAdminPanelRotateStepper().getValue());
+                System.out.println("Sollte drehen");
+                if(gameService.getAdminPanelRotateStepper().getValue() == 0)
+                    stepperController.orientieren();
+                else
+                 rotateStepperMotor(gameService.getAdminPanelRotateStepper().getValue());
                 gameService.setAdminPanelRotateStepper(new Pair<>(false, 0));
             }
             if(gameService.isAdminPanelCardThrowActivated()){
+                System.out.println("Sollte rauswerfen");
                 executeCardThrow();
                 gameService.setAdminPanelCardThrowActivated(false);
             }
@@ -164,8 +170,9 @@ public class Main {
             Thread.sleep(100);
         }
         if (gameService.isConnected()) {
+            System.out.println("Spiel Connected");
             while (!gameGraphics.isRestartClicked() && !gameGraphics.isMenuClicked()) {
-                //System.out.println("Gebe eine Button Anweisung an");
+                System.out.println("Gebe eine Button Anweisung an");
             }
 
             gameRestarted = gameGraphics.isRestartClicked();
@@ -173,15 +180,16 @@ public class Main {
             gameGraphics.setMenuClicked(false);
             gameGraphics.setRestartClicked(false);
         } else {
+            System.out.println("Spiel nicht Connected");
             while(!gameService.isGameRestarted() && !gameService.isGameChoiceReseted()){
 
             }
-
             gameRestarted = gameService.isGameRestarted();
             gameChoiceReseted = gameService.isGameChoiceReseted();
             gameService.setGameChoiceReseted(false);
             gameService.setGameRestarted(false);
         }
+
         gameService.setGameHasEnded(true);
         System.out.println("Restart: "+ gameRestarted);
         System.out.println("Reset: "+ gameChoiceReseted);
@@ -209,6 +217,7 @@ public class Main {
         gameService.setCurrentPlayer(new Player("0"));
         switch (gamemode) {
             case BLACKJACK -> {
+                gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() +1);
                 System.out.println("Computer Turn ist dran");
                 if(gameService.isConnected()) {
                     gameGraphics.removeFaceDownCard();
@@ -221,6 +230,7 @@ public class Main {
 
                 } else {
                     while (gameService.getDealer().getDealerHandWert() < 17) {
+                        gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() +1);
                         executeCameraScan();
                         rotateStepperMotor(3);
                         giveDealerNextCard();

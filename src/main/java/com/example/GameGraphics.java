@@ -37,7 +37,8 @@ public class GameGraphics extends Application {
     private static boolean isRestartClicked = false;
     private static boolean isMenuClicked = false;
 
-    public GameGraphics() {
+    public GameGraphics(boolean isRestartClicked) {
+        GameGraphics.isRestartClicked = isRestartClicked;
     }
 
     @Override
@@ -156,7 +157,7 @@ public class GameGraphics extends Application {
 
             restartButton.setOnAction(e -> {
                 isRestartClicked = true;
-                GameGraphics gameGraphics = new GameGraphics();
+                GameGraphics gameGraphics = new GameGraphics(true);
                 gameGraphics.start(myStage);
             });
 

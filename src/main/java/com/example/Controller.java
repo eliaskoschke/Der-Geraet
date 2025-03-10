@@ -80,6 +80,12 @@ public class Controller {
                 gameService.setPlayerAtReset(0);
                 gameService.setPlayerGotReseted(0);
                 gameService.setGameReset(false);
+                System.out.println("Alle Spieler Wurde reseted");
+            }
+            if(gameService.isConnected()) {
+                gameService.setPlayerAtReset(0);
+                gameService.setPlayerGotReseted(0);
+                gameService.setGameReset(false); //Wenn es Connected ist muss man nicht auf alle wartren bis es auf false gesetzt wird
             }
             return new ResponseMessage("true");
         }
@@ -125,10 +131,11 @@ public class Controller {
 
     @PostMapping("/admin/sendReset")
     public ResponseMessage sendReset(@RequestBody Message postPassword) {
+        System.out.println("reset wurde geklickt");
         gameService.setGameReset(true);
 
         gameService.setPlayerAtReset(gameService.getListOfAllPlayers().size());
-        gameService.setListOfAllPlayers(new ArrayList<>());
+        gameService.getListOfAllPlayers().clear();
         return new ResponseMessage("true");
     }
 
@@ -149,12 +156,14 @@ public class Controller {
 
     @PostMapping("/admin/adminPanel/rotateStepper")
     public ResponseMessage rotateStepper(@RequestBody Message message) {
+        System.out.println("STEPPER wurde geklickt");
         gameService.setAdminPanelRotateStepper(new Pair<>(true, Integer.parseInt(message.getMessage())));
         return new ResponseMessage("thanks");
     }
 
     @PostMapping("/admin/adminPanel/activateCardMotor")
     public ResponseMessage activateCardMotor(@RequestBody Message message) {
+        System.out.println("CARD MOTOR wurde geklickt");
         gameService.setAdminPanelCardThrowActivated(true);
         return new ResponseMessage("thanks");
     }
@@ -162,13 +171,7 @@ public class Controller {
     //Todo: Warum CSV? Warum nicht anders?
     @GetMapping("/game/ping/getDealerHand")
     public ResponseMessage getDealerHand() throws JsonProcessingException {
-        counter++;
         if (gameService.getDealer().getDealerHand() != null) {
-            if (counter >= 10) {
-                counter = 0;
-                gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() + 1);
-            }
-//            gameService.setNumberOfCardFaceup(gameService.getDealerHand().size() -1);
             String idCSV = castKartenObjectToBildId(gameService.getDealer().getDealerHand());
             return new ResponseMessage(idCSV);
         }
@@ -283,7 +286,7 @@ public class Controller {
         for(String key : map.keySet()){
             returnString += key + " " + map.get(key) +",";
         }
-        returnString = returnString.substring(0, returnString.length()-2);
+        returnString = returnString.substring(0, returnString.length()-1);
         return  returnString;
     }
 

@@ -1,5 +1,6 @@
 package com.example;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -10,6 +11,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +24,15 @@ import java.util.List;
 
 public class AdminPanel extends Application {
     private static final String BACKGROUND_COLOR = "rgb(36, 43, 66)";
+    private static ObjectMapper mapper = new ObjectMapper();
+    private static String baseURL = "http://localhost:8080/api";
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: " + BACKGROUND_COLOR + ";");
 
-        Button drehen = newStyledButton("Zum Ursprung drehen");
+        Button drehen = newStyledButton("Zum Ursprung");
         Button karteAuswerfen = newStyledButton("Karte Auswerfen");
         Button kicken = newStyledButton("Alle Spieler Kicken");
         Button spielerMenu = newStyledButton("Dreh Menü");
@@ -52,9 +61,9 @@ public class AdminPanel extends Application {
 
         drehen.setOnAction(e -> rotateStepper(0));
 
-        karteAuswerfen.setOnAction(e -> {});
+        karteAuswerfen.setOnAction(e -> {giveCard();});
 
-        kicken.setOnAction(e -> {});
+        kicken.setOnAction(e -> {kickAllPlayers();});
 
         esc.setOnAction(e -> {
             GameFX gameFX = new GameFX();
@@ -89,16 +98,73 @@ public class AdminPanel extends Application {
         primaryStage.show();
 
         Platform.runLater(() -> {
-            primaryStage.setWidth(1024);
-            primaryStage.setHeight(600);
-//            primaryStage.setFullScreen(true);
+//            primaryStage.setWidth(1024);
+//            primaryStage.setHeight(600);
+            primaryStage.setFullScreen(true);
         });
     }
-    private static void rotateStepper(int id){}
+    private static void rotateStepper(int id){
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            //Todo: Warum hast du das so gemacht? Mach doch einfach ein Message Objekt du Idiot
+            String message = "{\"message\":\"" + id + "\"}";
 
-    private static void giveCard() {}
+            HttpPost postRequest = new HttpPost(baseURL + "/admin/adminPanel/rotateStepper");
+            postRequest.setHeader("Content-Type", "application/json");
 
-    private static void kickAllPlayers() {}
+            postRequest.setEntity(new StringEntity(message));
+            System.out.println("Button wurde geklickt");
+            // Sende die POST-Anfrage und erhalte die Antwort
+            try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
+                // Überprüfe den Status der Antwort und verarbeite sie
+                Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
+
+            }
+        } catch (Exception exception) {
+            exception.getStackTrace();
+        }
+    }
+
+    private static void giveCard() {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            //Todo: Warum hast du das so gemacht? Mach doch einfach ein Message Objekt du Idiot
+            String message = "{\"message\":\"\"}";
+
+            HttpPost postRequest = new HttpPost(baseURL + "/admin/adminPanel/activateCardMotor");
+            postRequest.setHeader("Content-Type", "application/json");
+
+            postRequest.setEntity(new StringEntity(message));
+            System.out.println("Button wurde geklickt");
+            // Sende die POST-Anfrage und erhalte die Antwort
+            try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
+                // Überprüfe den Status der Antwort und verarbeite sie
+                Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
+
+            }
+        } catch (Exception exception) {
+            exception.getStackTrace();
+        }
+    }
+
+    private static void kickAllPlayers() {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            //Todo: Warum hast du das so gemacht? Mach doch einfach ein Message Objekt du Idiot
+            String message = "{\"message\":\"\"}";
+
+            HttpPost postRequest = new HttpPost(baseURL + "/admin/sendReset");
+            postRequest.setHeader("Content-Type", "application/json");
+
+            postRequest.setEntity(new StringEntity(message));
+            System.out.println("Button wurde geklickt");
+            // Sende die POST-Anfrage und erhalte die Antwort
+            try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
+                // Überprüfe den Status der Antwort und verarbeite sie
+                Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
+
+            }
+        } catch (Exception exception) {
+            exception.getStackTrace();
+        }
+    }
 
     public static Button newStyledButton(String text) {
         Button button = new Button(text);

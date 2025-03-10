@@ -38,7 +38,7 @@ public class PiButton {
         button.addListener(e -> {
             if (e.state() == DigitalState.HIGH) {
                 if(!buttonRegistered){
-                    //Todo: mach direkt eine registerMethode auf
+
                     singleButtonClick();
                 } else {
                     if (!locked) {
@@ -79,6 +79,8 @@ public class PiButton {
             } else {
                 registerPlayerAtTable();
             }
+        } else {
+            System.out.println("Es ist gelocked");
         }
     }
 

@@ -142,20 +142,19 @@ public class Tmc2209 {
             stepPin.on(50, -speed);
         }
 
-        new Thread(() -> {
-            while (isHoming.get())
-                try {
-                    Thread.sleep(0);
-                    int sgResult = readInt(Register.SG_RESULT.address);
-                    if (sgResult <= threshold) {
-                        stepPin.off();
-                        position.set(0);
-                        isHoming.set(false);
-                    }
-                } catch (Exception e) {
-                    System.out.println(e);
+
+        while (isHoming.get())
+            try {
+                Thread.sleep(0);
+                int sgResult = readInt(Register.SG_RESULT.address);
+                if (sgResult <= threshold) {
+                    stepPin.off();
+                    position.set(0);
+                    isHoming.set(false);
                 }
-        }).start();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
     }
 
     private void setSpreadCycle(boolean enabled) throws TMCCommunicationException {
