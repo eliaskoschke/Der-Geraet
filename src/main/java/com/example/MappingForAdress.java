@@ -28,8 +28,9 @@ public class MappingForAdress {
 
     public static int getMotorAdress(String motorID){
         return switch (motorID) {
-            case "1" -> 12;
-            case "2" -> 5;
+            case "1" -> 5;
+            case "2" -> 21;
+            case "3" -> 12;
             default -> 0;
         };
     }

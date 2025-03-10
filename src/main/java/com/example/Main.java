@@ -36,10 +36,11 @@ public class Main {
     static boolean gameRestarted = false;
     static boolean gameChoiceReseted = false;
     static ArrayList<Player> listOfAllPlayerAtTheBeginningOfTheGame;
-    static StepperController stepperController;
+//    static StepperController stepperController;
     static boolean someOneStartedWithBlackJack = false;
     static boolean stepperIsHome = true;
     static ArrayList<Player> blackJackList = new ArrayList<>();
+    static KartenMotor cardMotor;
 
 
     //--add-opens=Der.Geraet.Maven/com.example=ALL-UNNAMED --add-reads Der.Geraet.Maven=ALL-UNNAMED
@@ -48,11 +49,12 @@ public class Main {
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
 
-        stepperController = new StepperController(pi4j);
-        stepperController.orientieren();
+//        stepperController = new StepperController(pi4j);
+//        stepperController.orientieren();
 //        Thread.sleep(3000);
+        //cardMotor = new KartenMotor(pi4j);
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
-        gameService.setConnected(true);
+        gameService.setConnected(false);
         if(gameService.isConnected()) {
             startController(raspberryController);
             startGamePanel();
@@ -60,13 +62,14 @@ public class Main {
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
             System.out.println("Spiel wurde reseted");
-            gameService.setConnected(true);
+            gameService.setConnected(false);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
             while (!gameService.isGameHasEnded() || gameRestarted) {
                 if(!stepperIsHome)
-                    stepperController.orientieren();
+                    System.out.println("Es fährt zum Ursprung");
+//                    stepperController.orientieren();
                 else
                     stepperIsHome = false;
                 restartTheCurrentgame();
@@ -84,7 +87,8 @@ public class Main {
             if(gameService.getAdminPanelRotateStepper().getKey()){
                 System.out.println("Sollte drehen");
                 if(gameService.getAdminPanelRotateStepper().getValue() == 0)
-                    stepperController.orientieren();
+//                    stepperController.orientieren();
+                    System.out.println("Es fähjrt zum Ursprung");
                 else
                  rotateStepperMotor(gameService.getAdminPanelRotateStepper().getValue());
                 gameService.setAdminPanelRotateStepper(new Pair<>(false, 0));
@@ -343,12 +347,7 @@ public class Main {
     }
 
     private static void executeCardThrow() throws InterruptedException {
-//        discardMotorIn1.low();
-//        discardMotorIn2.high();
-        System.out.println("Motor wurde angesteuert");
-        Thread.sleep(1000);
-//        discardMotorIn1.low();
-//        discardMotorIn2.low();
+        cardMotor.werfeKarteAus();
     }
 
     private static void giveCurrentPlayerNextCard() {
@@ -378,7 +377,8 @@ public class Main {
     public static void rotateStepperMotor(int playerID) {
         int angle = (-30 * playerID);
         try{
-            stepperController.turn(angle);
+            //stepperController.turn(angle);
+            System.out.println("Es fährt zum Winkel: " + angle);
         } catch(Exception e){
             e.printStackTrace();
         }
