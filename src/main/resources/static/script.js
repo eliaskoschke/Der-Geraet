@@ -20,13 +20,16 @@ function joinTable(id) {
         console.warn(`Button mit ID ${id} nicht gefunden.`);
     }
 
-    if(post('user/playerJoinedTheTable', id) == "not acknowledged"){
-        window.location.reload();
-    } else {
-        sitzplatzClicked(id)
-    }
+    post('user/playerJoinedTheTable', id)
+        .then(belegtFrageueichen => {
+            if(belegtFrageueichen == "not acknowledged") {
+                window.location.reload();
+            } else if(belegtFrageueichen == "acknowledged") {
+                sitzplatzClicked(id);
+            }
+        })
+        .catch(error => console.error('Fehler beim Beitreten zum Tisch:', error));
 }
-
 
 window.onload = function() {
     var dots = document.getElementById('dots');
@@ -62,38 +65,42 @@ function inGame() {
 
     console.log('ingame vor fetch');
 
-    var GameState = get('user/ping');
-    
-        if (GameState == 'Game has started') {
-            gameStarted = true;
-            console.log('Spiel wurde gestartet');
-        } else if(GameState == "Game beendet") {
-            var winnerTable = get('game/getWinner');
-            if(winnerTable == false) {
-
-            } else {
-                gameStarted = false
+    get('user/ping')
+        .then(GameState => {
+            if (GameState == 'Game has started') {
+                gameStarted = true;
+                console.log('Spiel wurde gestartet');
+            } else if(GameState == "Game beendet") {
+                get('game/getWinner')
+                    .then(winnerTable => {
+                        if(winnerTable == false) {
+                            // nichts tun
+                        } else {
+                            gameStarted = false
+                            playerGame = document.getElementById('playerGame');
+                            playerGame.classList.add('hidden');
+                            table = document.getElementById('winnerTable');
+                            table.classList.remove('hidden');
+                            table.innerHTML = "";
+                            const d = winnerTable.message.split(',');
+                            for(const inhalt of d) {
+                                const h2inhalt = document.createElement("h2");
+                                h2inhalt.textContent = inhalt;
+                                table.appendChild(h2inhalt);
+                            }
+                        }
+                    });
+            } else if(GameState == "Game was reseted"){
+                gameStarted = true;
                 playerGame = document.getElementById('playerGame');
-                playerGame.classList.add('hidden');
+                playerGame.classList.remove('hidden');
                 table = document.getElementById('winnerTable');
-                table.classList.remove('hidden');
-                table.innerHTML = "";
-                const d = winnerTable.message.split(',');
-                for(const inhalt of d) {
-                    const h2inhalt = document.createElement("h2");
-                    h2inhalt.textContent = inhalt;
-                    table.appendChild(h2inhalt);
-                }
+                table.classList.add('hidden');
+                console.log("Resetted")
+                leave();
             }
-        } else if(GameState == "Game was reseted"){
-            gameStarted = true;
-            playerGame = document.getElementById('playerGame');
-            playerGame.classList.remove('hidden');
-            table = document.getElementById('winnerTable');
-            table.classList.add('hidden');
-            console.log("Resetted")
-            leave();
-        } 
+        })
+        .catch(error => console.error('Fehler beim Abrufen des Spielstatus:', error));
 }
 
 function loadTables() {
@@ -116,7 +123,7 @@ function handleServerResponse(message) {
 
 function pingLobbyAsUser() {
     if(user != null) {
-        if(get('user/ping') == "Game was reseted"){
+        if(get('user/ping') === "Game was reseted"){
             console.log("Game was resseted")
             leave();
         }
@@ -127,12 +134,9 @@ window.onload = function() {
     loadTables(); 
 }
 
-
-
 function getCard() {
     post('user/hit', user);
 }
-
 
 function holdCard() {
     post('user/stay', user);
