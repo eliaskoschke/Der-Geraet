@@ -46,7 +46,7 @@ public class GameFX extends Application {
         Button blackJackBtn = createStyledButton("Black Jack");
         Button pokerBtn = createStyledButton("Poker");
         Button luegeBtn = createStyledButton("Lüge");
-
+        Button adminPanelBtn = createStyledButton("Admin Dialog");
         // Hover-Effekte für die Buttons
         addHoverEffect(blackJackBtn);
         addHoverEffect(pokerBtn);
@@ -70,11 +70,24 @@ public class GameFX extends Application {
         addHoverEffect(startButton);
         startButton.setVisible(false);
 
+
         VBox bottomBox = new VBox(20);
         bottomBox.setAlignment(Pos.CENTER);
         bottomBox.setPadding(new Insets(20, 0, 0, 0));
-        bottomBox.getChildren().add(startButton);
-        root.setBottom(bottomBox);
+        bottomBox.getChildren().addAll(startButton);
+
+        VBox adminBox = new VBox(20);
+        adminBox.setAlignment(Pos.BOTTOM_RIGHT);
+        adminBox.getChildren().add(adminPanelBtn);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        HBox bottomContainer = new HBox(60);
+        bottomContainer.setAlignment(Pos.CENTER);
+        bottomContainer.getChildren().addAll(spacer, bottomBox, adminBox);
+        HBox.setHgrow(bottomBox, Priority.ALWAYS);
+        root.setBottom(bottomContainer);
 
         // Button Event Handler
         blackJackBtn.setOnAction(e -> {
@@ -93,6 +106,15 @@ public class GameFX extends Application {
             showSeats("Lüge");
             toggleButtonStyle(luegeBtn);
             resetOtherButtons(luegeBtn, blackJackBtn, pokerBtn);
+        });
+
+        adminPanelBtn.setOnAction(e -> {
+            AdminPanel adminPanel = new AdminPanel();
+            try {
+                adminPanel.start(primaryStage);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
         startButton.setOnAction(e -> {
