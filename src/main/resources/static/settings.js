@@ -9,11 +9,43 @@
 
 
 function rotateStepper(id) {
-    console.log(post('admin/adminPanel/rotateStepper', id));
+    fetch('/api/admin/adminPanel/rotateStepper', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: id })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Stepper rotiert:', data);
+    })
+    .catch(error => console.error('Fehler beim Rotieren des Steppers:', error));
 }
 
 function activateCardMotor() {
-    console.log(post('admin/adminPanel/activateCardMotor', ''));
+    fetch('/api/admin/adminPanel/activateCardMotor', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: '' })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Kartenmotor aktiviert:', data);
+    })
+    .catch(error => console.error('Fehler beim Aktivieren des Kartenmotors:', error));
 }
 
 function back() {

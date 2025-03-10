@@ -3,9 +3,24 @@ function leave() {
     if(window.location.pathname === "/play.html") {
         console.log(user + " left the game.");
         
-        post('user/playerLeftTheTable', user);
-        user = null;
-        ingame = false;
+        fetch('/api/user/playerLeftTheTable', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: user })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Netzwerkantwort war nicht ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            user = null;
+            ingame = false;
+        })
+        .catch(error => console.error('Fehler beim Verlassen des Spiels:', error));
     }
 }
 
@@ -13,15 +28,29 @@ var userPick;
 
 
 function pingPlayerTurn() {
-    console.log(data.message);
     var current = document.getElementById('currentPlayer');
-    userPick = get('game/ping/getPlayerTurn');;
-    if (userPick != user) {
-        current.textContent = "Spieler " + userPick + " ist an der Reihe!";
-    } else {
-        current.textContent = "Du bist an der Reihe!";
-    }
     
+    fetch('/api/game/ping/getPlayerTurn', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        userPick = data.message;
+        if (userPick != user) {
+            current.textContent = "Spieler " + userPick + " ist an der Reihe!";
+        } else {
+            current.textContent = "Du bist an der Reihe!";
+        }
+    })
+    .catch(error => console.error('Fehler beim Abrufen des aktuellen Spielers:', error));
 }
 
 var dealerHand = "";
@@ -29,15 +58,27 @@ var olddealerhand = "";
 var displayedCards = 0;
 
 function pingDealerHand() {
-    dealerHand = get('game/ping/getDealerHand');
-    
-    if (dealerHand == olddealerhand) {
-        console.log('Keine Neuen karten vorhanden');
-    } else {
-        updateDealerHand();
-    }
-    
-
+    fetch('/api/game/ping/getDealerHand', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        dealerHand = data.message;
+        if (dealerHand == olddealerhand) {
+            console.log('Keine Neuen karten vorhanden');
+        } else {
+            updateDealerHand();
+        }
+    })
+    .catch(error => console.error('Fehler beim Abrufen der Dealer-Hand:', error));
 }
 
 
