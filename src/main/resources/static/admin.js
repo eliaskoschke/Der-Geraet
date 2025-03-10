@@ -103,6 +103,14 @@ document.addEventListener('DOMContentLoaded', (event) => {
             dotCount = (dotCount + 1) % 4;
             dots.textContent = '.'.repeat(dotCount);
         }, 500);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const loggedIn = urlParams.get('loggedIn');
+        
+        if (loggedIn === true) {
+            var adminPanel = document.getElementById('adminPanel');
+            adminPanel.classList.remove('hidden');
+        }
     };
 
 

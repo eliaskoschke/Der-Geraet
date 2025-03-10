@@ -54,7 +54,6 @@ function Game() {
         document.getElementById('pickBtn2').disabled = true;
     }
 }
-setInterval(Game, 100);
 
 function inGame() {
     if (gameStarted && user == null) {
@@ -116,10 +115,9 @@ function handleServerResponse(message) {
 }
 
 function pingLobbyAsUser() {
-    console.log('ausgeführt');
     if(user != null) {
         if(get('user/ping') == "Game was reseted"){
-            console.log("Resseted")
+            console.log("Game was resseted")
             leave();
         }
     }
@@ -127,7 +125,6 @@ function pingLobbyAsUser() {
 
 window.onload = function() {
     loadTables(); 
-    setInterval(pingLobbyAsUser, 1000);
 }
 
 

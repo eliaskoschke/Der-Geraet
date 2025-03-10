@@ -24,8 +24,6 @@ function pingPlayerTurn() {
     
 }
 
-setInterval(pingPlayerTurn, 1000);
-
 var dealerHand = "";
 var olddealerhand = "";
 var displayedCards = 0;
@@ -41,8 +39,6 @@ function pingDealerHand() {
     
 
 }
-setInterval(pingDealerHand, 1000);
-
 
 
 function updateDealerHand() {
