@@ -104,29 +104,33 @@ function inGame() {
 }
 
 function loadTables() {
-    handleServerResponse(get('onload'));
-}
-
-function handleServerResponse(message) {
-    console.log('Serverantwort:', message);
-    const buttonIds = JSON.parse(message);
-    buttonIds.forEach(id => {
-        console.log(id)
-        const button = document.getElementById(id);
-        if (button) {
-            button.disabled = true;
-        } else {
-            console.warn(`Button mit ID ${id} nicht gefunden.`);
-        }
-    });
+    get('onload')
+        .then(message => {
+            console.log('Serverantwort:', message);
+            const buttonIds = JSON.parse(message);
+            buttonIds.forEach(id => {
+                console.log(id)
+                const button = document.getElementById(id);
+                if (button) {
+                    button.disabled = true;
+                } else {
+                    console.warn(`Button mit ID ${id} nicht gefunden.`);
+                }
+            });
+        })
+        .catch(error => console.error('Fehler beim Laden der Tische:', error));
 }
 
 function pingLobbyAsUser() {
     if(user != null) {
-        if(get('user/ping') === "Game was reseted"){
-            console.log("Game was resseted")
-            leave();
-        }
+        get('user/ping')
+            .then(response => {
+                if(response === "Game was reseted"){
+                    console.log("Game was resseted")
+                    leave();
+                }
+            })
+            .catch(error => console.error('Fehler beim Ping:', error));
     }
 }
 
@@ -135,11 +139,19 @@ window.onload = function() {
 }
 
 function getCard() {
-    post('user/hit', user);
+    post('user/hit', user)
+        .then(response => {
+            console.log('Karte gezogen:', response);
+        })
+        .catch(error => console.error('Fehler beim Ziehen der Karte:', error));
 }
 
 function holdCard() {
-    post('user/stay', user);
+    post('user/stay', user)
+        .then(response => {
+            console.log('Spieler bleibt:', response);
+        })
+        .catch(error => console.error('Fehler beim Halten:', error));
 }
 
 
