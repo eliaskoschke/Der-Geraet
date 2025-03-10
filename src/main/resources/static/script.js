@@ -31,14 +31,22 @@ function joinTable(id) {
         .catch(error => console.error('Fehler beim Beitreten zum Tisch:', error));
 }
 
+window.addEventListener("load", function(){
+    loadTables();
+})
+
 window.onload = function() {
     var dots = document.getElementById('dots');
     var dotCount = 0;
-    
+
+
     setInterval(function() {
         dotCount = (dotCount + 1) % 4; 
         dots.textContent = '.'.repeat(dotCount);
     }, 500);
+
+
+
 };
 
 function Game() {
@@ -48,12 +56,10 @@ function Game() {
         document.getElementById('start').classList.add('hidden');
         document.getElementById('playerGame').classList.remove('hidden');
     }
-    console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
     if(2 === user) {
 //        document.getElementById('pickBtn1').disabled = false;
 //        document.getElementById('pickBtn2').disabled = false;
     } else {
-    console.log("haaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: " + userPick)
 //        document.getElementById('pickBtn1').disabled = true;
 //        document.getElementById('pickBtn2').disabled = true;
     }
@@ -105,6 +111,7 @@ function inGame() {
 }
 
 function loadTables() {
+    console.log("Wurde geladen!!!!!!!!!!!!!!!!")
     get('onload')
         .then(message => {
             console.log('Serverantwort:', message);
