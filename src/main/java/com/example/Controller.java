@@ -50,9 +50,9 @@ public class Controller {
         List<String> playerIds = getListOfAllActiveID();
         if (!playerIds.contains(message.getMessage())) {
             gameService.getListOfAllPlayers().add(new Player(message.getMessage()));
-            return new ResponseMessage("acknowledged");
+            return new ResponseMessage("true");
         }
-        return new ResponseMessage("not acknowledged");
+        return new ResponseMessage("false");
     }
 
     @PostMapping("/user/playerLeftTheTable")
