@@ -1,10 +1,10 @@
 window.onload = function() {
-    const window = window.location.filename
     setInterval(pingActor, 50);
 }
 
 function pingActor() {
-    switch (window) {
+    const currentPage = window.location.pathname.split('/').pop();
+    switch (currentPage) {
         case 'play.html':
             if(!document.getElementById('start').classList.contains('hidden')) {
                 Game();
