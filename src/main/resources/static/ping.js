@@ -6,12 +6,12 @@ function pingActor() {
     const currentPage = window.location.pathname.split('/').pop();
     switch (currentPage) {
         case 'play.html':
-
+            Game();
             if(!document.getElementById('btns-sitzplaetze').classList.contains('hidden')){
 
             }
             if(!document.getElementById('start').classList.contains('hidden')) {
-                Game();
+
                 pingLobbyAsUser();
             }
             if(!document.getElementById('playerGame').classList.contains('hidden')) {

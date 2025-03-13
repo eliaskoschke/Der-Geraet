@@ -51,7 +51,7 @@ public class Main {
 
 //        stepperController = new StepperController(pi4j);
 //        stepperController.orientieren();
-//        Thread.sleep(3000);
+
         //cardMotor = new KartenMotor(pi4j);
         cardMotor = new KartenMotorFake();
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
@@ -230,7 +230,7 @@ public class Main {
                 }
                 System.out.println("Karte wurde hinzugefügt");
                 gameService.getDealer().countHand();
-                Thread.sleep(10000);
+                Thread.sleep(5000);
                 if (gameService.getListOfAllPlayers().isEmpty() && !someOneStartedWithBlackJack) {
 
                 } else {
@@ -243,7 +243,7 @@ public class Main {
                             gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size() - 1));
                         }
                         gameService.getDealer().countHand();
-                        Thread.sleep(10000);
+                        Thread.sleep(5000);
                     }
                 }
                 int dealerHandWert = gameService.getDealer().getDealerHandWert();

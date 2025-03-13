@@ -184,8 +184,10 @@ public class Controller {
     }
 
     @GetMapping("/game/getWinner")
-    public ResponseMessage getWinner() throws JsonProcessingException {
-        return new ResponseMessage(castWinnerMapIntoString(gameService.getMapOfAllWinners()));
+    public String getWinner() throws JsonProcessingException {
+        String gewinnerMessage = castWinnerMapIntoString(gameService.getMapOfAllWinners());
+        System.out.println("Der Gewinner: " + gewinnerMessage);
+        return gewinnerMessage;
     }
 
 

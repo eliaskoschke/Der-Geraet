@@ -81,7 +81,7 @@ function pingDealerHand() {
     .then(data => {
         dealerHand = data.message;
         if (dealerHand == olddealerhand) {
-            console.log('Keine Neuen karten vorhanden');
+
         } else {
             updateDealerHand();
         }

@@ -74,6 +74,7 @@ function inGame() {
 
     get('user/ping')
         .then(GameState => {
+        console.log('Aktueller Gamestate: ' +GameState)
             if (GameState == 'Game has started') {
                 gameStarted = true;
                 console.log('Spiel wurde gestartet');
@@ -83,13 +84,15 @@ function inGame() {
                         if(winnerTable == false) {
                             // nichts tun
                         } else {
-                            gameStarted = false
+                            console.log('Gewinner AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH: '+ winnerTable);
+                            gameStarted = false;
                             playerGame = document.getElementById('playerGame');
                             playerGame.classList.add('hidden');
                             table = document.getElementById('winnerTable');
                             table.classList.remove('hidden');
                             table.innerHTML = "";
-                            const d = winnerTable.message.split(',');
+                            let d = winnerTable.split(',');
+                            winnerTable = false;
                             for(const inhalt of d) {
                                 const h2inhalt = document.createElement("h2");
                                 h2inhalt.textContent = inhalt;
