@@ -74,17 +74,23 @@ function inGame() {
 
     get('user/ping')
         .then(GameState => {
-        console.log('Aktueller Gamestate: ' +GameState)
+            console.log('Aktueller Gamestate: ' + GameState);
             if (GameState == 'Game has started') {
                 gameStarted = true;
                 console.log('Spiel wurde gestartet');
             } else if(GameState == "Game beendet") {
-                get('game/getWinner')
+                fetch('api/game/getWinner')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Netzwerkantwort war nicht ok');
+                        }
+                        return response.json();
+                    })
                     .then(winnerTable => {
                         if(winnerTable == false) {
                             // nichts tun
                         } else {
-                            console.log('Gewinner AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH: '+ winnerTable);
+                            console.log('Gewinner: ' + winnerTable);
                             gameStarted = false;
                             playerGame = document.getElementById('playerGame');
                             playerGame.classList.add('hidden');
@@ -99,14 +105,15 @@ function inGame() {
                                 table.appendChild(h2inhalt);
                             }
                         }
-                    });
-            } else if(GameState == "Game was reseted"){
+                    })
+                    .catch(error => console.error('Fehler beim Abrufen des Gewinners:', error));
+            } else if(GameState == "Game was reseted") {
                 gameStarted = true;
                 playerGame = document.getElementById('playerGame');
                 playerGame.classList.remove('hidden');
                 table = document.getElementById('winnerTable');
                 table.classList.add('hidden');
-                console.log("Resetted")
+                console.log("Resetted");
                 leave();
             }
         })
