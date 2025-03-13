@@ -36,7 +36,7 @@ public class Main {
     static boolean gameRestarted = false;
     static boolean gameChoiceReseted = false;
     static ArrayList<Player> listOfAllPlayerAtTheBeginningOfTheGame;
-//    static StepperController stepperController;
+    static StepperController stepperController;
     static boolean someOneStartedWithBlackJack = false;
     static boolean stepperIsHome = true;
     static ArrayList<Player> blackJackList = new ArrayList<>();
@@ -45,15 +45,15 @@ public class Main {
 
     //--add-opens=Der.Geraet.Maven/com.example=ALL-UNNAMED --add-reads Der.Geraet.Maven=ALL-UNNAMED
     public static void main(String[] args) throws InterruptedException, TMCDeviceIsBusyException {
-//        controllerConfig();
+
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
 
-//        stepperController = new StepperController(pi4j);
-//        stepperController.orientieren();
+        stepperController = new StepperController(pi4j);
+        stepperController.orientieren();
 
-        //cardMotor = new KartenMotor(pi4j);
-        cardMotor = new KartenMotorFake();
+        cardMotor = new KartenMotor(pi4j);
+//        cardMotor = new KartenMotorFake();
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
         gameService.setConnected(false);
         if(gameService.isConnected()) {
@@ -88,8 +88,8 @@ public class Main {
             if(gameService.getAdminPanelRotateStepper().getKey()){
                 System.out.println("Sollte drehen");
                 if(gameService.getAdminPanelRotateStepper().getValue() == 0)
-//                    stepperController.orientieren();
-                    System.out.println("Es fähjrt zum Ursprung");
+                    stepperController.orientieren();
+//                    System.out.println("Es fähjrt zum Ursprung");
                 else
                  rotateStepperMotor(gameService.getAdminPanelRotateStepper().getValue());
                 gameService.setAdminPanelRotateStepper(new Pair<>(false, 0));
@@ -222,6 +222,7 @@ public class Main {
         gameService.setCurrentPlayer(new Player("0"));
         switch (gamemode) {
             case BLACKJACK -> {
+                rotateStepperMotor(3);
                 gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() +1);
                 System.out.println("Computer Turn ist dran");
                 if(gameService.isConnected()) {
@@ -237,7 +238,7 @@ public class Main {
                     while (gameService.getDealer().getDealerHandWert() < 17) {
                         gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() +1);
                         executeCameraScan();
-                        rotateStepperMotor(3);
+                        executeCardThrow();
                         giveDealerNextCard();
                         if(gameService.isConnected()) {
                             gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size() - 1));
@@ -321,33 +322,32 @@ public class Main {
     }
 
     private static void executeCameraScan() {
-        Karte karte = new Karte("5", "Herz", "Herz 5");
-        gameService.setNextCardInDeck(karte);
+//        Karte karte = new Karte("5", "Herz", "Herz 5");
+//        gameService.setNextCardInDeck(karte);
 
-//        for (int i = 0; i < 10; i++) {
-//            BufferedImage bufferedImage = camera.captureImage();
-//
-//            if (bufferedImage != null) {
-//                try {
-//                    // Dekodiere den QR-Code
-//                    String decodedText = camera.decodeQRCode(bufferedImage);
-//                    if (decodedText != null) {
-//                        System.out.println("Decoded text: " + decodedText);
-//                        //Karte karte = mapper.readValue(decodedText, Karte.class);
-//                        karte = new Karte("5", "Herz", "Herz 5");
-//                        gameService.setNextCardInDeck(karte);
-//                        break;
-//                    } else {
-//                        System.out.println("QR-Code nicht gefunden");
-//                    }
-//                } catch (Exception e) {
-//                    System.out.println("Fehler beim Dekodieren des QR-Codes: " + e.getMessage());
-//                    e.printStackTrace();
-//                }
-//            } else {
-//                System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
-//            }
-//        }
+        for (int i = 0; i < 10; i++) {
+            BufferedImage bufferedImage = camera.captureImage();
+
+            if (bufferedImage != null) {
+                try {
+                    // Dekodiere den QR-Code
+                    String decodedText = camera.decodeQRCode(bufferedImage);
+                    if (decodedText != null) {
+                        System.out.println("Decoded text: " + decodedText);
+                        Karte karte = mapper.readValue(decodedText, Karte.class);
+                        gameService.setNextCardInDeck(karte);
+                        break;
+                    } else {
+                        System.out.println("QR-Code nicht gefunden");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Fehler beim Dekodieren des QR-Codes: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
+            }
+        }
     }
 
     private static void executeCardThrow() throws InterruptedException {
@@ -379,9 +379,13 @@ public class Main {
     }
 
     public static void rotateStepperMotor(int playerID) {
-        int angle = (-30 * playerID);
+        int angle = (-25 * playerID);
+        if(playerID>=4){
+            angle = (-25 * playerID)-15;
+        }
+
         try{
-            //stepperController.turn(angle);
+            stepperController.turn(angle);
             System.out.println("Es fährt zum Winkel: " + angle);
         } catch(Exception e){
             e.printStackTrace();

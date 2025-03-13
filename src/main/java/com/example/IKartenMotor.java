@@ -2,5 +2,5 @@ package com.example;
 
 public interface IKartenMotor {
 
-     void werfeKarteAus();
+     void werfeKarteAus() throws InterruptedException;
 }
