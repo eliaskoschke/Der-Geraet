@@ -1,13 +1,3 @@
-//kick all players()
-
-//admin/adminPanel/rotateStepper - POST
-// id in msg -> user ID
-// id 0 -> Ursprung
-
-// .../activateCardMotor -> POST
-// message -> leer
-
-
 function rotateStepper(id) {
     fetch('/api/admin/adminPanel/rotateStepper', {
         method: 'POST',
@@ -47,25 +37,30 @@ function activateCardMotor() {
     })
     .catch(error => console.error('Fehler beim Aktivieren des Kartenmotors:', error));
 }
+var menu = document.getElementById('menu');
 
-function back() {
-    window.location.replace('admin.html?loggedIn=true');
+function backVar() {
+    if(!menu.classList.contains('hidden')) {
+        window.location.replace('admin.html?loggedIn=true');
+    } else {
+        menu.classList.remove('hidden');
+        let rotateStepperMenuElement = document.getElementById('rotateStepperMenu');
+        rotateStepperMenuElement.classList.add('hidden');
+    }
 }
-
 
 document.addEventListener('DOMContentLoaded', (event) => {
     const urlParams = new URLSearchParams(window.location.search);
     const loggedIn = urlParams.get('loggedIn');
 
-    if (loggedIn === "true") {
-        var pswIn = document.getElementById('passwordLine');
-        pswIn.classList.add('hidden');
-        var adminPanel = document.getElementById('adminPanel');
-        adminPanel.classList.remove('hidden');
-    } else {
-        window.location.href = 'admin.html?href=settings.html?loggedIn=true';
-    }
-
+    if (loggedIn === "true") {} else {window.location.href = 'admin.html?href=settings.html?loggedIn=true';}
 });
+
+function rotateStepperMenu() {
+    menu.classList.add('hidden');
+    
+    let rotateStepperMenuElement = document.getElementById('rotateStepperMenu');
+    rotateStepperMenuElement.classList.remove('hidden');
+}
 
 

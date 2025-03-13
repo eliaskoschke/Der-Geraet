@@ -304,4 +304,76 @@ function pingGameEnded() {
     .catch(error => console.error('Fehler:', error));
 } 
 
+function restartGame() {
+    fetch('/api/admin/restartGame', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: "restart" })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+            if (data.message === "thanks") {
+                dealerHand = document.getElementById('dealerHand');
+                dealerHand.classList.remove('hidden');
 
+                currentPlayer = document.getElementById('currentPlayer');
+                currentPlayer.classList.remove('hidden');
+
+                table = document.getElementById('winnerTable');
+                table.classList.add('hidden');
+
+                winnerWasAsked = false;
+            }
+        }
+    })
+    .catch(error => console.error('Fehler:', error));
+}
+
+function backToMenu() {
+    fetch('/api/admin/restartGameChoice', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: "reset" })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+            if (data.message === "thanks") {
+                dealerHand = document.getElementById('dealerHand');
+                dealerHand.classList.remove('hidden');
+
+                currentPlayer = document.getElementById('currentPlayer');
+                currentPlayer.classList.remove('hidden');
+
+                table = document.getElementById('winnerTable');
+                table.classList.add('hidden');
+
+                winnerWasAsked = false;
+
+                gameStarted = false;
+
+                game = document.getElementById('adminGame');
+                game.classList.add('hidden');
+
+                adminPanel = document.getElementById('adminPanel');
+                adminPanel.classList.remove('hidden');
+            }
+        }
+    })
+    .catch(error => console.error('Fehler:', error));
+}
