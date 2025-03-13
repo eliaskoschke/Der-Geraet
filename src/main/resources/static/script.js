@@ -77,6 +77,9 @@ function inGame() {
         .then(GameState => {
             console.log('Aktueller Gamestate: ' + GameState);
             if (GameState == 'Game has started') {
+                leaveBtn = document.getElementById('leaveBtn');
+                leaveBtn.classList.add('hidden');
+                
                 gameStarted = true;
                 console.log('Spiel wurde gestartet');
             } else if(GameState == "Game beendet") {
@@ -90,12 +93,19 @@ function inGame() {
                     .then(winnerTable => {
                         if(!winnerWasAsked) {
                             gameStarted = false;
+
                             dealerHand = document.getElementById('dealerHand');
                             dealerHand.classList.add('hidden');
+
                             currentPlayer = document.getElementById('currentPlayer');
                             currentPlayer.classList.add('hidden');
+
                             table = document.getElementById('winnerTable');
                             table.classList.remove('hidden');
+
+                            pickBtns = document.getElementById('pickBtns');
+                            pickBtns.classList.add('hidden');
+
                             table.innerHTML = "";
                             if( winnerTable.message.includes(",")){
                                 let d = winnerTable.message.split(',');

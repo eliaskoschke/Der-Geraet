@@ -244,6 +244,64 @@ function pingLobby() {
     }
 }
 
+function pingGameEnded() {
+    fetch('api/user/ping', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.message) {
+            if (data.message === "Game beendet") {
+                fetch('api/game/getWinner')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Netzwerkantwort war nicht ok');
+                    }
+                    return response.json();
+                })
+                .then(winnerTable => {
+                    if(!winnerWasAsked) {
+                        gameStarted = false;
 
+                        dealerHand = document.getElementById('dealerHand');
+                        dealerHand.classList.add('hidden');
+
+                        currentPlayer = document.getElementById('currentPlayer');
+                        currentPlayer.classList.add('hidden');
+
+                        table = document.getElementById('winnerTable');
+                        table.classList.remove('hidden');
+
+                        table.innerHTML = "";
+                        if( winnerTable.message.includes(",")){
+                            let d = winnerTable.message.split(',');
+                            for(const inhalt of d) {
+                                const h2inhalt = document.createElement("h2");
+                                h2inhalt.textContent = inhalt;
+                                table.appendChild(h2inhalt);
+                            }
+                        } else{
+                            const h2inhalt = document.createElement("h2");
+                            h2inhalt.textContent = winnerTable.message;
+                            table.appendChild(h2inhalt);
+                        }
+                        winnerWasAsked = true;
+                    } else {
+
+                    }
+                })
+            }
+        }
+    })
+    .catch(error => console.error('Fehler:', error));
+} 
 
 
