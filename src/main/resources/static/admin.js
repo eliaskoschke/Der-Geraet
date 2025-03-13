@@ -294,6 +294,9 @@ function pingGameEnded() {
                             table.appendChild(h2inhalt);
                         }
                         winnerWasAsked = true;
+
+                        controllBtns = document.getElementById('controllBtns');
+                        controllBtns.classList.remove('hidden');
                     } else {
 
                     }
@@ -321,6 +324,9 @@ function restartGame() {
     .then(data => {
         if (data && data.message) {
             if (data.message === "thanks") {
+                controllBtns = document.getElementById('controllBtns');
+                controllBtns.classList.add('hidden');
+
                 dealerHand = document.getElementById('dealerHand');
                 dealerHand.classList.remove('hidden');
 

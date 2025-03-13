@@ -45,8 +45,13 @@ function pingPlayerTurn() {
     .then(data => {
         userPick = data.message;
         if (userPick != user) {
-            current.textContent = "Spieler " + userPick + " ist an der Reihe!";
+            if (userPick === 0 || userPick === null) {
+                userPick = "Dealer";
+                current.textContent = "Der" + userPick + " ist an der Reihe!";
 
+            } else {
+                current.textContent = "Spieler " + userPick + " ist an der Reihe!";
+            }
                 document.getElementById('pickBtn1').disabled = true;
                 document.getElementById('pickBtn2').disabled = true;
 
