@@ -55,14 +55,14 @@ public class Main {
         cardMotor = new KartenMotor(pi4j);
 //        cardMotor = new KartenMotorFake();
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
-        gameService.setConnected(false);
+        gameService.setConnected(true);
         if(gameService.isConnected()) {
             startController(raspberryController);
             startGamePanel();
         }
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
-            gameService.setConnected(false);
+            gameService.setConnected(true);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();

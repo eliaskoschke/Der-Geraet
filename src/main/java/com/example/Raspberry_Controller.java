@@ -172,7 +172,7 @@ public class   Raspberry_Controller {
                 if (statusCode == 200) {
                     String responseBody = EntityUtils.toString(response.getEntity());
                     Message responseMessage = mapper.readValue(responseBody, Message.class);
-                    if(responseMessage.getMessage().equals("true")){
+                    if(responseMessage.getMessage().equals("true") || responseMessage.getMessage().equals("\"true\"")){
                         gameHasAlreadyStartedOnce = true;
                         System.out.println("Buttons wurde reseted");
                     }

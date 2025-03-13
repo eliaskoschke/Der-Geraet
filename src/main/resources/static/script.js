@@ -82,7 +82,16 @@ function inGame() {
         .then(data => {
             const GameState = data.message;
             console.log('Aktueller Gamestate: ' + GameState);
-            if (GameState == 'Game has started') {
+            if(GameState === "\"true\"") {
+                console.log("GameState ist true");
+                gameStarted = true;
+                playerGame = document.getElementById('playerGame');
+                playerGame.classList.remove('hidden');
+                table = document.getElementById('winnerTable');
+                table.classList.add('hidden');
+                console.log("Resetted");
+                leave();
+            } else if (GameState == 'Game has started') {
                 leaveBtn = document.getElementById('leaveBtn');
                 leaveBtn.classList.add('hidden');
                 
@@ -131,15 +140,6 @@ function inGame() {
                         }
                     })
                     .catch(error => console.error('Fehler beim Abrufen des Gewinners:', error));
-            } else if(GameState == "true") {
-                console.log("GameState ist true");
-                gameStarted = true;
-                playerGame = document.getElementById('playerGame');
-                playerGame.classList.remove('hidden');
-                table = document.getElementById('winnerTable');
-                table.classList.add('hidden');
-                console.log("Resetted");
-                leave();
             }
         })
         .catch(error => console.error('Fehler beim Abrufen des Spielstatus:', error));

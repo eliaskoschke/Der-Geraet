@@ -69,29 +69,45 @@ public class Controller {
 
     //Todo: /Logic
     @GetMapping({"/user/ping", "logic/ping"})
-    public ResponseMessage userPing() throws JsonProcessingException {
+    public ResponseMessage userPing() throws JsonProcessingException, InterruptedException {
         if (gameService.isGameReset()) {
             gameService.setPlayerGotReseted(gameService.getPlayerGotReseted() + 1);
             if (gameService.getPlayerGotReseted() >= gameService.getPlayerAtReset()) {
+//                verzögerungPfusch();
                 gameService.setPlayerAtReset(0);
                 gameService.setPlayerGotReseted(0);
                 gameService.setGameReset(false);
                 System.out.println("Alle Spieler Wurde reseted");
-                return new ResponseMessage("test");
+                return new ResponseMessage(mapper.writeValueAsString("true"));
             }
             if(gameService.isConnected()) {
                 gameService.setPlayerAtReset(0);
                 gameService.setPlayerGotReseted(0);
                 gameService.setGameReset(false); //Wenn es Connected ist muss man nicht auf alle wartren bis es auf false gesetzt wird
             }
-            return new ResponseMessage("true");
+            return new ResponseMessage(mapper.writeValueAsString("true"));
 
         } else if(gameService.isGameHasEnded()){
             return new ResponseMessage("Game beendet");
         } else if (gameService.isGameStarted()) {
             return new ResponseMessage("Game has started");
         }
-        return new ResponseMessage(mapper.writeValueAsString("false"));
+        return new ResponseMessage("false");
+    }
+
+    private void verzögerungPfusch() throws InterruptedException {
+        new Thread(() -> {
+            try {
+                Thread.sleep(100);
+                gameService.setPlayerAtReset(0);
+                gameService.setPlayerGotReseted(0);
+                gameService.setGameReset(false);
+                System.out.println("Alle Spieler Wurde reseted");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+
     }
 
     //Todo: Name "ping" umändern
@@ -135,7 +151,7 @@ public class Controller {
         if(gameService.getListOfAllPlayers().size()>0) {
             System.out.println("reset wurde geklickt");
             gameService.setGameReset(true);
-            gameService.setPlayerAtReset(gameService.getListOfAllPlayers().size());
+            gameService.setPlayerAtReset(gameService.getListOfAllPlayers().size()*2);
             gameService.getListOfAllPlayers().clear();
         }
         return new ResponseMessage("true");
