@@ -128,4 +128,5 @@ h5 {
 #winnerTable {
     background-color: hsl(225, 30%, 50%);
     border-radius: 20px;
+    color: white;
 }

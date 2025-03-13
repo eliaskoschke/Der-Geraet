@@ -1,6 +1,7 @@
 var user = null;
 var ingame = false;
 var gameStarted = false;
+var winnerWasAsked = false;
 
 function sitzplatzClicked(index) {
     var sitzplaetze = document.getElementById('btns-sitzplaetze');
@@ -87,23 +88,30 @@ function inGame() {
                         return response.json();
                     })
                     .then(winnerTable => {
-                        if(winnerTable == false) {
-                            // nichts tun
-                        } else {
-                            console.log('Gewinner: ' + winnerTable);
+                        if(!winnerWasAsked) {
                             gameStarted = false;
-                            playerGame = document.getElementById('playerGame');
-                            playerGame.classList.add('hidden');
+                            dealerHand = document.getElementById('dealerHand');
+                            dealerHand.classList.add('hidden');
+                            currentPlayer = document.getElementById('currentPlayer');
+                            currentPlayer.classList.add('hidden');
                             table = document.getElementById('winnerTable');
                             table.classList.remove('hidden');
                             table.innerHTML = "";
-                            let d = winnerTable.split(',');
-                            winnerTable = false;
-                            for(const inhalt of d) {
+                            if( winnerTable.message.includes(",")){
+                                let d = winnerTable.message.split(',');
+                                for(const inhalt of d) {
+                                    const h2inhalt = document.createElement("h2");
+                                    h2inhalt.textContent = inhalt;
+                                    table.appendChild(h2inhalt);
+                                }
+                            } else{
                                 const h2inhalt = document.createElement("h2");
-                                h2inhalt.textContent = inhalt;
+                                h2inhalt.textContent = winnerTable.message;
                                 table.appendChild(h2inhalt);
                             }
+                            winnerWasAsked = true;
+                        } else {
+
                         }
                     })
                     .catch(error => console.error('Fehler beim Abrufen des Gewinners:', error));
