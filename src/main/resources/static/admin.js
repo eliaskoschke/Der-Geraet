@@ -13,54 +13,71 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     }
 
-    function sendPassword() { 
-        passwordLine.classList.add('hidden');
-        rightPassword(); // das entfernen
-        // das auskommentieren unter dem kommentar
-        /*
-        var passwordLine = document.getElementById('passwordLine');
-        var wait = document.getElementById('start');
-        if (passwordLine && wait) {
-            passwordLine.classList.add('hidden');
-            wait.classList.remove('hidden');
+    function sendPassword() {
+        const password = document.getElementById('password').value;
+        const password2 = document.getElementById('password2').value;
+
+        if (password === '') {
+            console.log('Bitte Passwort eingeben');
+            return;
         }
-        let password = '';
-        inputs.forEach(input => {
-            password += input.value;
-        });
-        console.log("Password entered:", password);
-        /fetch('/api/admin/sendPassword', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ message: password })
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Netzwerkantwort war nicht ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data && data.message) {
-                                if(data.message === "true"){
-                                    if (href) {
-                                        window.location.href = href;
-                                    } else {
-                                        rightPassword();
-                                    }
-                                } else{
-                                    wrongPassword();
-                                }
-                            } else {
-                                alert('Nachricht gesendet, aber keine Nachricht in der Antwort gefunden.');
-                            }
-                        })
-                        .catch(
-                        //error => console.error('Fehler:', error)
-                        );*/
+
+        fetch('/api/admin/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: password })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Netzwerkantwort war nicht ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.message === true) {
+                if (password2 === '') {
+                    document.getElementById('password').classList.add('hidden');
+                    document.getElementById('password2').classList.remove('hidden');
+                    document.getElementById('password2').focus();
+                } else {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const href = urlParams.get('href');
+                    if (href) {
+                        window.location.href = href;
+                    } else {
+                        window.location.href = 'admin.html?loggedIn=true';
+                    }
+                }
+            } else {
+                console.log('Falsches Passwort');
+                document.getElementById('password').value = '';
+                document.getElementById('password2').value = '';
+            }
+        })
+        .catch(error => console.error('Fehler beim Login:', error));
     }
+
+    // Event Listener für Enter-Taste
+    document.addEventListener('DOMContentLoaded', function() {
+        const password1 = document.getElementById('password');
+        const password2 = document.getElementById('password2');
+
+        password1.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendPassword();
+            }
+        });
+
+        password2.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendPassword();
+            }
+        });
+    });
 
     inputs.forEach((input, index) => {
         input.addEventListener('input', (event) => {
