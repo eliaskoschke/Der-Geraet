@@ -125,7 +125,7 @@ function inGame() {
                         }
                     })
                     .catch(error => console.error('Fehler beim Abrufen des Gewinners:', error));
-            } else if(GameState == "Game was reseted") {
+            } else if(GameState == true) {
                 gameStarted = true;
                 playerGame = document.getElementById('playerGame');
                 playerGame.classList.remove('hidden');
