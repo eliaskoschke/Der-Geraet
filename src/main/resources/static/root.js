@@ -45,25 +45,20 @@ function pingPlayerTurn() {
     .then(data => {
         userPick = data.message;
         if (userPick != user) {
-            if (userPick === 0 || userPick === null) {
-                userPick = "Dealer";
-                current.textContent = "Der" + userPick + " ist an der Reihe!";
-
+            if (userPick === 0 || userPick === "0" || userPick === null) {
+                current.textContent = "Der Dealer ist an der Reihe!";
             } else {
                 current.textContent = "Spieler " + userPick + " ist an der Reihe!";
             }
-                document.getElementById('pickBtn1').disabled = true;
-                document.getElementById('pickBtn2').disabled = true;
-
+            document.getElementById('pickBtn1').disabled = true;
+            document.getElementById('pickBtn2').disabled = true;
         } else {
             current.textContent = "Du bist an der Reihe!";
-
-                document.getElementById('pickBtn1').disabled = false;
-                document.getElementById('pickBtn2').disabled = false;
-
+            document.getElementById('pickBtn1').disabled = false;
+            document.getElementById('pickBtn2').disabled = false;
         }
     })
-    .catch(error => console.error('Fehler beim Abrufen des aktuellen Spielers:'));
+    .catch(error => console.error('Fehler beim Abrufen des aktuellen Spielers:', error));
 }
 
 var dealerHand = "";
