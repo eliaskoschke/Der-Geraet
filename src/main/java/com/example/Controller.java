@@ -70,11 +70,7 @@ public class Controller {
     //Todo: /Logic
     @GetMapping({"/user/ping", "logic/ping"})
     public ResponseMessage userPing() throws JsonProcessingException {
-        if(gameService.isGameHasEnded()){
-            return new ResponseMessage("Game beendet");
-        } else if (gameService.isGameStarted()) {
-            return new ResponseMessage("Game has started");
-        } else if (gameService.isGameReset()) {
+        if (gameService.isGameReset()) {
             gameService.setPlayerGotReseted(gameService.getPlayerGotReseted() + 1);
             if (gameService.getPlayerGotReseted() >= gameService.getPlayerAtReset()) {
                 gameService.setPlayerAtReset(0);
@@ -87,9 +83,13 @@ public class Controller {
                 gameService.setPlayerGotReseted(0);
                 gameService.setGameReset(false); //Wenn es Connected ist muss man nicht auf alle wartren bis es auf false gesetzt wird
             }
-            return new ResponseMessage("true");
-        }
 
+            return new ResponseMessage("true");
+        } else if(gameService.isGameHasEnded()){
+            return new ResponseMessage("Game beendet");
+        } else if (gameService.isGameStarted()) {
+            return new ResponseMessage("Game has started");
+        }
         return new ResponseMessage(mapper.writeValueAsString("false"));
     }
 
@@ -171,6 +171,14 @@ public class Controller {
     @PostMapping("/admin/restartGameChoice")
     public ResponseMessage restartGameChoice(@RequestBody Message message) {
         gameService.setGameChoiceReseted(true);
+        if(!gameService.isConnected()){
+            if(!gameService.getListOfAllPlayers().isEmpty()) {
+                System.out.println("reset wurde geklickt");
+                gameService.setGameReset(true);
+                gameService.setPlayerAtReset(gameService.getListOfAllPlayers().size());
+                gameService.getListOfAllPlayers().clear();
+            }
+        }
         return new ResponseMessage("thanks");
     }
 
@@ -199,7 +207,6 @@ public class Controller {
     @GetMapping("/game/getWinner")
     public ResponseMessage getWinner() throws JsonProcessingException {
         String gewinnerMessage = castWinnerMapIntoString(gameService.getMapOfAllWinners());
-        System.out.println("Der Gewinner: " + gewinnerMessage);
         return new ResponseMessage(gewinnerMessage);
     }
 

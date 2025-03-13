@@ -1,4 +1,5 @@
 var user = 'admin';
+var winnerWasAsked = false;
 
 document.addEventListener('DOMContentLoaded', (event) => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -221,7 +222,7 @@ function setActiveGame(game) {
 
 function playerCountTest(players) {
     var elementBtn = document.getElementById('start-game');
-    if (players >= 2) {
+    if (players >= 1) {
         elementBtn.disabled = false;
     } else {
         elementBtn.disabled = true;
@@ -308,7 +309,7 @@ function pingGameEnded() {
                             table.appendChild(h2inhalt);
                         }
                         winnerWasAsked = true;
-
+                        console.log('odsgfiuagsoiudfgoiudsaguds');
                         controllBtns = document.getElementById('controllBtns');
                         controllBtns.classList.remove('hidden');
                     } else {
@@ -397,3 +398,6 @@ function backToMenu() {
     })
     .catch(error => console.error('Fehler:', error));
 }
+
+setInterval(pingGameEnded, 500);
+setInterval(pingLobby, 500);

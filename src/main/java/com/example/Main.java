@@ -187,7 +187,7 @@ public class Main {
         } else {
             System.out.println("Spiel nicht Connected");
             while(!gameService.isGameRestarted() && !gameService.isGameChoiceReseted()){
-
+                System.out.println("Mach mal was");
             }
             gameRestarted = gameService.isGameRestarted();
             gameChoiceReseted = gameService.isGameChoiceReseted();
