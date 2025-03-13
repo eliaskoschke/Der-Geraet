@@ -21,9 +21,11 @@ function pingActor() {
             }
             break;
         case 'admin.html':
+            pingLobby();
+            if(!document.getElementById('adminGame').classList.contains('hidden')) {
                 pingPlayerTurn();
                 pingDealerHand();
-                pingLobby();
+            }
             break;
         case 'settings.html':
             break;

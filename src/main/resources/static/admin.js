@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             return response.json();
         })
         .then(data => {
-            if (data.message === true) {
+            if (data.message == "true") {
                 const urlParams = new URLSearchParams(window.location.search);
                 const href = urlParams.get('href');
                 if (href) {
