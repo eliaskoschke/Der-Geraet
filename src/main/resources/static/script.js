@@ -72,9 +72,15 @@ function inGame() {
     }
 
     console.log('ingame vor fetch');
-
-    get('user/ping')
-        .then(GameState => {
+    fetch('/api/user/ping')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Netzwerkantwort war nicht ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const GameState = data.message;
             console.log('Aktueller Gamestate: ' + GameState);
             if (GameState == 'Game has started') {
                 leaveBtn = document.getElementById('leaveBtn');
@@ -83,7 +89,7 @@ function inGame() {
                 gameStarted = true;
                 console.log('Spiel wurde gestartet');
             } else if(GameState == "Game beendet") {
-                fetch('api/game/getWinner')
+                fetch('/api/game/getWinner')
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Netzwerkantwort war nicht ok');
@@ -126,7 +132,7 @@ function inGame() {
                     })
                     .catch(error => console.error('Fehler beim Abrufen des Gewinners:', error));
             } else if(GameState == "true") {
-                console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DIE NACHRICHT IST: " + GameState)
+                console.log("GameState ist true");
                 gameStarted = true;
                 playerGame = document.getElementById('playerGame');
                 playerGame.classList.remove('hidden');
@@ -135,10 +141,8 @@ function inGame() {
                 console.log("Resetted");
                 leave();
             }
-
         })
         .catch(error => console.error('Fehler beim Abrufen des Spielstatus:', error));
-
 }
 
 function loadTables() {

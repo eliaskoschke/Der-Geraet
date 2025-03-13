@@ -11,21 +11,17 @@ function pingActor() {
         case 'play.html':
             Game();
             if(!document.getElementById('btns-sitzplaetze').classList.contains('hidden')){
-
             }
             if(!document.getElementById('start').classList.contains('hidden')) {
-
                 pingLobbyAsUser();
             }
             if(!document.getElementById('playerGame').classList.contains('hidden')) {
-
                 pingPlayerTurn();
                 pingDealerHand();
             }
             break;
         case 'admin.html':
-            console.log("Admin Seite erkannt");
-            pingLobby();
+
             if(!document.getElementById('adminGame').classList.contains('hidden')) {
                 console.log("AdminGame ist sichtbar, führe Pings aus");
                 pingPlayerTurn();
