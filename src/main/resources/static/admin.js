@@ -1,6 +1,9 @@
 var user = 'admin';
 
 document.addEventListener('DOMContentLoaded', (event) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const href = urlParams.get('href');
+
     const inputs = document.querySelectorAll('.psw-in');
 
     // Funktion zum Leeren der Eingabefelder beim Laden der Seite
@@ -10,7 +13,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     }
 
-    function sendPassword() {
+    function sendPassword() { 
+        passwordLine.classList.add('hidden');
+        rightPassword(); // das entfernen
+        // das auskommentieren unter dem kommentar
+        /*
         var passwordLine = document.getElementById('passwordLine');
         var wait = document.getElementById('start');
         if (passwordLine && wait) {
@@ -22,7 +29,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             password += input.value;
         });
         console.log("Password entered:", password);
-        fetch('/api/admin/sendPassword', {
+        /fetch('/api/admin/sendPassword', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -38,7 +45,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
                         .then(data => {
                             if (data && data.message) {
                                 if(data.message === "true"){
-                                    rightPassword();
+                                    if (href) {
+                                        window.location.href = href;
+                                    } else {
+                                        rightPassword();
+                                    }
                                 } else{
                                     wrongPassword();
                                 }
@@ -48,7 +59,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                         })
                         .catch(
                         //error => console.error('Fehler:', error)
-                        );
+                        );*/
     }
 
     inputs.forEach((input, index) => {
@@ -76,6 +87,26 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     // Eingabefelder leeren beim Laden der Seite
     clearInputs();
+
+    // Dots Animation (aus dem ersten window.onload)
+    var dots = document.getElementById('dots');
+    if (dots) {
+        var dotCount = 0;
+        
+        setInterval(function() {
+            dotCount = (dotCount + 1) % 4;
+            dots.textContent = '.'.repeat(dotCount);
+        }, 500);
+    }
+
+    const loggedIn = urlParams.get('loggedIn');
+
+    if (loggedIn === "true") {
+        var pswIn = document.getElementById('passwordLine');
+        pswIn.classList.add('hidden');
+        var adminPanel = document.getElementById('adminPanel');
+        adminPanel.classList.remove('hidden');
+    }
 });
 
 
@@ -89,30 +120,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         dots.classList.add('hidden');
         adminPanel.classList.remove('hidden')
     }
-
-    window.onload = function() {
-    
-        var dots = document.getElementById('dots');
-        if (!dots) {
-            console.error("Element 'dots' nicht gefunden");
-            return;
-        }
-        var dotCount = 0;
-    
-        setInterval(function() {
-            dotCount = (dotCount + 1) % 4;
-            dots.textContent = '.'.repeat(dotCount);
-        }, 500);
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const loggedIn = urlParams.get('loggedIn');
-        
-        if (loggedIn === true) {
-            var adminPanel = document.getElementById('adminPanel');
-            adminPanel.classList.remove('hidden');
-        }
-    };
-
 
 function startGameForAll() {
     var adminPanel = document.getElementById('adminPanel')

@@ -51,3 +51,19 @@ function activateCardMotor() {
 function back() {
     window.location.replace('admin.html?loggedIn=true');
 }
+
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const loggedIn = urlParams.get('loggedIn');
+
+    if (loggedIn === "true") {
+        var pswIn = document.getElementById('passwordLine');
+        pswIn.classList.add('hidden');
+        var adminPanel = document.getElementById('adminPanel');
+        adminPanel.classList.remove('hidden');
+    } else {
+        window.location.href = 'admin.html?href=settings.html?loggedIn=true';
+    }
+
+});
