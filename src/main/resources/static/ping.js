@@ -1,6 +1,6 @@
 window.onload = function() {
     console.log("Ping.js geladen, starte Interval");
-    setInterval(pingActor, 50);
+    setInterval(pingActor, 200);
 }
 
 function pingActor() {

@@ -77,14 +77,15 @@ public class Controller {
                 gameService.setPlayerGotReseted(0);
                 gameService.setGameReset(false);
                 System.out.println("Alle Spieler Wurde reseted");
+                return new ResponseMessage("test");
             }
             if(gameService.isConnected()) {
                 gameService.setPlayerAtReset(0);
                 gameService.setPlayerGotReseted(0);
                 gameService.setGameReset(false); //Wenn es Connected ist muss man nicht auf alle wartren bis es auf false gesetzt wird
             }
-
             return new ResponseMessage("true");
+
         } else if(gameService.isGameHasEnded()){
             return new ResponseMessage("Game beendet");
         } else if (gameService.isGameStarted()) {

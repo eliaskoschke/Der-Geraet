@@ -62,7 +62,6 @@ public class Main {
         }
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
-            System.out.println("Spiel wurde reseted");
             gameService.setConnected(false);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;

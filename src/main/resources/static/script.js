@@ -125,7 +125,8 @@ function inGame() {
                         }
                     })
                     .catch(error => console.error('Fehler beim Abrufen des Gewinners:', error));
-            } else if(GameState == true || GameState == "true") {
+            } else if(GameState == "true") {
+                console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DIE NACHRICHT IST: " + GameState)
                 gameStarted = true;
                 playerGame = document.getElementById('playerGame');
                 playerGame.classList.remove('hidden');
@@ -137,7 +138,7 @@ function inGame() {
 
         })
         .catch(error => console.error('Fehler beim Abrufen des Spielstatus:', error));
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DIE NACHRICHT IST: " GameState)
+
 }
 
 function loadTables() {

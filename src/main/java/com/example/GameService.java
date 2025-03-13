@@ -251,8 +251,6 @@ public class GameService {
 
         gameStarted = false;
 
-        gameReset = false;
-
         gameHasEnded = false;
 
         Karte nextCardInDeck = null;
