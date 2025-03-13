@@ -463,7 +463,8 @@ public class Main {
                         Thread.sleep(3000);
                     }
                 }
-                executeCardThrow();
+                gameService.setButtonClickedOnce(false);
+                gameService.setButtonClickedTwice(false);
             }
             case POKER -> {
 

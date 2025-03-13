@@ -131,11 +131,12 @@ public class Controller {
 
     @PostMapping("/admin/sendReset")
     public ResponseMessage sendReset(@RequestBody Message postPassword) {
-        System.out.println("reset wurde geklickt");
-        gameService.setGameReset(true);
-
-        gameService.setPlayerAtReset(gameService.getListOfAllPlayers().size());
-        gameService.getListOfAllPlayers().clear();
+        if(gameService.getListOfAllPlayers().size()>0) {
+            System.out.println("reset wurde geklickt");
+            gameService.setGameReset(true);
+            gameService.setPlayerAtReset(gameService.getListOfAllPlayers().size());
+            gameService.getListOfAllPlayers().clear();
+        }
         return new ResponseMessage("true");
     }
 
@@ -158,6 +159,18 @@ public class Controller {
     public ResponseMessage rotateStepper(@RequestBody Message message) {
         System.out.println("STEPPER wurde geklickt");
         gameService.setAdminPanelRotateStepper(new Pair<>(true, Integer.parseInt(message.getMessage())));
+        return new ResponseMessage("thanks");
+    }
+
+    @PostMapping("/admin/restartGame")
+    public ResponseMessage restartGame(@RequestBody Message message) {
+        gameService.setGameRestarted(true);
+        return new ResponseMessage("thanks");
+    }
+
+    @PostMapping("/admin/restartGameChoice")
+    public ResponseMessage restartGameChoice(@RequestBody Message message) {
+        gameService.setGameChoiceReseted(true);
         return new ResponseMessage("thanks");
     }
 
