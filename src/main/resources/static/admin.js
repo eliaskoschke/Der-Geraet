@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             password += input.value;
         });
         
-        fetch('/api/admin/login', {
+        fetch('/api/admin/sendPassword', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
