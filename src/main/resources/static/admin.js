@@ -14,14 +14,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     function sendPassword() {
-        const password = document.getElementById('password').value;
-        const password2 = document.getElementById('password2').value;
-
-        if (password === '') {
-            console.log('Bitte Passwort eingeben');
-            return;
+        var passwordLine = document.getElementById('passwordLine');
+        var wait = document.getElementById('start');
+        if (passwordLine && wait) {
+            passwordLine.classList.add('hidden');
+            wait.classList.remove('hidden');
         }
 
+        let password = '';
+        const inputs = document.querySelectorAll('.psw-in');
+        inputs.forEach(input => {
+            password += input.value;
+        });
+        
         fetch('/api/admin/login', {
             method: 'POST',
             headers: {
@@ -37,23 +42,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
         })
         .then(data => {
             if (data.message === true) {
-                if (password2 === '') {
-                    document.getElementById('password').classList.add('hidden');
-                    document.getElementById('password2').classList.remove('hidden');
-                    document.getElementById('password2').focus();
+                const urlParams = new URLSearchParams(window.location.search);
+                const href = urlParams.get('href');
+                if (href) {
+                    window.location.href = href;
                 } else {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const href = urlParams.get('href');
-                    if (href) {
-                        window.location.href = href;
-                    } else {
-                        window.location.href = 'admin.html?loggedIn=true';
-                    }
+                    rightPassword();
                 }
             } else {
-                console.log('Falsches Passwort');
-                document.getElementById('password').value = '';
-                document.getElementById('password2').value = '';
+                wrongPassword();
             }
         })
         .catch(error => console.error('Fehler beim Login:', error));
