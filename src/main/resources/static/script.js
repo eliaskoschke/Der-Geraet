@@ -134,9 +134,10 @@ function inGame() {
                 console.log("Resetted");
                 leave();
             }
-            console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DIE NACHRICHT IST: " GameState)
+
         })
         .catch(error => console.error('Fehler beim Abrufen des Spielstatus:', error));
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DIE NACHRICHT IST: " GameState)
 }
 
 function loadTables() {

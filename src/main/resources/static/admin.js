@@ -359,6 +359,7 @@ function restartGame() {
 }
 
 function backToMenu() {
+    gameStarted = false;
     fetch('/api/admin/restartGameChoice', {
         method: 'POST',
         headers: {

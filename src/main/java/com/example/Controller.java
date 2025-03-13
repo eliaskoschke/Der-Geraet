@@ -172,7 +172,7 @@ public class Controller {
     public ResponseMessage restartGameChoice(@RequestBody Message message) {
         gameService.setGameChoiceReseted(true);
         if(!gameService.isConnected()){
-            if(!gameService.getListOfAllPlayers().isEmpty()) {
+            if(gameService.getListOfAllPlayers().size()>0) {
                 System.out.println("reset wurde geklickt");
                 gameService.setGameReset(true);
                 gameService.setPlayerAtReset(gameService.getListOfAllPlayers().size());
