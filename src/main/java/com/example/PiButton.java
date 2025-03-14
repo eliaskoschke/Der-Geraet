@@ -101,7 +101,7 @@ public class PiButton {
                 if (responseMessage.getMessage().equals("acknowledged")) {
                     buttonRegistered = true;
                 } else {
-                    System.out.println("Fehler: ");
+                    System.out.println("Fehler: Es registreit");
                 }
             }
         } catch (Exception exception) {

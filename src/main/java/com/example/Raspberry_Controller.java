@@ -53,8 +53,10 @@ public class   Raspberry_Controller {
                 String currentPlayerId = getCurrentPLayerId();
                 for (PiButton piButton : buttonList) {
                     if (currentPlayerId.equals(String.valueOf(piButton.getPlayerNumber()))) {
+                        piButton.setButtonRegistered(true);
                         if(playerButtonMap.get(currentPlayerId).isLow())
                             activateButton(piButton);
+
                     } else if (playerButtonMap.get(String.valueOf(piButton.getPlayerNumber())).isHigh()) {
                         deactivateButton(piButton);
                     }
@@ -65,8 +67,9 @@ public class   Raspberry_Controller {
                     gameHasAlreadyStartedOnce = false;
                     deactivateAllNonRegisteredButtons(buttonList);
                     for(PiButton button : buttonList){
+
                         button.resetButton();
-                        System.out.println("ALLE BUTTONS WURDE RESETED");
+                        System.out.println("ALLE BUTTONS WURDE RESETED!!!!!!!!!!!!!!!!!!!!");
                     }
                 }
                 manageButtonsForRegistration(buttonList);
@@ -172,9 +175,10 @@ public class   Raspberry_Controller {
                 if (statusCode == 200) {
                     String responseBody = EntityUtils.toString(response.getEntity());
                     Message responseMessage = mapper.readValue(responseBody, Message.class);
-                    if(responseMessage.getMessage().equals("true") || responseMessage.getMessage().equals("\"true\"")){
+                    System.out.println("Angekommene Nachricht : " + responseMessage.getMessage());
+                    if(responseMessage.getMessage().equals("\"true\"")){
                         gameHasAlreadyStartedOnce = true;
-                        System.out.println("Buttons wurde reseted");
+                        System.out.println("Buttons wurde reseted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     }
                     if(responseMessage.getMessage().equals("Game has started")){
                         return true;

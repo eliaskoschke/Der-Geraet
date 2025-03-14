@@ -58,24 +58,25 @@ public class Main {
         cardMotor = new KartenMotor(pi4j);
 
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
-        gameService.setConnected(true);
+        gameService.setConnected(false);
         if(gameService.isConnected()) {
             startController(raspberryController);
             startGamePanel();
         }
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
-            gameService.setConnected(true);
+            gameService.setConnected(false);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
             listOfAllPlayersWhoPlayTheGame = (ArrayList<Player>) listOfAllPlayerAtTheBeginningOfTheGame.clone();
             while (!gameService.isGameHasEnded() || gameRestarted) {
+
                 if(!stepperIsHome)
                     stepperController.orientieren();
-//                    System.out.println("Es fährt zum Ursprung");
                 else
                     stepperIsHome = false;
+
                 restartTheCurrentgame();
                 gameService.setGameStarted(true);
                 gameService.setGameHasEnded(false);
@@ -460,9 +461,9 @@ public class Main {
                 for (int i = 0; i < 2; i++) {
                     rotateStepperMotor(3);
                     executeCameraScan();
+                    Thread.sleep(100);
                     executeCardThrow();
                     giveDealerNextCard();
-                    executeCameraScan();
                     if(gameService.isConnected()) {
                         if (i == 0)
                             gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(0));
@@ -477,10 +478,10 @@ public class Main {
                     gameService.setCurrentPlayer(player);
                     for (int i = 0; i < 2; i++) {
                         rotateStepperMotor(Integer.parseInt(gameService.getCurrentPlayer().getId()));
+                        executeCameraScan();
+                        Thread.sleep(100);
                         executeCardThrow();
-                        executeCameraScan();
                         giveCurrentPlayerNextCard();
-                        executeCameraScan();
                         System.out.println("Jetzt Karte entnehmen");
                         Thread.sleep(3000);
                     }
