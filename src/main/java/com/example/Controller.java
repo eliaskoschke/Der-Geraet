@@ -17,6 +17,7 @@ public class Controller {
     private GameService gameService;
     private ObjectMapper mapper = new ObjectMapper();
     int counter = 0;
+    int numberOfAllPlayersInGame = 0;
 
 
     @Autowired
@@ -73,10 +74,10 @@ public class Controller {
         if (gameService.isGameReset()) {
             gameService.setPlayerGotReseted(gameService.getPlayerGotReseted() + 1);
             if (gameService.getPlayerGotReseted() >= gameService.getPlayerAtReset()) {
-//                verzögerungPfusch();
+
                 gameService.setPlayerAtReset(0);
                 gameService.setPlayerGotReseted(0);
-                gameService.setGameReset(false);
+                delayReset();
                 System.out.println("Alle Spieler Wurde reseted");
                 return new ResponseMessage(mapper.writeValueAsString("true"));
             }
@@ -84,6 +85,7 @@ public class Controller {
                 gameService.setPlayerAtReset(0);
                 gameService.setPlayerGotReseted(0);
                 gameService.setGameReset(false); //Wenn es Connected ist muss man nicht auf alle wartren bis es auf false gesetzt wird
+                return new ResponseMessage(mapper.writeValueAsString("true"));
             }
             return new ResponseMessage(mapper.writeValueAsString("true"));
 
@@ -95,19 +97,15 @@ public class Controller {
         return new ResponseMessage("false");
     }
 
-    private void verzögerungPfusch() throws InterruptedException {
+    public void delayReset(){
         new Thread(() -> {
             try {
-                Thread.sleep(100);
-                gameService.setPlayerAtReset(0);
-                gameService.setPlayerGotReseted(0);
+                Thread.sleep(1000);
                 gameService.setGameReset(false);
-                System.out.println("Alle Spieler Wurde reseted");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }).start();
-
     }
 
     //Todo: Name "ping" umändern
@@ -130,6 +128,7 @@ public class Controller {
     @PostMapping("/admin/startGame")
     public ResponseMessage startGame(@RequestBody Message message) {
         gameService.setGameStarted(true);
+        numberOfAllPlayersInGame = gameService.getListOfAllPlayers().size();
         //TODO: Gamemode.valueOf(message.getMessage().toUpperCase());
         if (message.getMessage().toLowerCase().equals("blackjack")) {
             gameService.setGamemode(Gamemode.BLACKJACK);
@@ -151,7 +150,7 @@ public class Controller {
         if(gameService.getListOfAllPlayers().size()>0) {
             System.out.println("reset wurde geklickt");
             gameService.setGameReset(true);
-            gameService.setPlayerAtReset(gameService.getListOfAllPlayers().size()*2);
+            gameService.setPlayerAtReset(numberOfAllPlayersInGame);
             gameService.getListOfAllPlayers().clear();
         }
         return new ResponseMessage("true");
@@ -189,12 +188,10 @@ public class Controller {
     public ResponseMessage restartGameChoice(@RequestBody Message message) {
         gameService.setGameChoiceReseted(true);
         if(!gameService.isConnected()){
-            if(gameService.getListOfAllPlayers().size()>0) {
-                System.out.println("reset wurde geklickt");
-                gameService.setGameReset(true);
-                gameService.setPlayerAtReset(gameService.getListOfAllPlayers().size());
-                gameService.getListOfAllPlayers().clear();
-            }
+            System.out.println("reset wurde geklickt");
+            gameService.setGameReset(true);
+            gameService.setPlayerAtReset(numberOfAllPlayersInGame);
+            gameService.getListOfAllPlayers().clear();
         }
         return new ResponseMessage("thanks");
     }

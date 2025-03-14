@@ -54,8 +54,13 @@ function Game() {
     inGame();
 
     if (gameStarted === true) {
+        winnerWasAsked = false;
         document.getElementById('start').classList.add('hidden');
+        document.getElementById('winnerTable').classList.add('hidden');
         document.getElementById('playerGame').classList.remove('hidden');
+        document.getElementById('dealerHand').classList.remove('hidden');
+        document.getElementById('pickBtns').classList.remove('hidden');
+        document.getElementById('currentPlayer').classList.remove('hidden');
     }
     if(2 === user) {
 //        document.getElementById('pickBtn1').disabled = false;
@@ -82,9 +87,12 @@ function inGame() {
         .then(data => {
             const GameState = data.message;
             console.log('Aktueller Gamestate: ' + GameState);
+
             if(GameState === "\"true\"") {
-                console.log("GameState ist true");
-                gameStarted = true;
+                user = null;
+                ingame = false;
+                gameStarted = false;
+                winnerWasAsked = false;
                 playerGame = document.getElementById('playerGame');
                 playerGame.classList.remove('hidden');
                 table = document.getElementById('winnerTable');
@@ -94,7 +102,6 @@ function inGame() {
             } else if (GameState == 'Game has started') {
                 leaveBtn = document.getElementById('leaveBtn');
                 leaveBtn.classList.add('hidden');
-                
                 gameStarted = true;
                 console.log('Spiel wurde gestartet');
             } else if(GameState == "Game beendet") {

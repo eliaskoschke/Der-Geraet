@@ -219,10 +219,6 @@ public class GameService {
 
         nextCardInDeck = null;
 
-        playerAtReset = 0;
-
-        playerGotReseted = 0;
-
         currentPlayer = new Player();
 
         currenPlayerIndex = 0;
@@ -255,13 +251,11 @@ public class GameService {
 
         Karte nextCardInDeck = null;
 
-        playerAtReset = 0;
-
-        playerGotReseted = 0;
-
         currentPlayer = new Player();
 
         listOfAllPlayers = new ArrayList<>();
+
+        //gameChoiceReseted = true;
 
         currenPlayerIndex = 0;
 

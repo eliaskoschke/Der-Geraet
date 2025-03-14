@@ -4,12 +4,14 @@ import com.example.tcm2209.StepperController;
 import com.example.tcm2209.TMCDeviceIsBusyException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi4j.Pi4J;
-import com.pi4j.context.Context;
 import javafx.util.Pair;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
+import com.pi4j.context.Context;
+import com.pi4j.io.gpio.digital.DigitalOutput;
+import com.pi4j.io.pwm.Pwm;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -40,11 +42,12 @@ public class Main {
     static boolean someOneStartedWithBlackJack = false;
     static boolean stepperIsHome = true;
     static ArrayList<Player> blackJackList = new ArrayList<>();
+    static ArrayList<Player> listOfAllPlayersWhoPlayTheGame = new ArrayList<>();
     static IKartenMotor cardMotor;
 
 
     //--add-opens=Der.Geraet.Maven/com.example=ALL-UNNAMED --add-reads Der.Geraet.Maven=ALL-UNNAMED
-    public static void main(String[] args) throws InterruptedException, TMCDeviceIsBusyException {
+    public static void main(String[] args) throws InterruptedException, TMCDeviceIsBusyException, CloneNotSupportedException {
 
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
@@ -53,7 +56,7 @@ public class Main {
         stepperController.orientieren();
 
         cardMotor = new KartenMotor(pi4j);
-//        cardMotor = new KartenMotorFake();
+
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
         gameService.setConnected(true);
         if(gameService.isConnected()) {
@@ -66,13 +69,15 @@ public class Main {
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
+            listOfAllPlayersWhoPlayTheGame = (ArrayList<Player>) listOfAllPlayerAtTheBeginningOfTheGame.clone();
             while (!gameService.isGameHasEnded() || gameRestarted) {
                 if(!stepperIsHome)
-                    System.out.println("Es fährt zum Ursprung");
-//                    stepperController.orientieren();
+                    stepperController.orientieren();
+//                    System.out.println("Es fährt zum Ursprung");
                 else
                     stepperIsHome = false;
                 restartTheCurrentgame();
+                gameService.setGameStarted(true);
                 gameService.setGameHasEnded(false);
                 gameRestarted = false;
                 initializeGame();
@@ -81,7 +86,7 @@ public class Main {
         }
     }
 
-    public static void registerPlayer() throws InterruptedException, TMCDeviceIsBusyException {
+    public static void registerPlayer() throws InterruptedException, TMCDeviceIsBusyException, CloneNotSupportedException {
         System.out.println("Spieler werden registriert");
         while (!gameService.isGameStarted()) {
             if(gameService.getAdminPanelRotateStepper().getKey()){
@@ -90,7 +95,7 @@ public class Main {
                     stepperController.orientieren();
 //                    System.out.println("Es fähjrt zum Ursprung");
                 else
-                 rotateStepperMotor(gameService.getAdminPanelRotateStepper().getValue());
+                    rotateStepperMotor(gameService.getAdminPanelRotateStepper().getValue());
                 gameService.setAdminPanelRotateStepper(new Pair<>(false, 0));
             }
             if(gameService.isAdminPanelCardThrowActivated()){
@@ -106,8 +111,8 @@ public class Main {
                 if (gameFx.isGameStarted()) {
                     gameService.setCurrentPlayer(new Player("0"));
                     listOfAllPlayerAtTheBeginningOfTheGame = new ArrayList<>();
-                    for (Player player : gameService.getListOfAllPlayers()) {
-                        listOfAllPlayerAtTheBeginningOfTheGame.add(player);
+                    for (Player player : (ArrayList<Player>) gameService.getListOfAllPlayers().clone()) {
+                        listOfAllPlayerAtTheBeginningOfTheGame.add((Player) player.clone());
                     }
                     gameService.setGamemode(gameFx.getCurrentGame());
                     gamemode = gameService.getGamemode();
@@ -121,8 +126,8 @@ public class Main {
             if(!gameService.isConnected()){
                 gameService.setCurrentPlayer(new Player("0"));
                 listOfAllPlayerAtTheBeginningOfTheGame = new ArrayList<>();
-                for (Player player : gameService.getListOfAllPlayers()) {
-                    listOfAllPlayerAtTheBeginningOfTheGame.add(player);
+                for (Player player : (ArrayList<Player>) gameService.getListOfAllPlayers().clone()) {
+                    listOfAllPlayerAtTheBeginningOfTheGame.add((Player) player.clone());
                 }
                 gamemode = gameService.getGamemode();
             }
@@ -193,7 +198,6 @@ public class Main {
             gameService.setGameChoiceReseted(false);
             gameService.setGameRestarted(false);
         }
-
         gameService.setGameHasEnded(true);
         System.out.println("Restart: "+ gameRestarted);
         System.out.println("Reset: "+ gameChoiceReseted);
@@ -201,10 +205,24 @@ public class Main {
 
     public static void executeNextTurn() throws InterruptedException {
         Player deleteThisPlayer = null;
+        for(Player player : listOfAllPlayerAtTheBeginningOfTheGame){
+            System.out.println("Alt: " +player.getId());
+        }
+
+        for(Player player : listOfAllPlayersWhoPlayTheGame){
+            System.out.println("Test Alt: " +player.getId());
+        }
         if (gameService.getCurrentPlayer().getKartenhandWert() > 21) {
             deleteThisPlayer = gameService.getCurrentPlayer();
             gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex() - 1);
             gameService.getListOfAllPlayers().remove(deleteThisPlayer);
+//            listOfAllPlayerAtTheBeginningOfTheGame.add(deleteThisPlayer);
+            for(Player player : listOfAllPlayerAtTheBeginningOfTheGame){
+                System.out.println("Neu: " +player.getId());
+            }
+            for(Player player : listOfAllPlayersWhoPlayTheGame){
+                System.out.println("Test Neu: " +player.getId());
+            }
         }
         if (gameService.getCurrenPlayerIndex() + 1 >= gameService.getListOfAllPlayers().size()) {
             if (deleteThisPlayer != null) {
@@ -321,7 +339,7 @@ public class Main {
     }
 
     private static void executeCameraScan() {
-//        Karte karte = new Karte("5", "Herz", "Herz 5");
+//        Karte karte = new Karte("10", "Herz", "Herz 10");
 //        gameService.setNextCardInDeck(karte);
 
         for (int i = 0; i < 10; i++) {
@@ -351,6 +369,7 @@ public class Main {
 
     private static void executeCardThrow() throws InterruptedException {
         cardMotor.werfeKarteAus();
+        System.out.println("Karte wurde gewurfen");
     }
 
     private static void giveCurrentPlayerNextCard() {
@@ -497,7 +516,10 @@ public class Main {
         someOneStartedWithBlackJack = false;
         gameChoiceReseted = false;
         blackJackList = new ArrayList<>();
-        gameService.setListOfAllPlayers(listOfAllPlayerAtTheBeginningOfTheGame);
+        gameService.setListOfAllPlayers((ArrayList<Player>) listOfAllPlayersWhoPlayTheGame.clone());
+        for(Player player : listOfAllPlayerAtTheBeginningOfTheGame){
+            System.out.println(player.getId());
+        }
         gameService.getDealer().resetDealer();
         for (Player player : gameService.getListOfAllPlayers()) {
             player.resetPlayer();

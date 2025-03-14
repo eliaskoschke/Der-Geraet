@@ -3,12 +3,12 @@ package com.example;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
+public class Player implements Cloneable{
     private String id;
     private ArrayList<Karte> kartenhand;
     private int kartenhandWert;
 
-    public Player(String id, ArrayList<Karte> kartenhand, int kartenhandWert) {
+    public Player(String id, ArrayList<Karte> kartenhand, int kartenhandWert){
         this.id = id;
         this.kartenhand = kartenhand;
         this.kartenhandWert = kartenhandWert;
@@ -97,6 +97,11 @@ public class Player {
         }
         kartenhandWert = handWert;
     }
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
     public void resetPlayer(){
         kartenhand = new ArrayList<>();
         kartenhandWert = 0;

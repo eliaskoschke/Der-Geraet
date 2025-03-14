@@ -385,6 +385,10 @@ function backToMenu() {
                 table = document.getElementById('winnerTable');
                 table.classList.add('hidden');
 
+
+                table = document.getElementById('controllBtns');
+                table.classList.add('hidden');
+
                 winnerWasAsked = false;
 
                 gameStarted = false;
