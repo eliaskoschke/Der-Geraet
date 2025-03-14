@@ -21,7 +21,7 @@ public class KartenMotor implements IKartenMotor{
     private final int FREQUENCY = 200;
     private int counter = 1;
     private int sleep = 225;
-    private int forwardTimer = 93;
+    private int forwardTimer = 83;
 
     public KartenMotor(Context pi4j){
          direction1 = pi4j.dout().create(MappingForAdress.getMotorAdress("1"));
@@ -39,12 +39,25 @@ public class KartenMotor implements IKartenMotor{
 
     public void werfeKarteAus() throws InterruptedException {
         dreheVorwaerts(600, forwardTimer);
-        if(counter>8)
-            sleep = 30;
+        if(counter>8 && counter < 25)
+            counter = 8;
+        if(counter>= 25)
+            counter = 25;
         forwardTimer++;
+        if(forwardTimer>110)
+            forwardTimer = 110;
         Thread.sleep(sleep/counter);
         counter++;
-        dreheRueckwaerts(80, 350);
+        dreheRueckwaerts(60, 400);
+//        dreheVorwaerts(95,105);
+//        Thread.sleep(100);
+//        dreheRueckwaerts(80,180);
+    }
+
+    public void werfeKarteAusDealer() throws InterruptedException {
+        dreheVorwaerts(60, 1306);
+
+        dreheRueckwaerts(80, 450);
     }
 
     private void dreheRueckwaerts(int speed, int dauer){

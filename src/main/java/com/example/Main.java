@@ -58,14 +58,14 @@ public class Main {
         cardMotor = new KartenMotor(pi4j);
 
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
-        gameService.setConnected(false);
+        gameService.setConnected(true);
         if(gameService.isConnected()) {
             startController(raspberryController);
             startGamePanel();
         }
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
-            gameService.setConnected(false);
+            gameService.setConnected(true);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
@@ -101,7 +101,8 @@ public class Main {
             }
             if(gameService.isAdminPanelCardThrowActivated()){
                 System.out.println("Sollte rauswerfen");
-                executeCardThrow();
+                executeCardThrow(); //Normale Karte
+//                cardMotor.werfeKarteAusDealer(); //Dealer karte
                 gameService.setAdminPanelCardThrowActivated(false);
             }
             if(gameService.isConnected()) {
@@ -168,9 +169,11 @@ public class Main {
             if (gameService.isButtonClickedOnce()) {
                 hitEvent();
                 gameService.setButtonClickedOnce(false);
+                gameService.setButtonClickedTwice(false);
             }
             if (gameService.isButtonClickedTwice()) {
                 stayEvent();
+                gameService.setButtonClickedOnce(false);
                 gameService.setButtonClickedTwice(false);
             }
             if (turnHasEnded) {
@@ -240,7 +243,7 @@ public class Main {
         gameService.setCurrentPlayer(new Player("0"));
         switch (gamemode) {
             case BLACKJACK -> {
-                rotateStepperMotor(3);
+                rotateStepperMotor(13);
                 gameService.setNumberOfCardFaceup(gameService.getNumberOfCardFaceup() +1);
                 System.out.println("Computer Turn ist dran");
                 if(gameService.isConnected()) {
@@ -398,13 +401,16 @@ public class Main {
     }
 
     public static void rotateStepperMotor(int playerID) {
-        int angle = (-25 * playerID);
-        if(playerID>=4){
-            angle = (-25 * playerID)-15;
+        double angle = (-25 * (playerID-1)) -12.5;
+        if(playerID == 13){
+            angle = -90;
+        }
+        if(playerID>=4 && playerID <=6){
+            angle = (-25 * playerID)-17.5;
         }
 
         try{
-            stepperController.turn(angle);
+            stepperController.turn((int) angle);
             System.out.println("Es fährt zum Winkel: " + angle);
         } catch(Exception e){
             e.printStackTrace();
@@ -459,7 +465,7 @@ public class Main {
             case BLACKJACK -> {
                 System.out.println("Karten werden für den Anfang ausgeteilt");
                 for (int i = 0; i < 2; i++) {
-                    rotateStepperMotor(3);
+                    rotateStepperMotor(13);
                     executeCameraScan();
                     Thread.sleep(100);
                     executeCardThrow();

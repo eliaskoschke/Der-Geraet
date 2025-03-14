@@ -1,8 +1,8 @@
 package com.example;
 
-public class KartenMotorFake implements IKartenMotor{
+public class KartenMotorFake {
 
-    @Override
+
     public void werfeKarteAus() {
         System.out.println("Karte wird ausgeworfen");
     }
