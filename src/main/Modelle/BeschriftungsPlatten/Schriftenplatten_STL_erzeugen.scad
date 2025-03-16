@@ -2,15 +2,15 @@ fontfaktor = 2.2;
 platte_hoehe = 40;  
 platte_breite = 110;  
 extrude_height = 2;
-offset = 5;
+offset = 6;
 spacing = 8;
-color2 ="black";
-color1 ="white";
+color1 ="black";
+color2 ="white";
 
 
 
     // Box
-    //basisbox();
+    basisbox();
 
     schriftDerGeraet();
     //schriftUnteschriften1();
@@ -64,21 +64,21 @@ module schriftDerGeraet() {
         font = "Segoe Script", halign = "center");
     }
 
-    translate([0,offset+spacing*1, -1])
+    translate([0,offset+2, -1])
     color(color2)
     linear_extrude(height = extrude_height) {
-        text("Ausbildung 2024  -  FI-AE-24", 
-        size = 7/fontfaktor, font = "Segoe Script",
+        text("FI-AE-24", 
+        size = 19/fontfaktor, font = "Segoe Script",
         halign = "center");
         
     }
 
-    translate([0,offset+0, -1])
+/*    translate([0,offset+0, -1])
     color(color2)
     linear_extrude(height = extrude_height) {
     
     text("Fachinformatiker Anwendungsentwicklung", 
         size = 7/fontfaktor, font = "Segoe Script", 
         halign = "center");
-    }
+    }*/
 }
