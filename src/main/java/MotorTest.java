@@ -5,7 +5,7 @@ public class MotorTest {
         var pi4j = Pi4J.newAutoContext();
         MotorController motor = new MotorController(pi4j);
         for (int i = 0; i < 10; i++) {
-            motor.werfeKatreAus();
+            motor.werfeSpielerKatreAus();
             Thread.sleep(500);
         }
 

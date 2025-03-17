@@ -31,9 +31,14 @@ public class MotorController {
                 .build());
     }
 
-    public void werfeKatreAus(){
+    public void werfeSpielerKatreAus(){
         dreheVorwaerts(100,100);
         dreheRueckwerts(75,300);
+    }
+
+    public void werfeDealerKatreAus(){
+        dreheVorwaerts(75,150);
+        dreheRueckwerts(76,301);
     }
 
     private void dreheRueckwerts(int speed, int dauer){
