@@ -61,14 +61,14 @@ public class Main {
         cardMotor = new KartenMotor(pi4j);
 
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
-        gameService.setConnected(true);
+        gameService.setConnected(false);
         if(gameService.isConnected()) {
             startController(raspberryController);
             startGamePanel();
         }
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
-            gameService.setConnected(true);
+            gameService.setConnected(false);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
@@ -225,15 +225,8 @@ public class Main {
                     } else {
                         System.out.println("QR-Code nicht gefunden");
                     }
-                } catch (NotFoundException e) {
-                    throw new RuntimeException(e);
-                } catch (JsonMappingException e) {
-                    throw new RuntimeException(e);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
                 } catch (Exception e) {
-                    System.out.println("Fehler beim Dekodieren des QR-Codes: " + e.getMessage());
-                    e.printStackTrace();
+                    System.out.println("Fehler");
                 }
             } else {
                 System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
@@ -253,15 +246,8 @@ public class Main {
                     } else {
                         System.out.println("QR-Code nicht gefunden");
                     }
-                } catch (NotFoundException e) {
-                    throw new RuntimeException(e);
-                } catch (JsonMappingException e) {
-                    throw new RuntimeException(e);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
                 } catch (Exception e) {
-                    System.out.println("Fehler beim Dekodieren des QR-Codes: " + e.getMessage());
-                    e.printStackTrace();
+                    System.out.println("Fehler");
                 }
             } else {
                 System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
