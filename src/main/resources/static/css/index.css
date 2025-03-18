@@ -208,12 +208,9 @@ body::before {
     margin: 0;
     font-size: 0.85rem;
     transition: all 0.3s ease;
+    color: hsla(0, 100%, 80%, 0.8)!important; /* Rote Farbe */
 }
 
-.statustext.hidden {
-    color: hsla(120, 100%, 80%, 0.8); /* Grüne Farbe */
-}
-
-.statustext:not(.hidden) {
-    color: hsla(0, 100%, 80%, 0.8); /* Rote Farbe */
+.active {
+    color: hsla(120, 100%, 80%, 0.8)!important; /* Grüne Farbe */
 }

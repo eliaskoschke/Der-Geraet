@@ -27,6 +27,8 @@ function joinTable(id) {
                 window.location.reload();
             } else if(belegtFrageueichen === true) {
                 sitzplatzClicked(id);
+            } else {
+                window.location.href = 'error.html?error=networkerror';
             }
         })
         .catch(error => console.error('Fehler beim Beitreten zum Tisch:', error));
