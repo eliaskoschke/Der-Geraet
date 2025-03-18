@@ -2,7 +2,10 @@ package com.example;
 
 import com.example.tcm2209.StepperController;
 import com.example.tcm2209.TMCDeviceIsBusyException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.NotFoundException;
 import com.pi4j.Pi4J;
 import javafx.util.Pair;
 import org.springframework.boot.SpringApplication;
@@ -44,7 +47,7 @@ public class Main {
     static ArrayList<Player> blackJackList = new ArrayList<>();
     static ArrayList<Player> listOfAllPlayersWhoPlayTheGame = new ArrayList<>();
     static IKartenMotor cardMotor;
-
+    static Karte oldCard = new Karte();
 
     //--add-opens=Der.Geraet.Maven/com.example=ALL-UNNAMED --add-reads Der.Geraet.Maven=ALL-UNNAMED
     public static void main(String[] args) throws InterruptedException, TMCDeviceIsBusyException, CloneNotSupportedException {
@@ -71,12 +74,8 @@ public class Main {
             registerPlayer();
             listOfAllPlayersWhoPlayTheGame = (ArrayList<Player>) listOfAllPlayerAtTheBeginningOfTheGame.clone();
             while (!gameService.isGameHasEnded() || gameRestarted) {
-
-                if(!stepperIsHome)
-                    stepperController.orientieren();
-                else
-                    stepperIsHome = false;
-
+                gameGraphics.setMenuClicked(false);
+                gameGraphics.setRestartClicked(false);
                 restartTheCurrentgame();
                 gameService.setGameStarted(true);
                 gameService.setGameHasEnded(false);
@@ -207,6 +206,71 @@ public class Main {
         System.out.println("Reset: "+ gameChoiceReseted);
     }
 
+    public static void checkForOldCard() throws InterruptedException {
+        Karte karte = new Karte();
+
+        for (int i = 0; i < 10; i++) {
+
+
+            BufferedImage bufferedImage = camera.captureImage();
+
+            if (bufferedImage != null) {
+                try {
+                    // Dekodiere den QR-Code
+                    String decodedText = camera.decodeQRCode(bufferedImage);
+                    if (decodedText != null) {
+                        System.out.println("Decoded text: " + decodedText);
+                        karte = mapper.readValue(decodedText, Karte.class);
+                        break;
+                    } else {
+                        System.out.println("QR-Code nicht gefunden");
+                    }
+                } catch (NotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (JsonMappingException e) {
+                    throw new RuntimeException(e);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    System.out.println("Fehler beim Dekodieren des QR-Codes: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
+            }
+        }
+        while(oldCard.equals(karte)) {
+            executeCardThrow();
+            BufferedImage bufferedImage = camera.captureImage();
+
+            if (bufferedImage != null) {
+                try {
+                    // Dekodiere den QR-Code
+                    String decodedText = camera.decodeQRCode(bufferedImage);
+                    if (decodedText != null) {
+                        System.out.println("Decoded text: " + decodedText);
+                        karte = mapper.readValue(decodedText, Karte.class);
+                    } else {
+                        System.out.println("QR-Code nicht gefunden");
+                    }
+                } catch (NotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (JsonMappingException e) {
+                    throw new RuntimeException(e);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    System.out.println("Fehler beim Dekodieren des QR-Codes: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
+            }
+        }
+
+    }
+
+
     public static void executeNextTurn() throws InterruptedException {
         Player deleteThisPlayer = null;
         for(Player player : listOfAllPlayerAtTheBeginningOfTheGame){
@@ -261,6 +325,7 @@ public class Main {
                         executeCameraScan();
                         executeCardThrow();
                         giveDealerNextCard();
+                        checkForOldCard();
                         if(gameService.isConnected()) {
                             gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size() - 1));
                         }
@@ -320,6 +385,7 @@ public class Main {
                 executeCameraScan();
                 executeCardThrow();
                 giveCurrentPlayerNextCard();
+                checkForOldCard();
                 gameService.getCurrentPlayer().countHand();
                 System.out.println(gameService.getCurrentPlayer().getKartenhandWert());
                 if (gameService.getCurrentPlayer().getKartenhandWert() >= 21) {
@@ -356,8 +422,9 @@ public class Main {
                     if (decodedText != null) {
                         System.out.println("Decoded text: " + decodedText);
                         Karte karte = mapper.readValue(decodedText, Karte.class);
+                        oldCard = karte;
                         gameService.setNextCardInDeck(karte);
-                        break;
+                            break;
                     } else {
                         System.out.println("QR-Code nicht gefunden");
                     }
@@ -459,8 +526,6 @@ public class Main {
 //das ist ein test2
 
     private static void initializeGame() throws InterruptedException {
-
-        executeCameraScan();
         switch (gamemode) {
             case BLACKJACK -> {
                 System.out.println("Karten werden für den Anfang ausgeteilt");
@@ -470,6 +535,7 @@ public class Main {
                     Thread.sleep(100);
                     executeCardThrow();
                     giveDealerNextCard();
+                    checkForOldCard();
                     if(gameService.isConnected()) {
                         if (i == 0)
                             gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(0));
@@ -488,6 +554,7 @@ public class Main {
                         Thread.sleep(100);
                         executeCardThrow();
                         giveCurrentPlayerNextCard();
+                        checkForOldCard();
                         System.out.println("Jetzt Karte entnehmen");
                         Thread.sleep(3000);
                     }
@@ -520,6 +587,7 @@ public class Main {
 
     private static void restartTheCurrentgame() {
         gameRestarted = false;
+        oldCard = new Karte();
         someOneStartedWithBlackJack = false;
         gameChoiceReseted = false;
         blackJackList = new ArrayList<>();
@@ -541,7 +609,7 @@ public class Main {
         gameChoiceReseted = false;
         blackJackList = new ArrayList<>();
         someOneStartedWithBlackJack = false;
-
+        oldCard = new Karte();
 
         turnHasEnded = false;
         gameService.resetGameChoice();

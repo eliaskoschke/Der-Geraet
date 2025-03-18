@@ -91,4 +91,9 @@ public class Karte {
         bild = new Image("file:/home/pi/Main-Branch/Der-Geraet/src/main/resources/static/img/cards/" + String.valueOf(idValue) + ".png");
         //System.out.println("Bild wurde hiinzugefügt");
     }
+    public boolean equals(Karte karte){
+        if(karte == null || karte.name == null || karte.name.isEmpty() )
+            return false;
+        return this.name.equals(karte.name);
+    }
 }
