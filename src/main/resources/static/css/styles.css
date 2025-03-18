@@ -1,9 +1,13 @@
-* {
-    font-family: "Roboto Mono", serif;
-}
-
+/* Scroll-Verhinderung für alle Seiten */
+html, 
 body {
     margin: 0;
+    padding: 0;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    font-family: "Roboto Mono", serif;
     background-color: hsl(225, 30%, 20%);
 }
 
@@ -41,9 +45,22 @@ button {
     font-size: 1rem;
 }
 
-button:hover {
+/* Hover nur für nicht-deaktivierte Buttons */
+button:not(:disabled):hover {
     box-shadow: 0 3px 10px rgba(0,0,0,0.15);
     transform: scale(1.1);
+}
+
+/* Deaktivierte Buttons */
+button:disabled:not(.platz-button) {
+    cursor: not-allowed;
+    transform: none !important;
+    transition: none;
+}
+
+button:disabled:hover:not(.platz-button) {
+    transform: none !important;
+    box-shadow: none;
 }
 
 .main-button:disabled {
@@ -130,4 +147,35 @@ h5 {
     border-radius: 20px;
     color: white;
     padding: 15px 20px;
+}
+
+/* Entferne Hover-Effekte für deaktivierte Buttons */
+.menu-container .main-button:disabled::before,
+.menu-container .secondary-button:disabled::before {
+    content: none; /* Entfernt die Animation */
+}
+
+.menu-container .main-button:not(:disabled)::before,
+.menu-container .secondary-button:not(:disabled)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        hsla(0, 0%, 100%, 0.2),
+        transparent
+    );
+    transition: 0.5s;
+}
+
+.menu-container .main-button:not(:disabled):hover::before {
+    left: 100%;
+}
+
+.menu-container .secondary-button:not(:disabled):hover::before {
+    width: 100%;
 }

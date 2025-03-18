@@ -3,5 +3,217 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    padding: 1rem;
+    gap: 2.5rem;
+    max-width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.title-section {
+    text-align: center;
+}
+
+.title-section h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: hsl(0, 0%, 95%);
+    text-shadow: 0 0 10px hsla(226, 61%, 45%, 0.5);
+    animation: glow 2s ease-in-out infinite alternate;
+    margin: 0;
+}
+
+/* Menü-Container als nav-Element */
+nav.menu-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 90%;
+    max-width: 400px;
+    padding: 1.5rem;
+    background: hsla(225, 30%, 25%, 0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* Button-Margins zurücksetzen */
+.menu-container button,
+.menu-container a {
+    margin: 0;
+}
+
+/* Gleichmäßiger Abstand zwischen den Buttons */
+.menu-container > * {
+    margin: 0.5rem 0;
+}
+
+.menu-container > *:first-child {
+    margin-top: 0;
+}
+
+.menu-container > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Button-Styling */
+.menu-container button {
+    width: 100%;
+    padding: 1rem;
+    transform-origin: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-container .main-button {
+    background: linear-gradient(135deg, hsl(226, 61%, 45%), hsl(226, 61%, 35%));
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-container .main-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        hsla(0, 0%, 100%, 0.2),
+        transparent
+    );
+    transition: 0.5s;
+}
+
+.menu-container .main-button:hover::before {
+    left: 100%;
+}
+
+.menu-container .secondary-button {
+    background: transparent;
+    border: 2px solid hsla(0, 0%, 85%, 0.8);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.menu-container .secondary-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: hsla(0, 0%, 85%, 0.1);
+    transition: 0.3s;
+    z-index: -1;
+}
+
+.menu-container .secondary-button:hover::before {
+    width: 100%;
+}
+
+/* Button hover Effekte nur für nicht-deaktivierte Buttons */
+.menu-container button:not(:disabled):hover {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    transform: scale(1.1);
+}
+
+.menu-container .secondary-button:not(:disabled):hover::before {
+    width: 100%;
+}
+
+.menu-container .main-button:not(:disabled):hover::before {
+    left: 100%;
+}
+
+/* Deaktivierte Buttons */
+.menu-container button:disabled {
+    cursor: not-allowed;
+    transform: none;
+    transition: none;
+}
+
+.menu-container button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 480px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    .menu-container {
+        width: 85%;
+        padding: 1.2rem;
+        margin: 0 auto;
+    }
+
+    .menu-container button {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Optional: Hintergrund-Animation */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, 
+        hsla(226, 61%, 25%, 0.3) 0%,
+        transparent 70%);
+    animation: pulse 8s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+.error-container {
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.errortext {
+    margin: 0;
+    font-size: 0.85rem;
+    color: hsla(0, 100%, 80%, 0.8);
+    transition: opacity 0.3s ease;
+}
+
+/* Anpassung für die Links in den Buttons */
+.menu-container a {
+    width: 100%;
+    text-decoration: none;
+}
+
+.statustext {
+    margin: 0;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.statustext.hidden {
+    color: hsla(120, 100%, 80%, 0.8); /* Grüne Farbe */
+}
+
+.statustext:not(.hidden) {
+    color: hsla(0, 100%, 80%, 0.8); /* Rote Farbe */
 }

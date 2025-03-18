@@ -1,27 +1,54 @@
+html, 
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
 .container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin-top: -60px;
+    padding: 1rem;
+    overflow: hidden;
 }
 
 .passwort-inputs {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
-
 .psw-in {
-    height: 70px;
-    width: 50px;
-    font-size: 2rem;
+    height: clamp(50px, 10vw, 70px);
+    width: clamp(40px, 8vw, 50px);
+    font-size: clamp(1.5rem, 4vw, 2rem);
     text-align: center;
     background-color: hsl(226, 61%, 70%);
     color: hsl(208, 100%, 95%);
     border: none;
     border-radius: 1.2rem;
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.psw-in::-webkit-outer-spin-button,
+.psw-in::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.psw-in:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px hsla(226, 61%, 45%, 0.5);
 }
 
 .btn-leave {
@@ -32,20 +59,23 @@
 
 #dots {
     position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
     display: block;
     white-space: pre;
-    margin: 0 145px;
+    text-align: center;
 }
 
 .panel {
     display: flex;
     flex-direction: column;
-    align-items: center; 
+    align-items: center;
     gap: 10px;
+    padding: 1rem;
 }
 
 .panel img {
-    width: 9rem;
+    width: clamp(7rem, 20vw, 9rem);
     height: auto;
     border-radius: 1.8rem;
     filter: none;
@@ -55,7 +85,7 @@
 }
 
 .panel img:hover:not(.deactive) {
-    width: 9.15rem;
+    width: clamp(7.15rem, 20.5vw, 9.15rem);
     height: auto;
 }
 

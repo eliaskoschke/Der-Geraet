@@ -12,13 +12,23 @@
 </head>
 <body>
     <div class="container">
-        <h1>Willkommen bei der Gerät</h1>
-        <div class="buttons">
-            <a href="play.html"><button class="main-button">Ich möchte mitspielen</button></a>
-            <button onclick="window.location.href='admin.html'" id="admin" class="secondary-button">Ich bin der Besitzer</button>
-            <h5 id="deactiveText" class="hidden errortext">Derzeit nicht möglich da der Gerät sich im Tisch befindet.</h5>
+        <div class="title-section">
+            <h1>Willkommen bei der Gerät</h1>
         </div>
+        
+        <nav class="menu-container">
+            <a href="play.html">
+                <button class="main-button">Ich möchte mitspielen</button>
+            </a>
+            <button onclick="window.location.href='admin.html'" id="admin" class="secondary-button" disabled>
+                Ich bin der Besitzer
+            </button>
+            <div class="error-container">
+                <h5 id="deactiveText" class="statustext">Derzeit nicht möglich da der Gerät sich im Tisch befindet.</h5>
+            </div>
+        </nav>
     </div>
+
     <script src="index.js"></script>
     <script src="fetcher.js"></script>
     <script src="root.js"></script>
