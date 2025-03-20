@@ -38,7 +38,7 @@ public class KartenMotor implements IKartenMotor{
     }
 
     public void werfeKarteAus() throws InterruptedException {
-        dreheVorwaerts(600, forwardTimer);
+        dreheVorwaerts(100, forwardTimer);
         if(counter>8 && counter < 25)
             counter = 8;
         if(counter>= 25)
