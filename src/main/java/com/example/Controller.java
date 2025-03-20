@@ -203,6 +203,18 @@ public class Controller {
         return new ResponseMessage("thanks");
     }
 
+    @PostMapping("/admin/adminPanel/saveUpdateInDatabase")
+    public ResponseMessage saveUpdateInDatabase(@RequestBody Message message) {
+        String[] list = message.getMessage().split("-");
+        DatenbankController.updateByName(list[0], Integer.parseInt(list[1]));
+        return new ResponseMessage("");
+    }
+
+    @PostMapping("/admin/adminPanel/getDatabaseValuesByName")
+    public ResponseMessage getDatabaseValuesByName(@RequestBody Message message) {
+        return new ResponseMessage(String.valueOf(DatenbankController.getValueByName(message.getMessage())));
+    }
+
     //Todo: Warum CSV? Warum nicht anders?
     @GetMapping("/game/ping/getDealerHand")
     public ResponseMessage getDealerHand() throws JsonProcessingException {

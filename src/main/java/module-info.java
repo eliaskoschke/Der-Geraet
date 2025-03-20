@@ -16,7 +16,13 @@ module Der.Geraet.Maven {
     requires spring.web;
     requires org.bytedeco.opencv;
     requires com.fazecast.jSerialComm;
+    requires spring.data.jpa;
+    requires jakarta.persistence;
+    requires spring.orm;
+    requires spring.tx;
+    requires org.hibernate.orm.core;
+    requires jakarta.xml.bind;
 
-    opens com.example to javafx.graphics, spring.beans, spring.context;
+    opens com.example to javafx.graphics, spring.beans, spring.context, org.hibernate.orm.core;
     exports com.example;
 }
