@@ -142,8 +142,9 @@ public class AdminPanel extends Application {
             } else {
                 root.getChildren().removeAll();
 
+                buttonBox.getChildren().removeAll(kicken, spielerMenu);
                 motorMenu.getChildren().remove(motorConfig);
-                buttonBox.getChildren().add(motorConfig);
+                buttonBox.getChildren().addAll(motorConfig, kicken, spielerMenu);
                 motorConfig.setText("Auswerfmotor Konfigurieren");
 
                 root.setTop(buttonBox);
