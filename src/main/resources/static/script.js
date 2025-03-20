@@ -64,13 +64,7 @@ function Game() {
         document.getElementById('pickBtns').classList.remove('hidden');
         document.getElementById('currentPlayer').classList.remove('hidden');
     }
-    if(2 === user) {
-//        document.getElementById('pickBtn1').disabled = false;
-//        document.getElementById('pickBtn2').disabled = false;
-    } else {
-//        document.getElementById('pickBtn1').disabled = true;
-//        document.getElementById('pickBtn2').disabled = true;
-    }
+
 }
 
 function inGame() {

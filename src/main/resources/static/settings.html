@@ -9,6 +9,7 @@
     <title>Admin Dialog</title>
     <link rel="stylesheet" href="css/play.css">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
     <button onclick="backVar()" class="main-button btn-leave">Zurück</button>
@@ -17,7 +18,35 @@
             <button onclick="rotateStepperMenu()" class="main-button">Drehmenü</button>
             <button onclick="activateCardMotor()" class="main-button">Karte Ausgeben</button>
             <button onclick="sendReset()" class="main-button">Alle Spieler entfernen</button>
+            <button onclick="calibrateAuswerfmotor()" class="main-button">Auswerfmotor Kalibrieren</button>
         </div>
+
+        <div class="hidden" id="calibrateAuswerfmotor">
+            <div class="container-inputs">
+                <div>
+                    <h3>Geschwindigkeit Vorwärts (%)</h3>
+                    <input type="number" id="1" placeholder="1-100" min="1" max="100">
+                    <h3>Dauer Vorwärts (ms)</h3>
+                    <input type="number" id="3" placeholder="Zeit in ms" min="0">
+                </div>
+                <div>
+                    <h3>Geschwindigkeit Rückwärts (%)</h3>
+                    <input type="number" id="2" placeholder="1-100" min="1" max="100">
+                    <h3>Dauer Rückwärts (ms)</h3>
+                    <input type="number" id="4" placeholder="Zeit in ms" min="0">
+                </div>
+                <div>
+                    <h3>Dauer Pause (ms)</h3>
+                    <input type="number" id="5" placeholder="Zeit in ms" min="0">
+                </div>
+            </div>
+
+            <div class="calibrate-buttons">
+                <button onclick="calibrateAuswerfmotorSave()" class="main-button">Speichern</button>
+                <button onclick="calibrateAuswerfmotorStandard()" class="main-button">Zurücksetzen</button>
+            </div>
+        </div>
+
         <div class="hidden" id="rotateStepperMenu">
             <div class="container-btn" id="btns-sitzplaetze">
                 <button id="1" onclick="rotateStepper(this.id)" class="main-button platz-button" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(0deg) translate(160px) rotate(0deg);"><b>Platz</b>1</button>
