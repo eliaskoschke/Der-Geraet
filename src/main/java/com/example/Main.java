@@ -74,6 +74,7 @@ public class Main {
             registerPlayer();
             listOfAllPlayersWhoPlayTheGame = (ArrayList<Player>) listOfAllPlayerAtTheBeginningOfTheGame.clone();
             while (!gameService.isGameHasEnded() || gameRestarted) {
+                cardMotor.readData();
                 gameGraphics.setMenuClicked(false);
                 gameGraphics.setRestartClicked(false);
                 restartTheCurrentgame();
