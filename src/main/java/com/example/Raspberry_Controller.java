@@ -22,6 +22,7 @@ public class   Raspberry_Controller {
     static HashMap<String, DigitalOutput> playerButtonMap = new HashMap<>();
     static boolean isRegistering = true;
     static boolean gameHasAlreadyStartedOnce = false;
+    static boolean isGameModePoker = false;
     //TODO: Umbennenen in Tisch Client
 
     public Raspberry_Controller(Context pi4j){
@@ -50,20 +51,35 @@ public class   Raspberry_Controller {
         while(true){
             if(!isRegistering) {
                 gameHasAlreadyStartedOnce = true;
-                String currentPlayerId = getCurrentPLayerId();
-                for (PiButton piButton : buttonList) {
-                    if (currentPlayerId.equals(String.valueOf(piButton.getPlayerNumber()))) {
-                        piButton.setButtonRegistered(true);
-                        if(playerButtonMap.get(currentPlayerId).isLow())
-                            activateButton(piButton);
+                if(isGameModePoker){
+                    Thread.sleep(1000);
+                    for (PiButton piButton : buttonList) {
 
-                    } else if (playerButtonMap.get(String.valueOf(piButton.getPlayerNumber())).isHigh()) {
-                        deactivateButton(piButton);
+                        if (piButton.isButtonRegistered() && playerButtonMap.get(String.valueOf(piButton.getPlayerNumber())).isLow()) {
+                            activateButton(piButton);
+                        }
+                        if(!piButton.isButtonRegistered() && playerButtonMap.get(String.valueOf(piButton.getPlayerNumber())).isHigh())
+                            deactivateButton(piButton);
+
+                        Thread.sleep(50);
                     }
-                    Thread.sleep(50);
+                } else {
+                    String currentPlayerId = getCurrentPLayerId();
+                    for (PiButton piButton : buttonList) {
+                        if (currentPlayerId.equals(String.valueOf(piButton.getPlayerNumber()))) {
+                            piButton.setButtonRegistered(true);
+                            if (playerButtonMap.get(currentPlayerId).isLow())
+                                activateButton(piButton);
+
+                        } else if (playerButtonMap.get(String.valueOf(piButton.getPlayerNumber())).isHigh()) {
+                            deactivateButton(piButton);
+                        }
+                        Thread.sleep(50);
+                    }
                 }
             } else {
                 if(gameHasAlreadyStartedOnce){
+                    isGameModePoker = false;
                     gameHasAlreadyStartedOnce = false;
                     deactivateAllNonRegisteredButtons(buttonList);
                     for(PiButton button : buttonList){
@@ -181,6 +197,9 @@ public class   Raspberry_Controller {
                         System.out.println("Buttons wurde reseted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     }
                     if(responseMessage.getMessage().equals("Game has started")){
+                        return true;
+                    }
+                    if(responseMessage.getMessage().equals("Game beendet")) {
                         return true;
                     }
                 } else {

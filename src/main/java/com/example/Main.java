@@ -61,14 +61,14 @@ public class Main {
         cardMotor = new KartenMotor(pi4j);
 
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
-        gameService.setConnected(false);
+        gameService.setConnected(true);
         if(gameService.isConnected()) {
             startController(raspberryController);
             startGamePanel();
         }
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
-            gameService.setConnected(false);
+            gameService.setConnected(true);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
@@ -359,6 +359,20 @@ public class Main {
             case POKER -> {
 
                 gameService.setCurrenPlayerIndex(0);
+                rotateStepperMotor(13);
+                executeCameraScan();
+                executeCardThrow();
+                giveDealerNextCard();
+                checkForOldCard();
+                if(gameService.isConnected()) {
+                    gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size() - 1));
+                }
+                if(gameService.getDealer().getDealerHand().size()>=5){
+                    Thread.sleep(10000);
+                    if (gameService.isConnected())
+                        gameGraphics.showGameResults(gameService.getMapOfAllWinners());
+                    gameService.setGameHasEnded(true);
+                }
                 //Taster auf High setzen
             }
         }
@@ -379,7 +393,7 @@ public class Main {
                 }
             }
             case POKER -> {
-                turnHasEnded = true;
+                executeComputerTurn();
             }
         }
     }
@@ -448,7 +462,7 @@ public class Main {
 
             }
             case POKER -> {
-                gameService.getCurrentPlayer().setKartenhandWert(33);
+                executeComputerTurn();
             }
         }
     }
@@ -522,7 +536,7 @@ public class Main {
                     executeCardThrow();
                     giveDealerNextCard();
                     checkForOldCard();
-                    if(gameService.isConnected()) {
+                    if (gameService.isConnected()) {
                         if (i == 0)
                             gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(0));
                         else
@@ -549,10 +563,41 @@ public class Main {
                 gameService.setButtonClickedTwice(false);
             }
             case POKER -> {
-
+                Raspberry_Controller.isGameModePoker = true;
+                for (Player player : gameService.getListOfAllPlayers()) {
+                    gameService.setCurrentPlayer(player);
+                    for (int i = 0; i < 2; i++) {
+                        rotateStepperMotor(Integer.parseInt(gameService.getCurrentPlayer().getId()));
+                        executeCameraScan();
+                        Thread.sleep(100);
+                        executeCardThrow();
+                        giveCurrentPlayerNextCard();
+                        checkForOldCard();
+                        System.out.println("Jetzt Karte entnehmen");
+                        Thread.sleep(3000);
+                    }
+                }
+                gameService.setCurrentPlayer(new Player("0"));
+                gameService.setButtonClickedOnce(false);
+                gameService.setButtonClickedTwice(false);
+                for (int i = 0; i < 3; i++) {
+                    rotateStepperMotor(13);
+                    gameService.setNumberOfCardFaceup(0);
+                    executeCameraScan();
+                    Thread.sleep(100);
+                    executeCardThrow();
+                    giveDealerNextCard();
+                    checkForOldCard();
+                    if (gameService.isConnected()) {
+                        gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(i));
+                    }
+                    System.out.println("Jetzt Karte entnehmen");
+                    Thread.sleep(3000);
+                }
             }
         }
-        System.out.println("Karten wurden ausgeteilt");
+            System.out.println("Karten wurden ausgeteilt");
+
     }
 
     private static void startGamePanel() {
