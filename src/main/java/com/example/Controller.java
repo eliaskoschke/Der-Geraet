@@ -65,7 +65,7 @@ public class Controller {
             playerIds = getListOfAllActiveID();
             System.out.println("Es sollte aus der Liste sein " + playerIds);
         }
-        return null;
+        return new ResponseMessage("thanks");
     }
 
     //Todo: /Logic
@@ -96,6 +96,22 @@ public class Controller {
         }
         return new ResponseMessage("false");
     }
+
+
+    @GetMapping("/user/getGameMode")
+    public ResponseMessage getGameMode() throws JsonProcessingException, InterruptedException {
+        String gamemode = "";
+        switch (gameService.getGamemode()){
+            case POKER -> {
+                gamemode = "Poker";
+            }
+            case BLACKJACK -> {
+                gamemode = "Blackjack";
+            }
+        }
+        return new ResponseMessage(gamemode);
+    }
+
 
     public void delayReset(){
         new Thread(() -> {
@@ -156,20 +172,20 @@ public class Controller {
         return new ResponseMessage("true");
     }
 
-    @GetMapping("/admin/kickCurrentPlayer")
-    public ResponseMessage kickCurrentPlayer() {
-        if (gameService.getCurrenPlayerIndex() + 1 >= gameService.getListOfAllPlayers().size()) {
-            gameService.setCurrenPlayerIndex(0);
-        } else {
-            gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex() + 1);
-            System.out.println("Ein Spieler wurde gekickt");
-            //setze den taster der nächste Person auf high
-        }
-        Player playerWhoHasToBeKicked = gameService.getCurrentPlayer();
-        gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(gameService.getCurrenPlayerIndex()));
-        gameService.getListOfAllPlayers().remove(playerWhoHasToBeKicked);
-        return new ResponseMessage("Spieler wurde gekickt");
-    }
+//    @GetMapping("/admin/kickCurrentPlayer")
+//    public ResponseMessage kickCurrentPlayer() {
+//        if (gameService.getCurrenPlayerIndex() + 1 >= gameService.getListOfAllPlayers().size()) {
+//            gameService.setCurrenPlayerIndex(0);
+//        } else {
+//            gameService.setCurrenPlayerIndex(gameService.getCurrenPlayerIndex() + 1);
+//            System.out.println("Ein Spieler wurde gekickt");
+//            //setze den taster der nächste Person auf high
+//        }
+//        Player playerWhoHasToBeKicked = gameService.getCurrentPlayer();
+//        gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(gameService.getCurrenPlayerIndex()));
+//        gameService.getListOfAllPlayers().remove(playerWhoHasToBeKicked);
+//        return new ResponseMessage("Spieler wurde gekickt");
+//    }
 
     @PostMapping("/admin/adminPanel/rotateStepper")
     public ResponseMessage rotateStepper(@RequestBody Message message) {
@@ -225,7 +241,7 @@ public class Controller {
         return new ResponseMessage("");
     }
 ///ping/getPlayerTurn
-    @GetMapping({"/game/ping/getPlayerTurn", "logic/ping/getPlayerTurn"})
+    @GetMapping({"/game/ping/getPlayerTurn", "/logic/ping/getPlayerTurn"})
     public ResponseMessage getPlayerTurn() throws JsonProcessingException {
         return new ResponseMessage(gameService.getCurrentPlayer().getId());
     }
@@ -258,16 +274,16 @@ public class Controller {
         return new ResponseMessage("true");
     }
 
-    @PostMapping("/logic/cardGotScanned")
-    public ResponseMessage cardGotScanned(@RequestBody Message message) throws JsonProcessingException {
-        try {
-            Karte karte = mapper.readValue(message.getMessage(), Karte.class);
-            return new ResponseMessage("true");
-        } catch (Exception e) {
-
-        }
-        return new ResponseMessage("false");
-    }
+//    @PostMapping("/logic/cardGotScanned")
+//    public ResponseMessage cardGotScanned(@RequestBody Message message) throws JsonProcessingException {
+//        try {
+//            Karte karte = mapper.readValue(message.getMessage(), Karte.class);
+//            return new ResponseMessage("true");
+//        } catch (Exception e) {
+//
+//        }
+//        return new ResponseMessage("false");
+//    }
 
     @PostMapping("/logic/registerPlayerAtTable")
     public ResponseMessage registerPlayerAtTable(@RequestBody Message message) throws JsonProcessingException {

@@ -2,6 +2,7 @@ var user = null;
 var ingame = false;
 var gameStarted = false;
 var winnerWasAsked = false;
+var gameMode = null;
 
 function sitzplatzClicked(index) {
     var sitzplaetze = document.getElementById('btns-sitzplaetze');
@@ -55,11 +56,24 @@ window.onload = function() {
 function Game() {
     inGame();
 
+
+    get('user/getGameMode')
+            .then(message => {
+                console.log('Serverantwort:', message);
+                gameMode = message;
+            })
+            .catch(error => console.error('Fehler beim Laden der Tische:', error));
+
+
     if (gameStarted === true) {
         winnerWasAsked = false;
         document.getElementById('start').classList.add('hidden');
         document.getElementById('winnerTable').classList.add('hidden');
         document.getElementById('playerGame').classList.remove('hidden');
+        if(gameMode === "Poker"){
+            button = document.getElementById('pickBtn2');
+            button.classList.add('hidden')
+        }
         document.getElementById('dealerHand').classList.remove('hidden');
         document.getElementById('pickBtns').classList.remove('hidden');
         document.getElementById('currentPlayer').classList.remove('hidden');
@@ -89,6 +103,7 @@ function inGame() {
                 ingame = false;
                 gameStarted = false;
                 winnerWasAsked = false;
+                gameMode = null;
                 playerGame = document.getElementById('playerGame');
                 playerGame.classList.remove('hidden');
                 table = document.getElementById('winnerTable');

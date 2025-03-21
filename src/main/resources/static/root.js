@@ -1,3 +1,4 @@
+var gameMode = null;
 function leave() {
     window.location.href = 'index.html';
     if(window.location.pathname === "/play.html") {
@@ -28,6 +29,13 @@ var userPick;
 
 
 function pingPlayerTurn() {
+    get('user/getGameMode')
+                .then(message => {
+                    console.log('Serverantwort:', message);
+                    gameMode = message;
+                })
+                .catch(error => console.error('Fehler beim Laden der Tische:', error));
+
     var current = document.getElementById('currentPlayer');
     
     fetch('/api/game/ping/getPlayerTurn', {
@@ -50,8 +58,10 @@ function pingPlayerTurn() {
             } else {
                 current.textContent = "Spieler " + userPick + " ist an der Reihe!";
             }
-            document.getElementById('pickBtn1').disabled = true;
-            document.getElementById('pickBtn2').disabled = true;
+            if(gameMode === "Blackjack"){
+                document.getElementById('pickBtn1').disabled = true;
+                document.getElementById('pickBtn2').disabled = true;
+            }
         } else {
             current.textContent = "Du bist an der Reihe!";
             document.getElementById('pickBtn1').disabled = false;
