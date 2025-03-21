@@ -61,14 +61,14 @@ public class Main {
         cardMotor = new KartenMotor(pi4j);
 
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
-        gameService.setConnected(true);
+        gameService.setConnected(false);
         if(gameService.isConnected()) {
             startController(raspberryController);
             startGamePanel();
         }
         while (!gameService.isGameHasEnded() || gameChoiceReseted) {
             resetGameChoice();
-            gameService.setConnected(true);
+            gameService.setConnected(false);
             gameService.setGameHasEnded(false);
             gameChoiceReseted = false;
             registerPlayer();
