@@ -344,7 +344,11 @@ public class Controller {
 
     private String castWinnerMapIntoString(HashMap<String, String> map){
         if(map == null || map.isEmpty()){
-            return "Kein Spieler hat gewonnen";
+            if(gameService.getGamemode() == Gamemode.POKER){
+                return "";
+            } else {
+                return "Kein Spieler hat gewonnen";
+            }
         }
         String returnString = "";
         for(String key : map.keySet()){

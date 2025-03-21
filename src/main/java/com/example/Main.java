@@ -358,21 +358,37 @@ public class Main {
                 gameService.setGameHasEnded(true);
             }
             case POKER -> {
-
-                gameService.setCurrenPlayerIndex(0);
-                rotateStepperMotor(13);
-                executeCameraScan();
-                executeCardThrow();
-                giveDealerNextCard();
-                checkForOldCard();
-                if(gameService.isConnected()) {
-                    gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size() - 1));
-                }
-                if(gameService.getDealer().getDealerHand().size()>=5){
-                    Thread.sleep(10000);
-                    if (gameService.isConnected())
-                        gameGraphics.showGameResults(gameService.getMapOfAllWinners());
-                    gameService.setGameHasEnded(true);
+                if(gameService.getDealer().getDealerHand() == null || gameService.getDealer().getDealerHand().isEmpty()){
+                    for (int i = 0; i < 3; i++) {
+                        rotateStepperMotor(13);
+                        gameService.setNumberOfCardFaceup(5);
+                        executeCameraScan();
+                        Thread.sleep(100);
+                        executeCardThrow();
+                        giveDealerNextCard();
+                        checkForOldCard();
+                        if (gameService.isConnected()) {
+                            gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(i));
+                        }
+                        System.out.println("Jetzt Karte entnehmen");
+                        Thread.sleep(3000);
+                    }
+                } else {
+                    gameService.setCurrenPlayerIndex(0);
+                    rotateStepperMotor(13);
+                    executeCameraScan();
+                    executeCardThrow();
+                    giveDealerNextCard();
+                    checkForOldCard();
+                    if (gameService.isConnected()) {
+                        gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(gameService.getDealer().getDealerHand().size() - 1));
+                    }
+                    if (gameService.getDealer().getDealerHand().size() >= 5) {
+                        Thread.sleep(10000);
+                        if (gameService.isConnected())
+                            gameGraphics.showGameResults(gameService.getMapOfAllWinners());
+                        gameService.setGameHasEnded(true);
+                    }
                 }
                 //Taster auf High setzen
             }
@@ -581,20 +597,6 @@ public class Main {
                 gameService.setCurrentPlayer(new Player("0"));
                 gameService.setButtonClickedOnce(false);
                 gameService.setButtonClickedTwice(false);
-                for (int i = 0; i < 3; i++) {
-                    rotateStepperMotor(13);
-                    gameService.setNumberOfCardFaceup(0);
-                    executeCameraScan();
-                    Thread.sleep(100);
-                    executeCardThrow();
-                    giveDealerNextCard();
-                    checkForOldCard();
-                    if (gameService.isConnected()) {
-                        gameGraphics.addCardToTable(gameService.getDealer().getDealerHand().get(i));
-                    }
-                    System.out.println("Jetzt Karte entnehmen");
-                    Thread.sleep(3000);
-                }
             }
         }
             System.out.println("Karten wurden ausgeteilt");
