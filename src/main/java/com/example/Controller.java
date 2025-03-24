@@ -18,6 +18,7 @@ public class Controller {
     private ObjectMapper mapper = new ObjectMapper();
     int counter = 0;
     int numberOfAllPlayersInGame = 0;
+    static boolean executingComand = false;
 
 
     @Autowired
@@ -142,22 +143,27 @@ public class Controller {
     }
 
     @PostMapping("/admin/startGame")
-    public ResponseMessage startGame(@RequestBody Message message) {
-        gameService.setGameStarted(true);
-        numberOfAllPlayersInGame = gameService.getListOfAllPlayers().size();
-        //TODO: Gamemode.valueOf(message.getMessage().toUpperCase());
-        if (message.getMessage().toLowerCase().equals("blackjack")) {
-            gameService.setGamemode(Gamemode.BLACKJACK);
-        } else {
-            gameService.setGamemode(Gamemode.POKER);
-        }
-        Collections.sort(gameService.getListOfAllPlayers(), new Comparator<Player>() {
-            @Override
-            public int compare(Player p1, Player p2) {
-                return Integer.compare(Integer.parseInt(p1.getId()), Integer.parseInt(p2.getId()));
+    public ResponseMessage startGame(@RequestBody Message message) throws InterruptedException, CloneNotSupportedException {
+        if(!executingComand) {
+            executingComand = true;
+            gameService.setGameStarted(true);
+            numberOfAllPlayersInGame = gameService.getListOfAllPlayers().size();
+            //TODO: Gamemode.valueOf(message.getMessage().toUpperCase());
+            if (message.getMessage().toLowerCase().equals("blackjack")) {
+                gameService.setGamemode(Gamemode.BLACKJACK);
+            } else {
+                gameService.setGamemode(Gamemode.POKER);
             }
-        });
-        gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
+            Collections.sort(gameService.getListOfAllPlayers(), new Comparator<Player>() {
+                @Override
+                public int compare(Player p1, Player p2) {
+                    return Integer.compare(Integer.parseInt(p1.getId()), Integer.parseInt(p2.getId()));
+                }
+            });
+            gameService.setCurrentPlayer(gameService.getListOfAllPlayers().get(0));
+            gameService.startGame();
+            executingComand = false;
+        }
         return new ResponseMessage("true");
     }
 
@@ -190,13 +196,14 @@ public class Controller {
     @PostMapping("/admin/adminPanel/rotateStepper")
     public ResponseMessage rotateStepper(@RequestBody Message message) {
         System.out.println("STEPPER wurde geklickt");
-        gameService.setAdminPanelRotateStepper(new Pair<>(true, Integer.parseInt(message.getMessage())));
+        GameService.rotateStepperMotor(Integer.parseInt(message.getMessage()));
         return new ResponseMessage("thanks");
     }
 
     @PostMapping("/admin/restartGame")
     public ResponseMessage restartGame(@RequestBody Message message) {
         gameService.setGameRestarted(true);
+        gameService.restartTheCurrentGame();
         return new ResponseMessage("thanks");
     }
 
@@ -209,12 +216,14 @@ public class Controller {
             gameService.setPlayerAtReset(numberOfAllPlayersInGame);
             gameService.getListOfAllPlayers().clear();
         }
+        gameService.resetGameChoice();
         return new ResponseMessage("thanks");
     }
 
     @PostMapping("/admin/adminPanel/activateCardMotor")
-    public ResponseMessage activateCardMotor(@RequestBody Message message) {
+    public ResponseMessage activateCardMotor(@RequestBody Message message) throws InterruptedException {
         System.out.println("CARD MOTOR wurde geklickt");
+        GameService.executeCardThrow();
         gameService.setAdminPanelCardThrowActivated(true);
         return new ResponseMessage("thanks");
     }
@@ -254,24 +263,33 @@ public class Controller {
 
 
     @PostMapping({"/logic/buttonIsClickedOnce", "/user/hit"})
-    public ResponseMessage buttonIsClickedOnce(@RequestBody Message message) {
-        System.out.println("Hallo");
-        String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ") + 1);
-        System.out.println("Es wurde ein Button geklickt: " + buttonId);
-        gameService.setButtonClickedOnce(true);
-
-        return new ResponseMessage("true");
+    public ResponseMessage buttonIsClickedOnce(@RequestBody Message message) throws InterruptedException {
+        if(!executingComand) {
+            executingComand = true;
+            System.out.println("Hallo");
+            String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ") + 1);
+            System.out.println("Es wurde ein Button geklickt: " + buttonId);
+            gameService.setButtonClickedOnce(true);
+            GameService.hitEvent();
+            executingComand = false;
+            return new ResponseMessage("true");
+        }
+        return  new ResponseMessage("true");
     }
 
     @PostMapping({"/logic/buttonIsClickedTwice", "/user/stay"})
-    public ResponseMessage buttonIsClickedTwice(@RequestBody Message message) {
-
+    public ResponseMessage buttonIsClickedTwice(@RequestBody Message message) throws InterruptedException {
+        if(!executingComand) {
+            executingComand = true;
         System.out.println("Hallo");
         String buttonId = message.getMessage().substring(message.getMessage().indexOf(" ") + 1);
         System.out.println("Es wurde ein Button geklickt: " + buttonId);
         gameService.setButtonClickedTwice(true);
-
-        return new ResponseMessage("true");
+        GameService.stayEvent();
+            executingComand = false;
+            return new ResponseMessage("true");
+        }
+        return  new ResponseMessage("true");
     }
 
 //    @PostMapping("/logic/cardGotScanned")
@@ -286,12 +304,13 @@ public class Controller {
 //    }
 
     @PostMapping("/logic/registerPlayerAtTable")
-    public ResponseMessage registerPlayerAtTable(@RequestBody Message message) throws JsonProcessingException {
+    public ResponseMessage registerPlayerAtTable(@RequestBody Message message) throws JsonProcessingException, InterruptedException, CloneNotSupportedException {
         System.out.println("Nachricht erhalten: " + message.getMessage());
         //gameService.buttonClicked();
         List<String> playerIds = getListOfAllActiveID();
         if (!playerIds.contains(message.getMessage())) {
             gameService.getListOfAllPlayers().add(new Player(message.getMessage()));
+            GameService.registerPlayer();
             return new ResponseMessage("acknowledged");
         }
         return new ResponseMessage("not acknowledged");

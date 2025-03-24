@@ -55,36 +55,36 @@ public class Main {
         ApplicationContext context = SpringApplication.run(Main.class, args);
         gameService = context.getBean(GameService.class);
 
-        stepperController = new StepperController(pi4j);
-        stepperController.orientieren();
-
-        cardMotor = new KartenMotor(pi4j);
-
-        Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
-        gameService.setConnected(false);
-        if(gameService.isConnected()) {
-            startController(raspberryController);
-            startGamePanel();
-        }
-        while (!gameService.isGameHasEnded() || gameChoiceReseted) {
-            resetGameChoice();
-            gameService.setConnected(false);
-            gameService.setGameHasEnded(false);
-            gameChoiceReseted = false;
-            registerPlayer();
-            listOfAllPlayersWhoPlayTheGame = (ArrayList<Player>) listOfAllPlayerAtTheBeginningOfTheGame.clone();
-            while (!gameService.isGameHasEnded() || gameRestarted) {
-                cardMotor.readData();
-                gameGraphics.setMenuClicked(false);
-                gameGraphics.setRestartClicked(false);
-                restartTheCurrentgame();
-                gameService.setGameStarted(true);
-                gameService.setGameHasEnded(false);
-                gameRestarted = false;
-                initializeGame();
-                gameLogic();
-            }
-        }
+//        stepperController = new StepperController(pi4j);
+//        stepperController.orientieren();
+//
+//        cardMotor = new KartenMotor(pi4j);
+//
+//        Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
+//        gameService.setConnected(false);
+//        if(gameService.isConnected()) {
+//            startController(raspberryController);
+//            startGamePanel();
+//        }
+//        while (!gameService.isGameHasEnded() || gameChoiceReseted) {
+//            resetGameChoice();
+//            gameService.setConnected(false);
+//            gameService.setGameHasEnded(false);
+//            gameChoiceReseted = false;
+//            registerPlayer();
+//            listOfAllPlayersWhoPlayTheGame = (ArrayList<Player>) listOfAllPlayerAtTheBeginningOfTheGame.clone();
+//            while (!gameService.isGameHasEnded() || gameRestarted) {
+//                cardMotor.readData();
+//                gameGraphics.setMenuClicked(false);
+//                gameGraphics.setRestartClicked(false);
+//                restartTheCurrentgame();
+//                gameService.setGameStarted(true);
+//                gameService.setGameHasEnded(false);
+//                gameRestarted = false;
+//                initializeGame();
+//                gameLogic();
+//            }
+//        }
     }
 
     public static void registerPlayer() throws InterruptedException, TMCDeviceIsBusyException, CloneNotSupportedException {
@@ -462,12 +462,9 @@ public class Main {
 
     private static void giveCurrentPlayerNextCard() {
         if (gameService.getCurrentPlayer().getKartenhand() == null) {
-//                        gameService.getDealer().setDealerHand(new ArrayList<Karte>());
-//                        gameService.getDealer().getDealerHand().add(karte);
             gameService.getCurrentPlayer().setKartenhand(new ArrayList<Karte>());
             gameService.getCurrentPlayer().getKartenhand().add(gameService.getNextCardInDeck());
         } else {
-//                        gameService.getDealer().getDealerHand().add(karte);
             gameService.getCurrentPlayer().getKartenhand().add(gameService.getNextCardInDeck());
         }
     }
