@@ -11,6 +11,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class PiButton {
     //Todo: URL in eine Config machen
     private static final String baseURL = "http://localhost:8080/api/logic";
@@ -36,6 +39,7 @@ public class PiButton {
         var button = pi4j.create(buttonConfig);
 
         button.addListener(e -> {
+            new Thread(() -> {
             if (e.state() == DigitalState.HIGH) {
                 if(!buttonRegistered){
 
@@ -50,7 +54,7 @@ public class PiButton {
                         } else{
                             lastPressTime = currentTime;
                             isWaitingForSecondClick = true;
-                            new java.util.Timer().schedule(new java.util.TimerTask(){
+                            new Timer().schedule(new TimerTask(){
                                 @Override
                                 public void run(){
                                     if(isWaitingForSecondClick) {
@@ -66,7 +70,7 @@ public class PiButton {
                 }
 //                System.out.println("Button "+playerNumber +" wurde geklickt");
             }
-        });
+        }).start();});
     }
 
 

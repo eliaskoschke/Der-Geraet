@@ -11,6 +11,12 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +34,14 @@ public class GameFX extends Application {
     private static Gamemode currentGame;
     private static boolean gameStarted = false;
     private static List<String> playerList = new ArrayList<>();
+
+    public static List<String> getPlayerList() {
+        return playerList;
+    }
+
+    public static void setPlayerList(List<String> playerList) {
+        GameFX.playerList = playerList;
+    }
 
     public GameFX() {
         seats = new ArrayList<>(6);
@@ -95,18 +109,24 @@ public class GameFX extends Application {
             showSeats("Black Jack");
             toggleButtonStyle(blackJackBtn);
             resetOtherButtons(blackJackBtn, pokerBtn, luegeBtn);
+            updateSeatColor(playerList);
+            updateSeatColor(playerList);
         });
 
         pokerBtn.setOnAction(e -> {
             showSeats("Poker");
             toggleButtonStyle(pokerBtn);
             resetOtherButtons(pokerBtn, blackJackBtn, luegeBtn);
+            updateSeatColor(playerList);
+            updateSeatColor(playerList);
         });
 
         luegeBtn.setOnAction(e -> {
             showSeats("Lüge");
             toggleButtonStyle(luegeBtn);
             resetOtherButtons(luegeBtn, blackJackBtn, pokerBtn);
+            updateSeatColor(playerList);
+            updateSeatColor(playerList);
         });
 
         adminPanelBtn.setOnAction(e -> {
@@ -120,6 +140,9 @@ public class GameFX extends Application {
 
         startButton.setOnAction(e -> {
             gameStarted = true;
+            new Thread(() -> {
+                startGame();
+            }).start();
             GameGraphics gameGraphics = new GameGraphics(false);
             gameGraphics.start(primaryStage);
         });
@@ -223,7 +246,10 @@ public class GameFX extends Application {
         // Reset and initialize seat list
         seats.clear();
         for (int i = 0; i < 6; i++) {
-            seats.add(false); // All seats start as empty
+            if(playerList.contains(String.valueOf((i+1))))
+                seats.add(true); // All seats start as empty
+            else
+                seats.add(false);
         }
 
         seatLayout.getChildren().clear();
@@ -258,7 +284,7 @@ public class GameFX extends Application {
             int finalI = i;
             seat.setOnMouseClicked(e -> {
                 seats.set(finalI, !seats.get(finalI));
-                seat.setFill(seats.get(finalI) ? Color.RED : Color.GREEN);
+                //seat.setFill(seats.get(finalI) ? Color.RED : Color.GREEN);
                 if(playerList.contains(String.valueOf(finalI+1))){
                     seat.setFill(Color.RED);
                 } else
@@ -302,6 +328,24 @@ public class GameFX extends Application {
 
     public void launchApp() {
         launch();
+    }
+    private void startGame(){
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            //Todo: Warum hast du das so gemacht? Mach doch einfach ein Message Objekt du Idiot
+            String message = "{\"message\":\"\"}";
+
+            HttpPost postRequest = new HttpPost("http://localhost:8080/api/admin/startGame");
+            postRequest.setHeader("Content-Type", "application/json");
+
+            postRequest.setEntity(new StringEntity(message));
+
+            // Sende die POST-Anfrage und erhalte die Antwort
+            try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
+                // Überprüfe den Status der Antwort und verarbeite sie
+            }
+        } catch (Exception exception) {
+            exception.getStackTrace();
+        }
     }
 
     private void openGameScene(Stage primaryStage) {

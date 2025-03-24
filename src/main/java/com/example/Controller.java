@@ -1,5 +1,6 @@
 package com.example;
 
+import com.example.tcm2209.TMCDeviceIsBusyException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.util.Pair;
@@ -29,7 +30,7 @@ public class Controller {
     @GetMapping("/onload")
     public ResponseMessage receiveMessageSitzplatz() throws JsonProcessingException {
         List<String> playerIds = getListOfAllActiveID();
-        System.out.println(playerIds);
+//        System.out.println(playerIds);
         return new ResponseMessage(mapper.writeValueAsString(playerIds));
     }
 
@@ -47,7 +48,7 @@ public class Controller {
 
     @PostMapping("/user/playerJoinedTheTable")
     public ResponseMessage playerJoinedTheTable(@RequestBody Message message) {
-        System.out.println("Nachricht erhalten: " + message.getMessage());
+//        System.out.println("Nachricht erhalten: " + message.getMessage());
         //gameService.buttonClicked();
         List<String> playerIds = getListOfAllActiveID();
         if (!playerIds.contains(message.getMessage())) {
@@ -79,7 +80,7 @@ public class Controller {
                 gameService.setPlayerAtReset(0);
                 gameService.setPlayerGotReseted(0);
                 delayReset();
-                System.out.println("Alle Spieler Wurde reseted");
+                //System.out.println("Alle Spieler Wurde reseted");
                 return new ResponseMessage(mapper.writeValueAsString("true"));
             }
             if(gameService.isConnected()) {
@@ -143,7 +144,7 @@ public class Controller {
     }
 
     @PostMapping("/admin/startGame")
-    public ResponseMessage startGame(@RequestBody Message message) throws InterruptedException, CloneNotSupportedException {
+    public ResponseMessage startGame(@RequestBody Message message) throws InterruptedException, CloneNotSupportedException, TMCDeviceIsBusyException {
         if(!executingComand) {
             executingComand = true;
             gameService.setGameStarted(true);
@@ -194,7 +195,7 @@ public class Controller {
 //    }
 
     @PostMapping("/admin/adminPanel/rotateStepper")
-    public ResponseMessage rotateStepper(@RequestBody Message message) {
+    public ResponseMessage rotateStepper(@RequestBody Message message) throws TMCDeviceIsBusyException {
         System.out.println("STEPPER wurde geklickt");
         GameService.rotateStepperMotor(Integer.parseInt(message.getMessage()));
         return new ResponseMessage("thanks");
@@ -232,6 +233,7 @@ public class Controller {
     public ResponseMessage saveUpdateInDatabase(@RequestBody Message message) {
         String[] list = message.getMessage().split("-");
         DatenbankController.updateByName(list[0], Integer.parseInt(list[1]));
+        GameService.updateCardMotorDatabase();
         return new ResponseMessage("");
     }
 
@@ -263,7 +265,7 @@ public class Controller {
 
 
     @PostMapping({"/logic/buttonIsClickedOnce", "/user/hit"})
-    public ResponseMessage buttonIsClickedOnce(@RequestBody Message message) throws InterruptedException {
+    public ResponseMessage buttonIsClickedOnce(@RequestBody Message message) throws InterruptedException, TMCDeviceIsBusyException {
         if(!executingComand) {
             executingComand = true;
             System.out.println("Hallo");
@@ -278,7 +280,7 @@ public class Controller {
     }
 
     @PostMapping({"/logic/buttonIsClickedTwice", "/user/stay"})
-    public ResponseMessage buttonIsClickedTwice(@RequestBody Message message) throws InterruptedException {
+    public ResponseMessage buttonIsClickedTwice(@RequestBody Message message) throws InterruptedException, TMCDeviceIsBusyException {
         if(!executingComand) {
             executingComand = true;
         System.out.println("Hallo");

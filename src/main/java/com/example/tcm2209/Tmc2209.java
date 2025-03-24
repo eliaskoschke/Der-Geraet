@@ -72,6 +72,7 @@ public class Tmc2209 {
                     this.stepPin.off();
                     this.currSpeed.set(0);
                     this.isMovingSemaphore.release();
+                    System.out.println("h");
                 }
             }
         });
@@ -95,6 +96,7 @@ public class Tmc2209 {
 
         stepPin.off();
         this.targetPosition.set(targetPosition);
+        System.out.println(targetPosition);
         if (position.get() < targetPosition) {
             currSpeed.set(speed);
             direction.set(Direction.FORWARD);

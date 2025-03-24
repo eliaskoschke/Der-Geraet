@@ -85,7 +85,7 @@ public class   Raspberry_Controller {
                     for(PiButton button : buttonList){
 
                         button.resetButton();
-                        System.out.println("ALLE BUTTONS WURDE RESETED!!!!!!!!!!!!!!!!!!!!");
+//                        System.out.println("ALLE BUTTONS WURDE RESETED!!!!!!!!!!!!!!!!!!!!");
                     }
                 }
                 manageButtonsForRegistration(buttonList);
@@ -191,10 +191,10 @@ public class   Raspberry_Controller {
                 if (statusCode == 200) {
                     String responseBody = EntityUtils.toString(response.getEntity());
                     Message responseMessage = mapper.readValue(responseBody, Message.class);
-                    System.out.println("Angekommene Nachricht : " + responseMessage.getMessage());
+                    //System.out.println("Angekommene Nachricht : " + responseMessage.getMessage());
                     if(responseMessage.getMessage().equals("\"true\"")){
                         gameHasAlreadyStartedOnce = true;
-                        System.out.println("Buttons wurde reseted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//                        System.out.println("Buttons wurde reseted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     }
                     if(responseMessage.getMessage().equals("Game has started")){
                         return true;
