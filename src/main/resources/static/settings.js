@@ -167,11 +167,7 @@ function saveDataindatabase() {
 function resetToDefault() {
     let fieldIds = ['1', '3', '5', '2', '4'];
     
-    for (let i = 0; i < fieldIds.length && i < standartWerte.length; i++) {
-        const feld = document.getElementById(fieldIds[i]);
-        if (feld) {
-            feld.value = standartWerte[i];
-        }
-    }
+    motorWerte = standartWerte;
+    fuelleFelderMitDaten();
     
 }
