@@ -196,8 +196,12 @@ public class Controller {
 
     @PostMapping("/admin/adminPanel/rotateStepper")
     public ResponseMessage rotateStepper(@RequestBody Message message) throws TMCDeviceIsBusyException {
-        System.out.println("STEPPER wurde geklickt");
-        GameService.rotateStepperMotor(Integer.parseInt(message.getMessage()));
+        if(!executingComand) {
+            executingComand = true;
+            System.out.println("STEPPER wurde geklickt");
+            GameService.rotateStepperMotor(Integer.parseInt(message.getMessage()));
+            executingComand = false;
+        }
         return new ResponseMessage("thanks");
     }
 
@@ -223,9 +227,13 @@ public class Controller {
 
     @PostMapping("/admin/adminPanel/activateCardMotor")
     public ResponseMessage activateCardMotor(@RequestBody Message message) throws InterruptedException {
-        System.out.println("CARD MOTOR wurde geklickt");
-        GameService.executeCardThrow();
-        gameService.setAdminPanelCardThrowActivated(true);
+        if(!executingComand) {
+            executingComand = true;
+            System.out.println("CARD MOTOR wurde geklickt");
+            GameService.executeCardThrow();
+            gameService.setAdminPanelCardThrowActivated(true);
+            executingComand = false;
+        }
         return new ResponseMessage("thanks");
     }
 

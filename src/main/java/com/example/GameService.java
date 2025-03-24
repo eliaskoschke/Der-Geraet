@@ -5,6 +5,9 @@ import com.example.tcm2209.TMCDeviceIsBusyException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
+import com.pi4j.io.gpio.digital.DigitalInput;
+import com.pi4j.io.gpio.digital.DigitalOutput;
+import com.pi4j.io.gpio.digital.DigitalState;
 import javafx.util.Pair;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -34,6 +37,7 @@ public class GameService {
     static ArrayList<Player> listOfAllPlayersWhoPlayTheGame = new ArrayList<>();
     static IKartenMotor cardMotor;
     static Karte oldCard = new Karte();
+    static DigitalInput connectionInput;
 
     private static Pair<Boolean, Integer> adminPanelRotateStepper = new Pair<>(false, 0);
 
@@ -78,7 +82,11 @@ public class GameService {
         cardMotor = new KartenMotor(pi4j);
 
         Raspberry_Controller raspberryController = new Raspberry_Controller(pi4j);
-        connected = (true);
+        connectionInput = pi4j.create(DigitalInput.newConfigBuilder(pi4j)
+                .name("Connection Input")
+                .id("Connection Input ID")
+                .address(MappingForAdress.getConnectionAdress()));
+        connected = connectionInput.isHigh();
         if(connected) {
             startController(raspberryController);
             startGamePanel();
@@ -104,7 +112,7 @@ public class GameService {
         }
         if(gameChoiceReseted){
             resetGameChoice();
-            connected = (true);
+            connected = connectionInput.isHigh();
             gameHasEnded = (false);
             gameChoiceReseted = false;
             GameFX.setPlayerList(new ArrayList<String>());
