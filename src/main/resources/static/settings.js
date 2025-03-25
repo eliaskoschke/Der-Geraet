@@ -67,49 +67,111 @@ function rotateStepperMenu() {
     rotateStepperMenuElement.classList.remove('hidden');
 }
 
-function calibrateAuswerfmotor() {
+function calibrateAuswerfmotorshowanddo() {
     menu.classList.add('hidden');
     let calibrateAuswerfmotorElement = document.getElementById('calibrateAuswerfmotor');
     calibrateAuswerfmotorElement.classList.remove('hidden');
+
+    let currentDataMsg = ["vorwaertsGeschwindigkeit", "vorwaertsDauer", "pauseDauer", "rueckwaertsGeschwindigkeit", "rueckwaertsDauer"];
+    let defaultDataMsg = ["standartVorwaertsGeschwindigkeit", "standartVorwaertsDauer", "standartPauseDauer", "standartRueckwaertsGeschwindigkeit", "StandartRueckwaertsDauer"];
+    
+    motorWerte = [];
+    standartWerte = [];
+    
+    // Daten abrufen und in Felder einfügen
+    Promise.all(currentDataMsg.map(name => getDataByName(name)))
+        .then(values => {
+            motorWerte = values;
+            return Promise.all(defaultDataMsg.map(name => getDataByName(name)));
+        })
+        .then(values => {
+            standartWerte = values;
+            // Daten in die Felder einfügen
+            fuelleFelderMitDaten();
+        })
+        .catch(error => {
+            console.error('Fehler beim Abrufen der Daten:', error);
+        });
 }
 
-function calibrateAuswerfmotorSave() {}
+function fuelleFelderMitDaten() {
+    document.getElementById('1').value = motorWerte[0]; // vorwaertsGeschwindigkeit
+    document.getElementById('3').value = motorWerte[1]; // vorwaertsDauer
+    document.getElementById('5').value = motorWerte[2]; // pauseDauer
+    document.getElementById('2').value = motorWerte[3]; // rueckwaertsGeschwindigkeit
+    document.getElementById('4').value = motorWerte[4]; // rueckwaertsDauer
+}
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Geschwindigkeits-Inputs (IDs 1 und 2) überwachen
-    const speedInputs = document.querySelectorAll('#calibrateAuswerfmotor input[type="number"]');
-    
-    speedInputs.forEach(input => {
-        if (input.id === '1' || input.id === '2') {  // Nur Geschwindigkeits-Inputs
-            input.addEventListener('input', function() {
-                let value = parseInt(this.value);
-                
-                // Leere Eingabe erlauben
-                if (this.value === '') return;
-                
-                // Wert auf 1-100 beschränken
-                if (isNaN(value)) {
-                    this.value = '';
-                } else if (value > 100) {
-                    this.value = 100;
-                } else if (value < 1) {
-                    this.value = 1;
-                }
-            });
-
-            // Verhindert das Einfügen ungültiger Werte
-            input.addEventListener('paste', function(e) {
-                e.preventDefault();
-                let pastedValue = parseInt(e.clipboardData.getData('text'));
-                
-                if (!isNaN(pastedValue)) {
-                    if (pastedValue > 100) pastedValue = 100;
-                    if (pastedValue < 1) pastedValue = 1;
-                    this.value = pastedValue;
-                }
-            });
+function getDataByName(name) {
+    return fetch('/api/admin/adminPanel/getDatabaseValuesByName', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: name })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Netzwerkantwort war nicht ok');
         }
+        return response.json();
+    })
+    .then(data => {
+        return data.message;
+    })
+    .catch(error => {
+        console.error('Fehler beim Abrufen der Daten:', error);
+        return null;
     });
-});
+}
 
 
+function saveDataindatabase() {
+    let dataNames = ["vorwaertsGeschwindigkeit", "vorwaertsDauer", "pauseDauer", "rueckwaertsGeschwindigkeit", "rueckwaertsDauer"];
+    
+    let fieldIds = ['1', '3', '5', '2', '4'];
+    
+    for (let i = 0; i < dataNames.length; i++) {
+        let value = document.getElementById(fieldIds[i]).value;
+        
+        if (value === "" || value === null || value === undefined) {
+            value = "0";
+        }
+        
+        let message = dataNames[i] + "-" + value;
+        
+        // Sende die Daten an den Server
+        fetch('/api/admin/adminPanel/saveUpdateInDatabase', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Netzwerkantwort war nicht ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Daten gespeichert:', data);
+        })
+        .catch(error => {
+            console.error('Fehler beim Speichern der Daten:', error);
+        });
+    }
+    
+}
+
+function resetToDefault() {
+    let fieldIds = ['1', '3', '5', '2', '4'];
+    
+    for (let i = 0; i < fieldIds.length && i < standartWerte.length; i++) {
+        const feld = document.getElementById(fieldIds[i]);
+        if (feld) {
+            feld.value = standartWerte[i];
+        }
+    }
+    
+}
