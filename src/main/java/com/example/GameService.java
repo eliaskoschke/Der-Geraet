@@ -245,8 +245,6 @@ public class GameService {
         turnHasEnded = true;
         switch (gamemode) {
             case BLACKJACK -> {
-                //stepperController.orientieren();
-                //Thread.sleep(500);
                 executeNextTurn();
             }
             case POKER -> {
