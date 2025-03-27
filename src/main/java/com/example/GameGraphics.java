@@ -121,6 +121,7 @@ public class GameGraphics extends Application {
     public void showGameResults(Map<String, String> results) {
         Platform.runLater(() -> {
             StackPane resultPane = new StackPane();
+
             resultPane.setStyle("-fx-background-color: rgb(36, 43, 66);");
 
             StringBuilder resultText = new StringBuilder();
@@ -173,9 +174,9 @@ public class GameGraphics extends Application {
             resultPane.getChildren().add(vbox);
 
             Scene resultScene = new Scene(resultPane, screenWidth, screenHeight);
-
             Stage stage = (Stage) cardTable.getScene().getWindow();
             stage.setScene(resultScene);
+            stage.setFullScreen(true);
         });
     }
 

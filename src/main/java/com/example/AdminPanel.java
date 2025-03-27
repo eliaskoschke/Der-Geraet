@@ -335,7 +335,7 @@ public class AdminPanel extends Application {
         String css = """
                     -fx-background-color: rgb(70, 103, 210);
                     -fx-text-fill: white;
-                    -fx-font-size: 21px;
+                    -fx-font-size: 19px;
                     -fx-font-weight: Bold;
                     -fx-max-height: 275px;
                     -fx-max-width: 350px;
