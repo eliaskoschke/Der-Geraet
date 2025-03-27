@@ -39,6 +39,7 @@ public class GameService {
     static Karte oldCard = new Karte();
     static DigitalInput connectionInput;
 
+
     private static Pair<Boolean, Integer> adminPanelRotateStepper = new Pair<>(false, 0);
 
     private static boolean adminPanelCardThrowActivated = false;
@@ -86,8 +87,7 @@ public class GameService {
                 .name("Connection Input")
                 .id("Connection Input ID")
                 .address(MappingForAdress.getConnectionAdress()));
-        connected = connectionInput.isHigh();
-        if(connected) {
+        if(isConnected()) {
             startController(raspberryController);
             startGamePanel();
         }
@@ -141,6 +141,7 @@ public class GameService {
     private static void startController(Raspberry_Controller controller) {
         new Thread(() -> {
             try {
+                controller.setRunning(true);
                 controller.execute();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -148,11 +149,16 @@ public class GameService {
         }).start();
     }
 
-    public static void startGame() throws InterruptedException, CloneNotSupportedException, TMCDeviceIsBusyException {
+    private static void endController(Raspberry_Controller controller){
+        controller.setRunning(false);
+        controller = null;
+    }
+
+    public void startGame() throws InterruptedException, CloneNotSupportedException, TMCDeviceIsBusyException {
         for(Player player : listOfAllPlayers){
             System.out.println("Spieler " + player.getId() +" ist im Spiel.");
         }
-        if(connected){
+        if(isConnected()){
             if (gameFx.isGameStarted()) {
                 currentPlayer = new Player("0");
                 listOfAllPlayerAtTheBeginningOfTheGame = new ArrayList<>();
@@ -235,9 +241,6 @@ public class GameService {
                     .map(Player::getId)
                     .toList();
             gameFx.updateSeatColor(playerIds);
-        }
-        for(Player player : listOfAllPlayers){
-            System.out.println("Spieler " + player.getId() +" wurde registriert");
         }
     }
 
@@ -407,6 +410,7 @@ public class GameService {
 
     private static void executeCameraScan() {
 //        nextCardInDeck = new Karte("10", "Herz", "Herz 10");
+        boolean cardGotScanned = false;
         for (int i = 0; i < 10; i++) {
             BufferedImage bufferedImage = camera.captureImage();
 
@@ -418,6 +422,7 @@ public class GameService {
                         Karte karte = mapper.readValue(decodedText, Karte.class);
                         oldCard = karte;
                         nextCardInDeck = karte;
+                        cardGotScanned = true;
                         break;
                     } else {
                         System.out.println("QR-Code nicht gefunden");
@@ -429,6 +434,13 @@ public class GameService {
             } else {
                 System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
             }
+        }
+        if(!cardGotScanned){
+            resetGameChoice();
+            connected = connectionInput.isHigh();
+            gameHasEnded = (false);
+            gameChoiceReseted = false;
+            GameFX.setPlayerList(new ArrayList<String>());
         }
     }
 
@@ -727,6 +739,7 @@ public class GameService {
     }
 
     public boolean isConnected() {
+        connected = connectionInput.isHigh();
         return connected;
     }
 

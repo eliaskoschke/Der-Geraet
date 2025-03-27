@@ -17,6 +17,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -40,11 +41,12 @@ public class AdminPanel extends Application {
         Button karteAuswerfen = newStyledButton("Karte Auswerfen");
         Button kicken = newStyledButton("Alle Spieler Kicken");
         Button spielerMenu = newStyledButton("Dreh Menü");
+        Button endProgrammButton = newStyledButton("Programm beenden");
         Button motorConfig = newStyledButton("Auswerfmotor Konfigurieren");
         Button esc = newStyledButton("Zurück zum Menü");
 
         VBox buttonBox = new VBox(20);
-        buttonBox.getChildren().addAll(esc, karteAuswerfen, motorConfig, kicken, spielerMenu);
+        buttonBox.getChildren().addAll(esc, karteAuswerfen, motorConfig, kicken, spielerMenu, endProgrammButton);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(150));
         root.setTop(buttonBox);
@@ -107,6 +109,10 @@ public class AdminPanel extends Application {
             sendControllerDatabaseUpdate("rueckwaertsDauer", Integer.parseInt(rueckdauer.getText()));
         });
 
+        endProgrammButton.setOnAction(e -> {
+            endProgramm();
+        });
+
         standart.setOnAction(e -> {
             List<Integer> values = getDatabseDefaultValues();
 
@@ -152,9 +158,9 @@ public class AdminPanel extends Application {
             } else {
                 root.getChildren().removeAll();
 
-                buttonBox.getChildren().removeAll(kicken, spielerMenu);
+                buttonBox.getChildren().removeAll(kicken, spielerMenu, endProgrammButton);
                 motorMenu.getChildren().remove(motorConfig);
-                buttonBox.getChildren().addAll(motorConfig, kicken, spielerMenu);
+                buttonBox.getChildren().addAll(motorConfig, kicken, spielerMenu, endProgrammButton);
                 motorConfig.setText("Auswerfmotor Konfigurieren");
 
                 root.setTop(buttonBox);
@@ -171,6 +177,21 @@ public class AdminPanel extends Application {
         Platform.runLater(() -> {
             primaryStage.setFullScreen(true);
         });
+    }
+
+    private void endProgramm() {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet getRequest = new HttpGet(baseURL + "/admin/adminPanel/endProgramm");
+            getRequest.setHeader("Content-Type", "application/json");
+
+            System.out.println("Button wurde geklickt");
+            try (CloseableHttpResponse response = httpClient.execute(getRequest)) {
+                Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
+
+            }
+        } catch (Exception exception) {
+            exception.getStackTrace();
+        }
     }
 
     private void showNumberPad(TextField textField) {

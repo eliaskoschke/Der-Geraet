@@ -23,7 +23,17 @@ public class   Raspberry_Controller {
     static boolean isRegistering = true;
     static boolean gameHasAlreadyStartedOnce = false;
     static boolean isGameModePoker = false;
+    boolean running = true;
     //TODO: Umbennenen in Tisch Client
+
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
 
     public Raspberry_Controller(Context pi4j){
         this.pi4j = pi4j;
@@ -48,7 +58,7 @@ public class   Raspberry_Controller {
         buttonList.add(new PiButton(pi4j, "5"));
         buttonList.add(new PiButton(pi4j, "6"));
         Thread.sleep(5000);
-        while(true){
+        while(running){
             if(!isRegistering) {
                 gameHasAlreadyStartedOnce = true;
                 if(isGameModePoker){
@@ -96,7 +106,6 @@ public class   Raspberry_Controller {
             isRegistering = !gameHasStarted();
             Thread.sleep(100);
         }
-
     }
 
 

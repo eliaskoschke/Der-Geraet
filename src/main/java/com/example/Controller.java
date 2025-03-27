@@ -59,13 +59,14 @@ public class Controller {
     }
 
     @PostMapping("/user/playerLeftTheTable")
-    public ResponseMessage playerLeftTheTable(@RequestBody Message message) {
+    public ResponseMessage playerLeftTheTable(@RequestBody Message message) throws InterruptedException, CloneNotSupportedException {
         System.out.println("Nachricht erhalten: " + message.getMessage());
         List<String> playerIds = getListOfAllActiveID();
         if (playerIds.contains(message.getMessage())) {
             gameService.getListOfAllPlayers().removeIf(player -> player.getId().equals(message.getMessage()));
             playerIds = getListOfAllActiveID();
             System.out.println("Es sollte aus der Liste sein " + playerIds);
+            GameService.registerPlayer();
         }
         return new ResponseMessage("thanks");
     }
@@ -169,14 +170,21 @@ public class Controller {
     }
 
     @PostMapping("/admin/sendReset")
-    public ResponseMessage sendReset(@RequestBody Message postPassword) {
+    public ResponseMessage sendReset(@RequestBody Message postPassword) throws InterruptedException, CloneNotSupportedException {
         if(gameService.getListOfAllPlayers().size()>0) {
             System.out.println("reset wurde geklickt");
             gameService.setGameReset(true);
             gameService.setPlayerAtReset(numberOfAllPlayersInGame);
             gameService.getListOfAllPlayers().clear();
+            GameService.registerPlayer();
         }
         return new ResponseMessage("true");
+    }
+
+    @GetMapping("/admin/adminPanel/endProgramm")
+    public ResponseMessage endProgramm() throws JsonProcessingException {
+        System.exit(200);
+        return new ResponseMessage("");
     }
 
 //    @GetMapping("/admin/kickCurrentPlayer")
