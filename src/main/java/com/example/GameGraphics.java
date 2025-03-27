@@ -33,6 +33,10 @@ public class GameGraphics extends Application {
     private final int screenHeight = 600 ;
     private static Stage myStage;
 
+    public static Stage getMyStage() {
+        return myStage;
+    }
+
     // Variablen, um den Status der Button-Klicks zu speichern
     private static boolean isRestartClicked = false;
     private static boolean isMenuClicked = false;
@@ -196,10 +200,17 @@ public class GameGraphics extends Application {
         isMenuClicked = menuClicked;
     }
 
-    public void remove() {
+    public static void remove() {
         Platform.runLater(() -> {
             Stage stage = (Stage) cardTable.getScene().getWindow();
             stage.close();
+        });
+    }
+
+    public static void goBackToMenu(){
+        Platform.runLater(() -> {
+            GameFX gameFX = new GameFX();
+            gameFX.start(myStage);
         });
     }
 

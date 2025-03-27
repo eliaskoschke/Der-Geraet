@@ -38,7 +38,7 @@ public class GameService {
     static IKartenMotor cardMotor;
     static Karte oldCard = new Karte();
     static DigitalInput connectionInput;
-
+    static boolean cardGotScanned = false;
 
     private static Pair<Boolean, Integer> adminPanelRotateStepper = new Pair<>(false, 0);
 
@@ -87,10 +87,12 @@ public class GameService {
                 .name("Connection Input")
                 .id("Connection Input ID")
                 .address(MappingForAdress.getConnectionAdress()));
+        connected=connectionInput.isHigh();
         if(isConnected()) {
             startController(raspberryController);
             startGamePanel();
         }
+        checkForConnection();
     }
 
     public static void gameEnded() throws InterruptedException, TMCDeviceIsBusyException {
@@ -220,9 +222,31 @@ public class GameService {
             case BLACKJACK -> {
                 rotateStepperMotor(Integer.parseInt(currentPlayer.getId()));
                 executeCameraScan();
+                if(!cardGotScanned){
+                    resetGameChoice();
+                    connected = connectionInput.isHigh();
+                    gameHasEnded = (false);
+                    gameChoiceReseted = false;
+                    GameFX.setPlayerList(new ArrayList<String>());
+                    if(connected){
+                        GameGraphics.goBackToMenu();
+                    }
+                    return;
+                }
                 executeCardThrow();
                 giveCurrentPlayerNextCard();
                 checkForOldCard();
+                if(!cardGotScanned){
+                    resetGameChoice();
+                    connected = connectionInput.isHigh();
+                    gameHasEnded = (false);
+                    gameChoiceReseted = false;
+                    GameFX.setPlayerList(new ArrayList<String>());
+                    if(connected){
+                        GameGraphics.goBackToMenu();
+                    }
+                    return;
+                }
                 currentPlayer.countHand();
                 System.out.println(currentPlayer.getKartenhandWert());
                 if (currentPlayer.getKartenhandWert() >= 21) {
@@ -311,9 +335,31 @@ public class GameService {
                     while (dealer.getDealerHandWert() < 17) {
                         numberOfCardFaceup = numberOfCardFaceup + 1;
                         executeCameraScan();
+                        if(!cardGotScanned){
+                            resetGameChoice();
+                            connected = connectionInput.isHigh();
+                            gameHasEnded = (false);
+                            gameChoiceReseted = false;
+                            GameFX.setPlayerList(new ArrayList<String>());
+                            if(connected){
+                                GameGraphics.goBackToMenu();
+                            }
+                            return;
+                        }
                         executeCardThrow();
                         giveDealerNextCard();
                         checkForOldCard();
+                        if(!cardGotScanned){
+                            resetGameChoice();
+                            connected = connectionInput.isHigh();
+                            gameHasEnded = (false);
+                            gameChoiceReseted = false;
+                            GameFX.setPlayerList(new ArrayList<String>());
+                            if(connected){
+                                GameGraphics.goBackToMenu();
+                            }
+                            return;
+                        }
                         if (connected) {
                             gameGraphics.addCardToTable(dealer.getDealerHand().get(dealer.getDealerHand().size() - 1));
                         }
@@ -362,10 +408,32 @@ public class GameService {
                         rotateStepperMotor(13);
                         numberOfCardFaceup = 5;
                         executeCameraScan();
+                        if(!cardGotScanned){
+                            resetGameChoice();
+                            connected = connectionInput.isHigh();
+                            gameHasEnded = (false);
+                            gameChoiceReseted = false;
+                            GameFX.setPlayerList(new ArrayList<String>());
+                            if(connected){
+                                GameGraphics.goBackToMenu();
+                            }
+                            return;
+                        }
                         Thread.sleep(100);
                         executeCardThrow();
                         giveDealerNextCard();
                         checkForOldCard();
+                        if(!cardGotScanned){
+                            resetGameChoice();
+                            connected = connectionInput.isHigh();
+                            gameHasEnded = (false);
+                            gameChoiceReseted = false;
+                            GameFX.setPlayerList(new ArrayList<String>());
+                            if(connected){
+                                GameGraphics.goBackToMenu();
+                            }
+                            return;
+                        }
                         if (connected) {
                             gameGraphics.addCardToTable(dealer.getDealerHand().get(i));
                         }
@@ -376,9 +444,31 @@ public class GameService {
                     currenPlayerIndex = 0;
                     rotateStepperMotor(13);
                     executeCameraScan();
+                    if(!cardGotScanned){
+                        resetGameChoice();
+                        connected = connectionInput.isHigh();
+                        gameHasEnded = (false);
+                        gameChoiceReseted = false;
+                        GameFX.setPlayerList(new ArrayList<String>());
+                        if(connected){
+                            GameGraphics.goBackToMenu();
+                        }
+                        return;
+                    }
                     executeCardThrow();
                     giveDealerNextCard();
                     checkForOldCard();
+                    if(!cardGotScanned){
+                        resetGameChoice();
+                        connected = connectionInput.isHigh();
+                        gameHasEnded = (false);
+                        gameChoiceReseted = false;
+                        GameFX.setPlayerList(new ArrayList<String>());
+                        if(connected){
+                            GameGraphics.goBackToMenu();
+                        }
+                        return;
+                    }
                     if (connected) {
                         gameGraphics.addCardToTable(dealer.getDealerHand().get(dealer.getDealerHand().size() - 1));
                     }
@@ -410,7 +500,7 @@ public class GameService {
 
     private static void executeCameraScan() {
 //        nextCardInDeck = new Karte("10", "Herz", "Herz 10");
-        boolean cardGotScanned = false;
+        cardGotScanned = false;
         for (int i = 0; i < 10; i++) {
             BufferedImage bufferedImage = camera.captureImage();
 
@@ -435,13 +525,6 @@ public class GameService {
                 System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
             }
         }
-        if(!cardGotScanned){
-            resetGameChoice();
-            connected = connectionInput.isHigh();
-            gameHasEnded = (false);
-            gameChoiceReseted = false;
-            GameFX.setPlayerList(new ArrayList<String>());
-        }
     }
 
     private static void giveDealerNextCard() {
@@ -455,7 +538,7 @@ public class GameService {
 
     public static void checkForOldCard() throws InterruptedException {
         Karte karte = new Karte();
-
+        cardGotScanned = false;
         for (int i = 0; i < 10; i++) {
             BufferedImage bufferedImage = camera.captureImage();
 
@@ -465,6 +548,7 @@ public class GameService {
                     if (decodedText != null) {
                         System.out.println("Decoded text: " + decodedText);
                         karte = mapper.readValue(decodedText, Karte.class);
+                        cardGotScanned = true;
                         break;
                     } else {
                         System.out.println("QR-Code nicht gefunden");
@@ -476,24 +560,26 @@ public class GameService {
                 System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
             }
         }
-        while (oldCard.equals(karte)) {
-            executeCardThrow();
-            BufferedImage bufferedImage = camera.captureImage();
+        if(cardGotScanned) {
+            while (oldCard.equals(karte)) {
+                executeCardThrow();
+                BufferedImage bufferedImage = camera.captureImage();
 
-            if (bufferedImage != null) {
-                try {
-                    String decodedText = camera.decodeQRCode(bufferedImage);
-                    if (decodedText != null) {
-                        System.out.println("Decoded text: " + decodedText);
-                        karte = mapper.readValue(decodedText, Karte.class);
-                    } else {
-                        System.out.println("QR-Code nicht gefunden");
+                if (bufferedImage != null) {
+                    try {
+                        String decodedText = camera.decodeQRCode(bufferedImage);
+                        if (decodedText != null) {
+                            System.out.println("Decoded text: " + decodedText);
+                            karte = mapper.readValue(decodedText, Karte.class);
+                        } else {
+                            System.out.println("QR-Code nicht gefunden");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Fehler");
                     }
-                } catch (Exception e) {
-                    System.out.println("Fehler");
+                } else {
+                    System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
                 }
-            } else {
-                System.out.println("Fehler: Kein Bild von der Webcam erhalten.");
             }
         }
     }
@@ -508,10 +594,32 @@ public class GameService {
                 for (int i = 0; i < 2; i++) {
                     rotateStepperMotor(13);
                     executeCameraScan();
+                    if(!cardGotScanned){
+                        resetGameChoice();
+                        connected = connectionInput.isHigh();
+                        gameHasEnded = (false);
+                        gameChoiceReseted = false;
+                        GameFX.setPlayerList(new ArrayList<String>());
+                        if(connected){
+                            GameGraphics.goBackToMenu();
+                        }
+                        return;
+                    }
                     Thread.sleep(100);
                     executeCardThrow();
                     giveDealerNextCard();
                     checkForOldCard();
+                    if(!cardGotScanned){
+                        resetGameChoice();
+                        connected = connectionInput.isHigh();
+                        gameHasEnded = (false);
+                        gameChoiceReseted = false;
+                        GameFX.setPlayerList(new ArrayList<String>());
+                        if(connected){
+                            GameGraphics.goBackToMenu();
+                        }
+                        return;
+                    }
                     if (connected) {
                         if (i == 0)
                             gameGraphics.addCardToTable(dealer.getDealerHand().get(0));
@@ -527,10 +635,32 @@ public class GameService {
                     for (int i = 0; i < 2; i++) {
                         rotateStepperMotor(Integer.parseInt(currentPlayer.getId()));
                         executeCameraScan();
+                        if(!cardGotScanned){
+                            resetGameChoice();
+                            connected = connectionInput.isHigh();
+                            gameHasEnded = (false);
+                            gameChoiceReseted = false;
+                            GameFX.setPlayerList(new ArrayList<String>());
+                            if(connected){
+                                GameGraphics.goBackToMenu();
+                            }
+                            return;
+                        }
                         Thread.sleep(100);
                         executeCardThrow();
                         giveCurrentPlayerNextCard();
                         checkForOldCard();
+                        if(!cardGotScanned){
+                            resetGameChoice();
+                            connected = connectionInput.isHigh();
+                            gameHasEnded = (false);
+                            gameChoiceReseted = false;
+                            GameFX.setPlayerList(new ArrayList<String>());
+                            if(connected){
+                                GameGraphics.goBackToMenu();
+                            }
+                            return;
+                        }
                         System.out.println("Jetzt Karte entnehmen");
                         Thread.sleep(3000);
                     }
@@ -546,10 +676,32 @@ public class GameService {
                     for (int i = 0; i < 2; i++) {
                         rotateStepperMotor(Integer.parseInt(currentPlayer.getId()));
                         executeCameraScan();
+                        if(!cardGotScanned){
+                            resetGameChoice();
+                            connected = connectionInput.isHigh();
+                            gameHasEnded = (false);
+                            gameChoiceReseted = false;
+                            GameFX.setPlayerList(new ArrayList<String>());
+                            if(connected){
+                                GameGraphics.goBackToMenu();
+                            }
+                            break;
+                        }
                         Thread.sleep(100);
                         executeCardThrow();
                         giveCurrentPlayerNextCard();
                         checkForOldCard();
+                        if(!cardGotScanned){
+                            resetGameChoice();
+                            connected = connectionInput.isHigh();
+                            gameHasEnded = (false);
+                            gameChoiceReseted = false;
+                            GameFX.setPlayerList(new ArrayList<String>());
+                            if(connected){
+                                GameGraphics.goBackToMenu();
+                            }
+                            break;
+                        }
                         System.out.println("Jetzt Karte entnehmen");
                         Thread.sleep(3000);
                     }
@@ -612,6 +764,28 @@ public class GameService {
 
         turnHasEnded = false;
         restartTheCurrentGame();
+    }
+
+    private static void checkForConnection(){
+        new Thread(() -> {
+            while(true){
+                if(gameStarted == false && gameHasEnded == false) {
+                    if (connected != connectionInput.isHigh()) {
+                        connected = connectionInput.isHigh();
+                        resetGameChoice();
+                        connected = connectionInput.isHigh();
+                        gameHasEnded = (false);
+                        gameChoiceReseted = false;
+                        GameFX.setPlayerList(new ArrayList<String>());
+                    }
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
     }
 
     public boolean isGameChoiceReseted() {
@@ -739,7 +913,6 @@ public class GameService {
     }
 
     public boolean isConnected() {
-        connected = connectionInput.isHigh();
         return connected;
     }
 
@@ -785,12 +958,16 @@ public class GameService {
         currenPlayerIndex = 0;
 
         dealer = new Computer();
+
+
     }
 
     public static void resetGameChoice() {
         adminPanelRotateStepper = new Pair<>(false, 0);
 
         adminPanelCardThrowActivated = false;
+
+        gameReset = true;
 
         mapOfAllWinners = new HashMap<>();
 

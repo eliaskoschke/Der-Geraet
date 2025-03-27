@@ -223,7 +223,7 @@ public class AdminPanel extends Application {
         VBox vBox = new VBox(gridPane);
         popup.getContent().add(vBox);
         popup.setAutoHide(false); // Setze AutoHide auf false, damit es nicht automatisch geschlossen wird
-        popup.show(textField.getScene().getWindow(), textField.getLayoutX() + textField.getWidth() - 150, 250);
+        popup.show(textField.getScene().getWindow(), textField.getLayoutX() + textField.getWidth() +50, 220);
 
         // Füge einen Listener hinzu, um das Popup zu schließen, wenn ein anderes Feld fokussiert wird
         textField.focusedProperty().addListener((observable, oldValue, newValue) -> {

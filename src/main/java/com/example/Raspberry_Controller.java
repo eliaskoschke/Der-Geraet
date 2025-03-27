@@ -216,7 +216,7 @@ public class   Raspberry_Controller {
                 }
             }
         } catch (Exception exception) {
-            exception.printStackTrace();
+            //exception.printStackTrace();
             return false;
         }
         return false;
