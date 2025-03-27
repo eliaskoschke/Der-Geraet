@@ -9,10 +9,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -23,7 +25,6 @@ import org.apache.http.util.EntityUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class AdminPanel extends Application {
     private static final String BACKGROUND_COLOR = "rgb(36, 43, 66)";
@@ -72,10 +73,19 @@ public class AdminPanel extends Application {
         Text t5 = newStyledText("Dauer rückwärts");
 
         TextField vorspeed = newStyledTextField(String.valueOf(getDatabaseValuesByName("vorwaertsGeschwindigkeit")));
+        vorspeed.setOnMouseClicked(e -> showNumberPad(vorspeed));
+
         TextField vordauer = newStyledTextField(String.valueOf(getDatabaseValuesByName("vorwaertsDauer")));
+        vordauer.setOnMouseClicked(e -> showNumberPad(vordauer));
+
         TextField pause = newStyledTextField(String.valueOf(getDatabaseValuesByName("pauseDauer")));
+        pause.setOnMouseClicked(e -> showNumberPad(pause));
+
         TextField rueckspeed = newStyledTextField(String.valueOf(getDatabaseValuesByName("rueckwaertsGeschwindigkeit")));
+        rueckspeed.setOnMouseClicked(e -> showNumberPad(rueckspeed));
+
         TextField rueckdauer = newStyledTextField(String.valueOf(getDatabaseValuesByName("rueckwaertsDauer")));
+        rueckdauer.setOnMouseClicked(e -> showNumberPad(rueckdauer));
 
         Button speichern = newStyledButton("Speichern");
         Button standart = newStyledButton("Standartwerte");
@@ -159,9 +169,46 @@ public class AdminPanel extends Application {
         primaryStage.show();
 
         Platform.runLater(() -> {
-//            primaryStage.setWidth(1024);
-//            primaryStage.setHeight(600);
             primaryStage.setFullScreen(true);
+        });
+    }
+
+    private void showNumberPad(TextField textField) {
+        Popup popup = new Popup();
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+
+        for (int i = 0; i < 10; i++) {
+            Button button = newStyledButton(String.valueOf(i));
+            button.setPrefSize(60, 60); // Größe der Buttons anpassen
+            button.setOnAction(e -> {
+                textField.setText(textField.getText() + button.getText());
+            });
+            gridPane.add(button, i % 3, i / 3);
+        }
+
+        // Hinzufügen des "<-" Buttons
+        Button backspaceButton = newStyledButton("<-");
+        backspaceButton.setPrefSize(60, 60);
+        backspaceButton.setOnAction(e -> {
+            String currentText = textField.getText();
+            if (!currentText.isEmpty()) {
+                textField.setText(currentText.substring(0, currentText.length() - 1));
+            }
+        });
+        gridPane.add(backspaceButton, 2, 3); // Ändere die Positionierung des Buttons im GridPane
+
+        VBox vBox = new VBox(gridPane);
+        popup.getContent().add(vBox);
+        popup.setAutoHide(false); // Setze AutoHide auf false, damit es nicht automatisch geschlossen wird
+        popup.show(textField.getScene().getWindow(), textField.getLayoutX() + textField.getWidth() - 150, 250);
+
+        // Füge einen Listener hinzu, um das Popup zu schließen, wenn ein anderes Feld fokussiert wird
+        textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                popup.hide();
+            }
         });
     }
 
@@ -172,7 +219,6 @@ public class AdminPanel extends Application {
         for (int i = 0; i < namen.length; i++) {
 
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                //Todo: Warum hast du das so gemacht? Mach doch einfach ein Message Objekt du Idiot
                 String message = "{\"message\":\"" + namen[i] + "\"}";
 
                 HttpPost postRequest = new HttpPost(baseURL + "/admin/adminPanel/getDatabaseValuesByName");
@@ -180,9 +226,7 @@ public class AdminPanel extends Application {
 
                 postRequest.setEntity(new StringEntity(message));
                 System.out.println("Button wurde geklickt");
-                // Sende die POST-Anfrage und erhalte die Antwort
                 try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
-                    // Überprüfe den Status der Antwort und verarbeite sie
                     Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
                     valueList.add(Integer.parseInt(responseMessage.getMessage()));
                 }
@@ -196,7 +240,6 @@ public class AdminPanel extends Application {
     private static int getDatabaseValuesByName(String name){
         int value = 0;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            //Todo: Warum hast du das so gemacht? Mach doch einfach ein Message Objekt du Idiot
             String message = "{\"message\":\"" + name + "\"}";
 
             HttpPost postRequest = new HttpPost(baseURL + "/admin/adminPanel/getDatabaseValuesByName");
@@ -204,9 +247,7 @@ public class AdminPanel extends Application {
 
             postRequest.setEntity(new StringEntity(message));
             System.out.println("Button wurde geklickt");
-            // Sende die POST-Anfrage und erhalte die Antwort
             try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
-                // Überprüfe den Status der Antwort und verarbeite sie
                 Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
                 value = Integer.parseInt(responseMessage.getMessage());
             }
@@ -219,7 +260,6 @@ public class AdminPanel extends Application {
     private static void sendControllerDatabaseUpdate(String name, int wert) {
         String postMessage = name+"-"+String.valueOf(wert);
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            //Todo: Warum hast du das so gemacht? Mach doch einfach ein Message Objekt du Idiot
             String message = "{\"message\":\"" + postMessage + "\"}";
 
             HttpPost postRequest = new HttpPost(baseURL + "/admin/adminPanel/saveUpdateInDatabase");
@@ -227,9 +267,7 @@ public class AdminPanel extends Application {
 
             postRequest.setEntity(new StringEntity(message));
             System.out.println("Button wurde geklickt");
-            // Sende die POST-Anfrage und erhalte die Antwort
             try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
-                // Überprüfe den Status der Antwort und verarbeite sie
                 Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
 
             }
@@ -240,7 +278,6 @@ public class AdminPanel extends Application {
 
     private static void rotateStepper(int id){
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            //Todo: Warum hast du das so gemacht? Mach doch einfach ein Message Objekt du Idiot
             String message = "{\"message\":\"" + id + "\"}";
 
             HttpPost postRequest = new HttpPost(baseURL + "/admin/adminPanel/rotateStepper");
@@ -248,9 +285,7 @@ public class AdminPanel extends Application {
 
             postRequest.setEntity(new StringEntity(message));
             System.out.println("Button wurde geklickt");
-            // Sende die POST-Anfrage und erhalte die Antwort
             try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
-                // Überprüfe den Status der Antwort und verarbeite sie
                 Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
 
             }
@@ -261,7 +296,6 @@ public class AdminPanel extends Application {
 
     private static void giveCard() {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            //Todo: Warum hast du das so gemacht? Mach doch einfach ein Message Objekt du Idiot
             String message = "{\"message\":\"\"}";
 
             HttpPost postRequest = new HttpPost(baseURL + "/admin/adminPanel/activateCardMotor");
@@ -269,9 +303,7 @@ public class AdminPanel extends Application {
 
             postRequest.setEntity(new StringEntity(message));
             System.out.println("Button wurde geklickt");
-            // Sende die POST-Anfrage und erhalte die Antwort
             try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
-                // Überprüfe den Status der Antwort und verarbeite sie
                 Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
 
             }
@@ -282,7 +314,6 @@ public class AdminPanel extends Application {
 
     private static void kickAllPlayers() {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            //Todo: Warum hast du das so gemacht? Mach doch einfach ein Message Objekt du Idiot
             String message = "{\"message\":\"\"}";
 
             HttpPost postRequest = new HttpPost(baseURL + "/admin/sendReset");
@@ -290,9 +321,7 @@ public class AdminPanel extends Application {
 
             postRequest.setEntity(new StringEntity(message));
             System.out.println("Button wurde geklickt");
-            // Sende die POST-Anfrage und erhalte die Antwort
             try (CloseableHttpResponse response = httpClient.execute(postRequest)) {
-                // Überprüfe den Status der Antwort und verarbeite sie
                 Message responseMessage = mapper.readValue(EntityUtils.toString(response.getEntity()), Message.class);
 
             }
@@ -306,7 +335,7 @@ public class AdminPanel extends Application {
         String css = """
                     -fx-background-color: rgb(70, 103, 210);
                     -fx-text-fill: white;
-                    -fx-font-size: 23px;
+                    -fx-font-size: 21px;
                     -fx-font-weight: Bold;
                     -fx-max-height: 275px;
                     -fx-max-width: 350px;

@@ -130,7 +130,7 @@ public class GameGraphics extends Application {
 
             Label resultLabel = new Label(resultText.toString());
             resultLabel.setTextFill(Color.WHITE);
-            resultLabel.setFont(new Font("Arial", 50));
+            resultLabel.setFont(new Font("Arial", 45));
             resultLabel.setTextAlignment(TextAlignment.CENTER);
 
             Button restartButton = new Button("Spiel Neustarten");
@@ -144,7 +144,7 @@ public class GameGraphics extends Application {
             final String STYLE = """
                     -fx-background-color: rgb(70, 103, 210);
                     -fx-text-fill: white;
-                    -fx-font-size: 30px; // Schriftgröße erhöht
+                    -fx-font-size: 25px; // Schriftgröße erhöht
                     -fx-font-weight: Bold;
                     -fx-min-width: 150px; // Breite erhöht
                     -fx-min-height: 80px; // Höhe erhöht
