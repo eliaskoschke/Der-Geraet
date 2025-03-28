@@ -205,6 +205,14 @@ public class GameService {
             } else {
                 if (playerID >= 4 && playerID <= 6) {
                     angle = (-25 * playerID) - 17;
+                } else{
+                    if(playerID >= 7 && playerID <= 9){
+                        angle = (-25 * (playerID - 7)) - 192;
+                    } else{
+                        if(playerID >= 10 && playerID <= 12){
+                            angle = (-25 * (playerID-6)) - 197;
+                        }
+                    }
                 }
             }
 
@@ -328,7 +336,7 @@ public class GameService {
                 }
                 System.out.println("Karte wurde hinzugefügt");
                 dealer.countHand();
-                Thread.sleep(5000);
+                Thread.sleep(3000);
                 if (listOfAllPlayers.isEmpty() && !someOneStartedWithBlackJack) {
 
                 } else {
@@ -364,7 +372,7 @@ public class GameService {
                             gameGraphics.addCardToTable(dealer.getDealerHand().get(dealer.getDealerHand().size() - 1));
                         }
                         dealer.countHand();
-                        Thread.sleep(5000);
+                        Thread.sleep(3000);
                     }
                 }
                 int dealerHandWert = dealer.getDealerHandWert();
@@ -501,7 +509,7 @@ public class GameService {
     private static void executeCameraScan() {
 //        nextCardInDeck = new Karte("10", "Herz", "Herz 10");
         cardGotScanned = false;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             BufferedImage bufferedImage = camera.captureImage();
 
             if (bufferedImage != null) {
@@ -539,7 +547,7 @@ public class GameService {
     public static void checkForOldCard() throws InterruptedException {
         Karte karte = new Karte();
         cardGotScanned = false;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             BufferedImage bufferedImage = camera.captureImage();
 
             if (bufferedImage != null) {
@@ -627,7 +635,7 @@ public class GameService {
                             gameGraphics.addBeginningCards();
                     }
                     System.out.println("Jetzt Karte entnehmen");
-                    Thread.sleep(3000);
+                    Thread.sleep(1000);
                 }
                 System.out.println("Jetzt sijnnd die Spieler dran");
                 for (Player player : listOfAllPlayers) {
@@ -662,7 +670,7 @@ public class GameService {
                             return;
                         }
                         System.out.println("Jetzt Karte entnehmen");
-                        Thread.sleep(3000);
+                        Thread.sleep(1000);
                     }
                 }
                 buttonClickedOnce = false;
@@ -703,7 +711,7 @@ public class GameService {
                             break;
                         }
                         System.out.println("Jetzt Karte entnehmen");
-                        Thread.sleep(3000);
+                        Thread.sleep(1000);
                     }
                 }
                 currentPlayer = new Player("0");
