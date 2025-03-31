@@ -52,6 +52,7 @@ public class Controller {
         //gameService.buttonClicked();
         List<String> playerIds = getListOfAllActiveID();
         if (!playerIds.contains(message.getMessage())) {
+            GameService.registerPlayer();
             gameService.getListOfAllPlayers().add(new Player(message.getMessage()));
             return new ResponseMessage("true");
         }
