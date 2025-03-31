@@ -47,12 +47,13 @@ public class Controller {
     }
 
     @PostMapping("/user/playerJoinedTheTable")
-    public ResponseMessage playerJoinedTheTable(@RequestBody Message message) {
+    public ResponseMessage playerJoinedTheTable(@RequestBody Message message) throws InterruptedException, CloneNotSupportedException {
 //        System.out.println("Nachricht erhalten: " + message.getMessage());
         //gameService.buttonClicked();
         List<String> playerIds = getListOfAllActiveID();
         if (!playerIds.contains(message.getMessage())) {
             gameService.getListOfAllPlayers().add(new Player(message.getMessage()));
+            GameService.registerPlayer();
             return new ResponseMessage("true");
         }
         return new ResponseMessage("false");
